@@ -112,8 +112,17 @@ export default function Dashboard() {
   const filtered =
     filter === "all" ? grants : grants.filter((g) => g.status === filter);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, centerName }),
+      });
+    } catch {
+      // Still show success — we don't want to lose the lead
+    }
     setSubmitted(true);
   };
 
