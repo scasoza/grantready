@@ -1,25 +1,6 @@
 import Link from "next/link";
-import {
-  grants,
-  tierLabels,
-  type GrantTier,
-} from "@/lib/grants";
-
-const tiers: GrantTier[] = ["essential", "growth", "staff", "foundation"];
-
-const tierAccent: Record<GrantTier, string> = {
-  essential: "border-l-green-500",
-  growth: "border-l-blue-500",
-  staff: "border-l-violet-500",
-  foundation: "border-l-amber-500",
-};
-
-const tierDot: Record<GrantTier, string> = {
-  essential: "bg-green-500",
-  growth: "bg-blue-500",
-  staff: "bg-violet-500",
-  foundation: "bg-amber-500",
-};
+import { grants } from "@/lib/grants";
+import GrantExplorer from "./grant-explorer";
 
 export default function Home() {
   return (
@@ -147,71 +128,7 @@ export default function Home() {
       </section>
 
       {/* Grant database — the real product preview */}
-      <section
-        id="grants"
-        className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-20"
-      >
-        <div className="max-w-3xl mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-bold text-warm-900 mb-2">
-            {grants.length} programs we track in Texas
-          </h2>
-          <p className="text-sm text-warm-400">
-            Government agencies and private foundations. Organized by
-            how much they matter to your bottom line.
-          </p>
-        </div>
-
-        {tiers.map((tier) => {
-          const tierGrants = grants.filter((g) => g.tier === tier);
-          return (
-            <div key={tier} className="mb-7 sm:mb-9">
-              <div className="flex items-center gap-2.5 mb-2.5">
-                <span
-                  className={`w-2 h-2 rounded-full ${tierDot[tier]}`}
-                />
-                <h3 className="text-xs font-semibold text-warm-700 uppercase tracking-wide">
-                  {tierLabels[tier]}
-                </h3>
-                <span className="text-xs text-warm-300">{tierGrants.length}</span>
-              </div>
-              <div className="space-y-1.5">
-                {tierGrants.map((grant) => (
-                  <div
-                    key={grant.id}
-                    className={`bg-white rounded-lg border border-warm-200/80 border-l-[3px] ${tierAccent[tier]} px-4 py-3 sm:py-3.5 hover:shadow-sm transition`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <h4 className="text-sm font-semibold text-warm-900 leading-snug">
-                          {grant.name}
-                        </h4>
-                        <p className="text-xs text-warm-400 mt-0.5">
-                          {grant.source}
-                          {grant.recurring && (
-                            <span className="text-blue-500 font-medium">
-                              {" "}&middot; Recurring
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                      <span className="text-brand-700 font-bold text-xs sm:text-sm whitespace-nowrap mt-0.5">
-                        {grant.amount}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-
-        <Link
-          href="/dashboard"
-          className="inline-block bg-brand-600 hover:bg-brand-700 text-white px-7 py-3.5 rounded-xl font-semibold transition shadow-md shadow-brand-600/20 text-sm mt-4"
-        >
-          See full details and eligibility
-        </Link>
-      </section>
+      <GrantExplorer />
 
       {/* Pricing — straightforward, no "one plan no surprises" filler */}
       <section id="pricing" className="border-y border-warm-200/60 bg-white">

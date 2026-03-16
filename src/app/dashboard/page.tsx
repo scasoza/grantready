@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   grants,
@@ -37,6 +38,15 @@ const diffStyle: Record<string, string> = {
 type FilterType = "all" | GrantTier;
 
 export default function Dashboard() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
+  );
+}
+
+function DashboardContent() {
+  const searchParams = useSearchParams();
   const [showSignup, setShowSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [centerName, setCenterName] = useState("");
@@ -46,6 +56,21 @@ export default function Dashboard() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const grantParam = searchParams.get("grant");
+    if (grantParam) {
+      const id = Number(grantParam);
+      if (!isNaN(id)) {
+        setExpandedId(id);
+        // Scroll to the grant after a short delay for render
+        setTimeout(() => {
+          const el = document.getElementById(`grant-${id}`);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
+      }
+    }
+  }, [searchParams]);
 
   const filtered = grants
     .filter((g) => filter === "all" || g.tier === filter)
@@ -177,6 +202,7 @@ export default function Dashboard() {
             return (
               <div
                 key={grant.id}
+                id={`grant-${grant.id}`}
                 className="bg-white border border-warm-200/80 rounded-xl overflow-hidden hover:shadow-sm transition"
               >
                 <button

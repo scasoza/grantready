@@ -1,6 +1,48 @@
 export type GrantTier = "essential" | "growth" | "staff" | "foundation";
 export type GrantStatus = "open" | "upcoming" | "ongoing";
 
+export interface EligibilityCriteria {
+  licensed?: boolean;
+  servesMeals?: boolean;
+  ccsEnrolled?: boolean;
+  minTrsStars?: number;
+  familyChildcare?: boolean;
+  rural?: boolean;
+  maxEmployees?: number;
+  nonprofit?: boolean;
+  metroAreas?: string[];
+  servesUnder5?: boolean;
+}
+
+export interface CenterInfo {
+  licensed: boolean;
+  servesMeals: boolean;
+  ccsEnrolled: boolean;
+  trsStars: number;
+  isFamilyChildcare: boolean;
+  isRural: boolean;
+  employeeCount: number;
+  isNonprofit: boolean;
+  metroArea: string;
+  servesUnder5: boolean;
+}
+
+export function checkEligibility(center: CenterInfo, grant: Grant): boolean {
+  const c = grant.criteria;
+  if (!c) return true; // no criteria = everyone qualifies
+  if (c.licensed && !center.licensed) return false;
+  if (c.servesMeals && !center.servesMeals) return false;
+  if (c.ccsEnrolled && !center.ccsEnrolled) return false;
+  if (c.minTrsStars && center.trsStars < c.minTrsStars) return false;
+  if (c.familyChildcare && !center.isFamilyChildcare) return false;
+  if (c.rural && !center.isRural) return false;
+  if (c.maxEmployees && center.employeeCount > c.maxEmployees) return false;
+  if (c.nonprofit && !center.isNonprofit) return false;
+  if (c.metroAreas && c.metroAreas.length > 0 && !c.metroAreas.includes(center.metroArea)) return false;
+  if (c.servesUnder5 && !center.servesUnder5) return false;
+  return true;
+}
+
 export interface Grant {
   id: number;
   name: string;
@@ -13,6 +55,7 @@ export interface Grant {
   status: GrantStatus;
   difficulty: "Easy" | "Medium" | "Hard";
   recurring: boolean;
+  criteria?: EligibilityCriteria;
 }
 
 export const tierLabels: Record<GrantTier, string> = {
@@ -48,6 +91,7 @@ export const grants: Grant[] = [
     status: "ongoing",
     difficulty: "Easy",
     recurring: true,
+    criteria: { licensed: true, servesMeals: true },
   },
   {
     id: 2,
@@ -62,6 +106,7 @@ export const grants: Grant[] = [
     status: "ongoing",
     difficulty: "Easy",
     recurring: true,
+    criteria: { licensed: true },
   },
   {
     id: 3,
@@ -76,6 +121,7 @@ export const grants: Grant[] = [
     status: "ongoing",
     difficulty: "Medium",
     recurring: true,
+    criteria: { licensed: true, ccsEnrolled: true },
   },
 
   // === GROWTH & IMPROVEMENT ===
@@ -92,6 +138,7 @@ export const grants: Grant[] = [
     status: "open",
     difficulty: "Hard",
     recurring: false,
+    criteria: { licensed: true, ccsEnrolled: true, minTrsStars: 3 },
   },
   {
     id: 5,
@@ -106,6 +153,7 @@ export const grants: Grant[] = [
     status: "open",
     difficulty: "Easy",
     recurring: false,
+    criteria: { familyChildcare: true },
   },
   {
     id: 6,
@@ -120,6 +168,7 @@ export const grants: Grant[] = [
     status: "upcoming",
     difficulty: "Hard",
     recurring: true,
+    criteria: { servesUnder5: true },
   },
   {
     id: 7,
@@ -134,6 +183,7 @@ export const grants: Grant[] = [
     status: "open",
     difficulty: "Medium",
     recurring: false,
+    criteria: { licensed: true, rural: true },
   },
   {
     id: 8,
@@ -148,6 +198,7 @@ export const grants: Grant[] = [
     status: "ongoing",
     difficulty: "Easy",
     recurring: true,
+    criteria: { maxEmployees: 100 },
   },
   {
     id: 9,
@@ -162,6 +213,7 @@ export const grants: Grant[] = [
     status: "open",
     difficulty: "Medium",
     recurring: false,
+    criteria: { licensed: true },
   },
 
   // === STAFF DEVELOPMENT ===
@@ -178,6 +230,7 @@ export const grants: Grant[] = [
     status: "ongoing",
     difficulty: "Easy",
     recurring: true,
+    criteria: { licensed: true },
   },
   {
     id: 11,
@@ -192,6 +245,7 @@ export const grants: Grant[] = [
     status: "upcoming",
     difficulty: "Easy",
     recurring: false,
+    criteria: { licensed: true, minTrsStars: 1 },
   },
   {
     id: 12,
@@ -206,6 +260,7 @@ export const grants: Grant[] = [
     status: "upcoming",
     difficulty: "Hard",
     recurring: false,
+    criteria: { servesUnder5: true },
   },
 
   // === PRIVATE FOUNDATIONS ===
@@ -222,6 +277,7 @@ export const grants: Grant[] = [
     status: "open",
     difficulty: "Medium",
     recurring: false,
+    criteria: { licensed: true },
   },
   {
     id: 14,
@@ -236,6 +292,7 @@ export const grants: Grant[] = [
     status: "open",
     difficulty: "Medium",
     recurring: false,
+    criteria: { licensed: true },
   },
   {
     id: 15,
@@ -250,6 +307,7 @@ export const grants: Grant[] = [
     status: "open",
     difficulty: "Medium",
     recurring: false,
+    criteria: { licensed: true, metroAreas: ["Houston", "Austin", "Dallas"] },
   },
   {
     id: 16,
@@ -264,5 +322,6 @@ export const grants: Grant[] = [
     status: "open",
     difficulty: "Hard",
     recurring: false,
+    criteria: { nonprofit: true, metroAreas: ["Fort Worth", "Dallas"] },
   },
 ];
