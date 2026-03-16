@@ -2,98 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import {
+  grants,
+  tierLabels,
+  type GrantTier,
+  type GrantStatus,
+} from "@/lib/grants";
 
-const grants = [
-  {
-    id: 1,
-    name: "T3C Readiness Grants",
-    source: "TWC / TACFS",
-    amount: "Varies by project",
-    deadline: "Next cycle: TBD",
-    eligibility: "Licensed residential childcare providers",
-    description:
-      "Supports readiness activities to meet T3C service array credentialing requirements.",
-    status: "open" as const,
-    difficulty: "Medium",
-  },
-  {
-    id: 2,
-    name: "Pre-K Partnership Grants",
-    source: "Texas Workforce Commission",
-    amount: "Up to $25,000",
-    deadline: "Check TWC for current cycle",
-    eligibility: "Texas Rising Star 3- or 4-Star rated providers",
-    description:
-      "Start-up costs for new pre-k partnership classrooms in collaboration with school districts.",
-    status: "open" as const,
-    difficulty: "Hard",
-  },
-  {
-    id: 3,
-    name: "CACFP Meal Reimbursement",
-    source: "USDA / Texas Dept of Agriculture",
-    amount: "Per-meal reimbursement",
-    deadline: "Open enrollment",
-    eligibility: "Licensed childcare centers serving qualifying children",
-    description:
-      "Federal reimbursement for nutritious meals and snacks served to enrolled children.",
-    status: "open" as const,
-    difficulty: "Easy",
-  },
-  {
-    id: 4,
-    name: "Texas Rising Star Quality Incentives",
-    source: "Texas Workforce Commission",
-    amount: "Tiered by star level",
-    deadline: "Ongoing",
-    eligibility: "Licensed centers accepting subsidized children",
-    description:
-      "Financial incentives for meeting quality benchmarks in teacher qualifications, curriculum, and environment.",
-    status: "open" as const,
-    difficulty: "Medium",
-  },
-  {
-    id: 5,
-    name: "FCCN Start-Up Mini-Grants",
-    source: "TX Family Child Care Network / TWC",
-    amount: "Up to $15,000",
-    deadline: "Until 200 recipients funded",
-    eligibility: "New or advancing family childcare providers",
-    description:
-      "Supports new family childcare providers seeking registration or licensure.",
-    status: "open" as const,
-    difficulty: "Easy",
-  },
-  {
-    id: 6,
-    name: "CDA Scholarship Program",
-    source: "Workforce Solutions (regional)",
-    amount: "Full tuition + books",
-    deadline: "Feb 2027 (next cycle)",
-    eligibility: "Staff at Texas Rising Star certified centers",
-    description:
-      "Covers cost of Child Development Associate credential coursework and materials.",
-    status: "upcoming" as const,
-    difficulty: "Easy",
-  },
-  {
-    id: 7,
-    name: "Preschool Development Grant (PDG B-5)",
-    source: "Federal HHS / TWC",
-    amount: "Varies",
-    deadline: "State-administered",
-    eligibility: "Programs serving birth through age 5",
-    description:
-      "Federal funding to improve coordination and quality of early childhood programs statewide.",
-    status: "upcoming" as const,
-    difficulty: "Hard",
-  },
-];
-
-const statusColors = {
+const statusColors: Record<GrantStatus, string> = {
   open: "bg-emerald-900/50 text-emerald-400",
   upcoming: "bg-amber-900/50 text-amber-400",
-  closed: "bg-red-900/50 text-red-400",
+  ongoing: "bg-blue-900/50 text-blue-400",
 };
 
 const difficultyColors: Record<string, string> = {
@@ -102,15 +21,36 @@ const difficultyColors: Record<string, string> = {
   Hard: "text-red-400",
 };
 
+const tierBadgeColors: Record<GrantTier, string> = {
+  essential: "bg-emerald-900/60 text-emerald-400",
+  growth: "bg-blue-900/60 text-blue-400",
+  staff: "bg-purple-900/60 text-purple-400",
+  foundation: "bg-amber-900/60 text-amber-400",
+};
+
+type FilterType = "all" | GrantTier;
+
 export default function Dashboard() {
   const [showSignup, setShowSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [centerName, setCenterName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [filter, setFilter] = useState<"all" | "open" | "upcoming">("all");
+  const [filter, setFilter] = useState<FilterType>("all");
+  const [search, setSearch] = useState("");
 
-  const filtered =
-    filter === "all" ? grants : grants.filter((g) => g.status === filter);
+  const filtered = grants
+    .filter((g) => filter === "all" || g.tier === filter)
+    .filter(
+      (g) =>
+        search === "" ||
+        g.name.toLowerCase().includes(search.toLowerCase()) ||
+        g.description.toLowerCase().includes(search.toLowerCase()) ||
+        g.source.toLowerCase().includes(search.toLowerCase())
+    );
+
+  const totalRecurring = grants.filter((g) => g.recurring).length;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,10 +58,10 @@ export default function Dashboard() {
       await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, centerName }),
+        body: JSON.stringify({ email, centerName, phone, zipCode }),
       });
     } catch {
-      // Still show success — we don't want to lose the lead
+      // Still show success
     }
     setSubmitted(true);
   };
@@ -136,80 +76,146 @@ export default function Dashboard() {
           onClick={() => setShowSignup(true)}
           className="text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg transition"
         >
-          Sign Up for Free Trial
+          Start Free Trial
         </button>
       </nav>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-bold">Grant Dashboard</h1>
-            <p className="text-gray-400 text-sm mt-1">
-              Texas childcare grants — {grants.length} opportunities tracked
-            </p>
+        {/* Header stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+            <div className="text-2xl font-bold text-emerald-400">
+              {grants.length}
+            </div>
+            <div className="text-xs text-gray-400">Programs Tracked</div>
           </div>
-          <div className="flex gap-2">
-            {(["all", "open", "upcoming"] as const).map((f) => (
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+            <div className="text-2xl font-bold text-blue-400">
+              {totalRecurring}
+            </div>
+            <div className="text-xs text-gray-400">Recurring Funding</div>
+          </div>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+            <div className="text-2xl font-bold text-emerald-400">
+              {grants.filter((g) => g.status === "open").length}
+            </div>
+            <div className="text-xs text-gray-400">Open Now</div>
+          </div>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+            <div className="text-2xl font-bold text-amber-400">
+              {grants.filter((g) => g.status === "upcoming").length}
+            </div>
+            <div className="text-xs text-gray-400">Upcoming</div>
+          </div>
+        </div>
+
+        {/* Search + Filters */}
+        <div className="flex flex-col md:flex-row gap-3 mb-6">
+          <input
+            type="text"
+            placeholder="Search grants..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 bg-gray-900 border border-gray-800 rounded-lg px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-600 text-sm"
+          />
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => setFilter("all")}
+              className={`px-3 py-2 rounded-lg text-xs transition ${
+                filter === "all"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-gray-800 text-gray-400 hover:text-white"
+              }`}
+            >
+              All ({grants.length})
+            </button>
+            {(
+              ["essential", "growth", "staff", "foundation"] as GrantTier[]
+            ).map((tier) => (
               <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-lg text-sm capitalize transition ${
-                  filter === f
+                key={tier}
+                onClick={() => setFilter(tier)}
+                className={`px-3 py-2 rounded-lg text-xs transition ${
+                  filter === tier
                     ? "bg-emerald-600 text-white"
                     : "bg-gray-800 text-gray-400 hover:text-white"
                 }`}
               >
-                {f} {f === "all" ? `(${grants.length})` : `(${grants.filter((g) => g.status === f).length})`}
+                {tierLabels[tier]} (
+                {grants.filter((g) => g.tier === tier).length})
               </button>
             ))}
           </div>
         </div>
 
-        <div className="grid gap-4">
+        {/* Recommended banner */}
+        {filter === "all" && search === "" && (
+          <div className="bg-emerald-950/40 border border-emerald-800 rounded-xl p-4 mb-6">
+            <p className="text-sm text-emerald-300">
+              <span className="font-semibold">Start here:</span> The top 3
+              &ldquo;Essential Revenue&rdquo; grants are ongoing funding streams
+              that every licensed Texas center should apply for. CACFP alone can
+              bring in $30K–$60K/year for a 60-child center.
+            </p>
+          </div>
+        )}
+
+        {/* Grant list */}
+        <div className="grid gap-3">
           {filtered.map((grant) => (
             <div
               key={grant.id}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-emerald-800 transition"
+              className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition"
             >
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-3">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-white">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <h3 className="text-base font-semibold text-white">
                       {grant.name}
                     </h3>
                     <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${statusColors[grant.status]}`}
+                      className={`text-[10px] px-2 py-0.5 rounded-full ${statusColors[grant.status]}`}
                     >
                       {grant.status}
                     </span>
                     <span
-                      className={`text-xs ${difficultyColors[grant.difficulty]}`}
+                      className={`text-[10px] px-2 py-0.5 rounded-full ${tierBadgeColors[grant.tier]}`}
+                    >
+                      {tierLabels[grant.tier]}
+                    </span>
+                    {grant.recurring && (
+                      <span className="text-[10px] bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded-full">
+                        Recurring
+                      </span>
+                    )}
+                    <span
+                      className={`text-[10px] ${difficultyColors[grant.difficulty]}`}
                     >
                       {grant.difficulty}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-400 mb-3">
+                  <p className="text-sm text-gray-400 mb-2">
                     {grant.description}
                   </p>
-                  <div className="flex flex-wrap gap-2 text-xs">
-                    <span className="bg-gray-800 text-gray-300 px-2 py-1 rounded">
+                  <div className="flex flex-wrap gap-1.5 text-[11px]">
+                    <span className="bg-gray-800 text-gray-300 px-2 py-0.5 rounded">
                       {grant.source}
                     </span>
-                    <span className="bg-gray-800 text-gray-300 px-2 py-1 rounded">
+                    <span className="bg-gray-800 text-gray-300 px-2 py-0.5 rounded">
                       {grant.eligibility}
                     </span>
-                    <span className="bg-gray-800 text-gray-300 px-2 py-1 rounded">
+                    <span className="bg-gray-800 text-gray-300 px-2 py-0.5 rounded">
                       Deadline: {grant.deadline}
                     </span>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-2">
-                  <div className="text-emerald-400 font-bold text-lg">
+                <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                  <div className="text-emerald-400 font-bold">
                     {grant.amount}
                   </div>
                   <button
                     onClick={() => setShowSignup(true)}
-                    className="text-sm bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white px-4 py-1.5 rounded-lg transition"
+                    className="text-xs bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white px-4 py-2 rounded-lg transition whitespace-nowrap"
                   >
                     Start Application
                   </button>
@@ -218,20 +224,53 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
+
+        {filtered.length === 0 && (
+          <div className="text-center py-12 text-gray-500">
+            No grants match your search. Try a different term or filter.
+          </div>
+        )}
       </div>
 
       {/* Signup Modal */}
       {showSignup && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
             {submitted ? (
               <div className="text-center">
-                <div className="text-4xl mb-4">&#10003;</div>
-                <h2 className="text-xl font-bold mb-2">You&apos;re on the list!</h2>
-                <p className="text-gray-400 text-sm mb-6">
+                <div className="w-16 h-16 bg-emerald-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg
+                    className="w-8 h-8 text-emerald-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold mb-2">
+                  You&apos;re on the list!
+                </h2>
+                <p className="text-gray-400 text-sm mb-4">
                   We&apos;ll reach out within 24 hours to set up your GrantReady
-                  account and start finding grants for your center.
+                  account and help you identify the best grants for your center.
                 </p>
+                <div className="bg-gray-800 rounded-lg p-4 mb-6 text-left">
+                  <p className="text-xs text-gray-400 mb-1">
+                    While you wait, here&apos;s a quick win:
+                  </p>
+                  <p className="text-sm text-white">
+                    If you&apos;re not enrolled in{" "}
+                    <span className="text-emerald-400 font-medium">CACFP</span>,
+                    that&apos;s your #1 priority. A 60-child center can receive
+                    $30,000–$60,000/year in meal reimbursements.
+                  </p>
+                </div>
                 <button
                   onClick={() => {
                     setShowSignup(false);
@@ -239,21 +278,22 @@ export default function Dashboard() {
                   }}
                   className="bg-emerald-600 text-white px-6 py-2 rounded-lg"
                 >
-                  Close
+                  Back to Grants
                 </button>
               </div>
             ) : (
               <>
-                <h2 className="text-xl font-bold mb-2">
+                <h2 className="text-xl font-bold mb-1">
                   Start Your Free Trial
                 </h2>
                 <p className="text-gray-400 text-sm mb-6">
-                  14 days free. Then $199/month. Cancel anytime.
+                  14 days free. Then $199/month. Cancel anytime. We&apos;ll
+                  match your center to every grant you qualify for.
                 </p>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm text-gray-300 mb-1">
-                      Center Name
+                      Center Name *
                     </label>
                     <input
                       type="text"
@@ -261,12 +301,12 @@ export default function Dashboard() {
                       value={centerName}
                       onChange={(e) => setCenterName(e.target.value)}
                       placeholder="e.g. Sunshine Learning Center"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-600"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-600"
                     />
                   </div>
                   <div>
                     <label className="block text-sm text-gray-300 mb-1">
-                      Email
+                      Your Email *
                     </label>
                     <input
                       type="email"
@@ -274,8 +314,34 @@ export default function Dashboard() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="director@center.com"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-600"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-600"
                     />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">
+                        Phone
+                      </label>
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="(555) 123-4567"
+                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-600"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">
+                        ZIP Code
+                      </label>
+                      <input
+                        type="text"
+                        value={zipCode}
+                        onChange={(e) => setZipCode(e.target.value)}
+                        placeholder="75001"
+                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-600"
+                      />
+                    </div>
                   </div>
                   <button
                     type="submit"
@@ -283,6 +349,10 @@ export default function Dashboard() {
                   >
                     Start Free Trial
                   </button>
+                  <p className="text-[11px] text-gray-500 text-center">
+                    No credit card required. We&apos;ll email you access within
+                    24 hours.
+                  </p>
                 </form>
                 <button
                   onClick={() => setShowSignup(false)}

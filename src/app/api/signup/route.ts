@@ -4,7 +4,7 @@ import path from "path";
 
 export async function POST(request: Request) {
   try {
-    const { email, centerName } = await request.json();
+    const { email, centerName, phone, zipCode } = await request.json();
 
     if (!email || !centerName) {
       return NextResponse.json(
@@ -16,6 +16,8 @@ export async function POST(request: Request) {
     const signup = {
       email,
       centerName,
+      phone: phone || "",
+      zipCode: zipCode || "",
       timestamp: new Date().toISOString(),
     };
 
