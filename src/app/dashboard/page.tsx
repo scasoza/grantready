@@ -159,12 +159,13 @@ export default function Dashboard() {
 
         {/* Tip banner */}
         {filter === "all" && search === "" && (
-          <div className="bg-brand-50 border border-brand-100 rounded-xl p-3.5 sm:p-4 mb-5">
+          <div className="bg-brand-50 border border-brand-100 rounded-xl p-3.5 sm:p-4 mb-5 flex gap-3 items-start">
+            <span className="text-lg leading-none mt-0.5">💡</span>
             <p className="text-xs sm:text-sm text-brand-800 leading-relaxed">
               <span className="font-semibold">Start with the essentials.</span>{" "}
-              CACFP, CCS enrollment, and Rising Star are ongoing funding
-              streams that every licensed center should have. CACFP alone can
-              bring in $30K–$60K/year.
+              CACFP, CCS enrollment, and Rising Star are ongoing funding streams
+              that every licensed center should have. CACFP alone can bring in
+              $30K–$60K/year.
             </p>
           </div>
         )}
