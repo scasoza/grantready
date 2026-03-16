@@ -20,196 +20,151 @@ function CheckIcon() {
   );
 }
 
-function DollarIcon() {
-  return (
-    <svg
-      className="w-5 h-5 text-emerald-400"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-      />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg
-      className="w-5 h-5 text-amber-400"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 6v6l4 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"
-      />
-    </svg>
-  );
-}
-
-function RepeatIcon() {
-  return (
-    <svg
-      className="w-5 h-5 text-blue-400"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-      />
-    </svg>
-  );
-}
-
 const tiers: GrantTier[] = ["essential", "growth", "staff", "foundation"];
 
-const tierColors: Record<GrantTier, string> = {
-  essential: "border-emerald-700 bg-emerald-950/30",
-  growth: "border-blue-700 bg-blue-950/30",
-  staff: "border-purple-700 bg-purple-950/30",
-  foundation: "border-amber-700 bg-amber-950/30",
+const tierBadgeColors: Record<GrantTier, string> = {
+  essential: "bg-emerald-900/60 text-emerald-400 border-emerald-800",
+  growth: "bg-blue-900/60 text-blue-400 border-blue-800",
+  staff: "bg-purple-900/60 text-purple-400 border-purple-800",
+  foundation: "bg-amber-900/60 text-amber-400 border-amber-800",
 };
 
-const tierBadgeColors: Record<GrantTier, string> = {
-  essential: "bg-emerald-900/60 text-emerald-400",
-  growth: "bg-blue-900/60 text-blue-400",
-  staff: "bg-purple-900/60 text-purple-400",
-  foundation: "bg-amber-900/60 text-amber-400",
+const tierCardColors: Record<GrantTier, string> = {
+  essential: "border-emerald-800/60 hover:border-emerald-700",
+  growth: "border-blue-800/60 hover:border-blue-700",
+  staff: "border-purple-800/60 hover:border-purple-700",
+  foundation: "border-amber-800/60 hover:border-amber-700",
 };
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      {/* Nav */}
-      <nav className="border-b border-gray-800 px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-        <span className="text-xl font-bold text-emerald-400">GrantReady</span>
-        <div className="flex gap-4 items-center">
-          <a href="#grants" className="text-sm text-gray-400 hover:text-white hidden sm:inline">
-            Grants
-          </a>
-          <a href="#pricing" className="text-sm text-gray-400 hover:text-white hidden sm:inline">
-            Pricing
-          </a>
-          <Link
-            href="/dashboard"
-            className="text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg transition"
-          >
-            Get Started
-          </Link>
+      {/* Nav — compact on mobile */}
+      <nav className="sticky top-0 z-40 bg-gray-950/90 backdrop-blur-md border-b border-gray-800">
+        <div className="px-4 sm:px-6 py-3 flex items-center justify-between max-w-6xl mx-auto">
+          <span className="text-lg sm:text-xl font-bold text-emerald-400">
+            GrantReady
+          </span>
+          <div className="flex gap-2 sm:gap-4 items-center">
+            <a
+              href="#grants"
+              className="text-xs sm:text-sm text-gray-400 hover:text-white hidden sm:inline"
+            >
+              Grants
+            </a>
+            <a
+              href="#pricing"
+              className="text-xs sm:text-sm text-gray-400 hover:text-white hidden sm:inline"
+            >
+              Pricing
+            </a>
+            <Link
+              href="/dashboard"
+              className="text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 sm:px-4 py-2 rounded-lg transition font-medium"
+            >
+              Get Started
+            </Link>
+          </div>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
-        <div className="inline-block bg-emerald-900/40 text-emerald-400 text-xs font-medium px-3 py-1 rounded-full mb-6">
+      {/* Hero — mobile-optimized spacing and font sizes */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-10 sm:pb-16 text-center">
+        <div className="inline-block bg-emerald-900/40 text-emerald-400 text-[11px] sm:text-xs font-medium px-3 py-1 rounded-full mb-4 sm:mb-6">
           {grants.length} active grants tracked for Texas
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-4 sm:mb-6">
           Your center is leaving
           <br />
-          <span className="text-emerald-400">$50,000+ on the table</span>
-          <br />
-          every year.
+          <span className="text-emerald-400">$50,000+</span> on the table.
         </h1>
-        <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
-          Most Texas childcare directors don&apos;t know about CACFP, Rising Star
-          incentives, or Pre-K Partnership grants — or find the 30-hour
-          application process too overwhelming. GrantReady finds your grants,
+        <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed">
+          Most Texas childcare directors miss thousands in grants because the
+          application process is overwhelming. GrantReady finds your grants,
           tracks deadlines, and drafts applications with AI.
         </p>
-        <div className="flex gap-4 justify-center flex-wrap">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           <Link
             href="/dashboard"
-            className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-lg text-lg font-medium transition shadow-lg shadow-emerald-900/30"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl text-base sm:text-lg font-medium transition shadow-lg shadow-emerald-900/30 text-center"
           >
             See Your Grants
           </Link>
           <a
             href="#how-it-works"
-            className="border border-gray-700 hover:border-gray-500 text-gray-300 px-8 py-3 rounded-lg text-lg transition"
+            className="border border-gray-700 hover:border-gray-500 text-gray-300 px-8 py-3.5 rounded-xl text-base sm:text-lg transition text-center"
           >
             How It Works
           </a>
         </div>
-        <p className="text-sm text-gray-500 mt-4">
+        <p className="text-xs sm:text-sm text-gray-500 mt-4">
           Free to browse. 14-day trial for AI applications.
         </p>
       </section>
 
-      {/* Stats */}
-      <section className="max-w-4xl mx-auto px-6 pb-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Stats — 2x2 grid on mobile */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 pb-10 sm:pb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { stat: "$50K+", label: "Avg. funding left unclaimed per center" },
+            { stat: "$50K+", label: "Avg. unclaimed per center" },
             { stat: "16", label: "Grant programs tracked" },
             { stat: "87%", label: "Less time on applications" },
-            { stat: "12,000+", label: "TX centers eligible" },
+            { stat: "12K+", label: "TX centers eligible" },
           ].map((item) => (
             <div
               key={item.label}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-5 text-center"
+              className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5 text-center"
             >
-              <div className="text-2xl md:text-3xl font-bold text-emerald-400 mb-1">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-emerald-400 mb-0.5">
                 {item.stat}
               </div>
-              <div className="text-xs text-gray-400">{item.label}</div>
+              <div className="text-[11px] sm:text-xs text-gray-400 leading-tight">
+                {item.label}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Pain points */}
-      <section className="max-w-4xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-center mb-4">
+      {/* Pain points — single column on mobile */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
           Sound familiar?
         </h2>
-        <p className="text-gray-400 text-center mb-10 max-w-xl mx-auto">
+        <p className="text-gray-400 text-center mb-8 text-sm sm:text-base">
           Every childcare director we talk to says the same things.
         </p>
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-3">
           {[
             {
               quote:
-                "I know there are grants out there, but I don't even know where to start looking.",
+                "I know there are grants out there, but I don't know where to start.",
               pain: "Discovery",
             },
             {
               quote:
-                "I spent 30 hours on a CCDF application last month and I'm still not sure I did it right.",
+                "I spent 30 hours on one CCDF application and I'm still not sure I did it right.",
               pain: "Time",
             },
             {
               quote:
-                "I missed the deadline by two days because nobody reminded me.",
+                "I missed the deadline by two days. Nobody reminded me.",
               pain: "Deadlines",
             },
             {
               quote:
-                "Every grant wants the same info in a different format. I keep re-entering our enrollment numbers.",
+                "Every grant wants the same info in a different format.",
               pain: "Repetition",
             },
           ].map((item) => (
             <div
               key={item.pain}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-6"
+              className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-6"
             >
-              <p className="text-gray-300 italic mb-3">
+              <p className="text-gray-300 italic text-sm sm:text-base mb-3 leading-relaxed">
                 &ldquo;{item.quote}&rdquo;
               </p>
-              <span className="text-xs bg-red-900/40 text-red-400 px-2 py-1 rounded-full">
+              <span className="text-[11px] bg-red-900/40 text-red-400 px-2 py-1 rounded-full">
                 {item.pain} problem
               </span>
             </div>
@@ -217,114 +172,125 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how-it-works" className="max-w-4xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-center mb-4">
+      {/* How it works — stacked on mobile */}
+      <section
+        id="how-it-works"
+        className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16"
+      >
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
           GrantReady solves all of them.
         </h2>
-        <p className="text-gray-400 text-center mb-12 max-w-xl mx-auto">
+        <p className="text-gray-400 text-center mb-8 sm:mb-12 text-sm sm:text-base max-w-xl mx-auto">
           Three steps. From &ldquo;I don&apos;t know where to start&rdquo; to
           &ldquo;application submitted.&rdquo;
         </p>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-3 gap-4">
           {[
             {
               step: "1",
               title: "We Find & Match",
-              desc: "Tell us about your center once — location, size, accreditations, children served. We instantly show every grant you qualify for, sorted by value and deadline.",
-              icon: <DollarIcon />,
+              desc: "Tell us about your center once. We match you to every grant you qualify for, sorted by value and deadline.",
+              emoji: "🔍",
             },
             {
               step: "2",
               title: "AI Drafts It",
-              desc: "Select a grant. GrantReady pulls your stored data, drafts narrative sections, fills budget templates, and formats everything to that grant's specific requirements.",
-              icon: <ClockIcon />,
+              desc: "GrantReady pulls your data, drafts narratives, fills budgets, and formats everything to each grant's requirements.",
+              emoji: "✍️",
             },
             {
               step: "3",
-              title: "You Review & Submit",
-              desc: "Edit the AI draft, download the finished application, and submit. We track your status and remind you about reporting deadlines when you win.",
-              icon: <RepeatIcon />,
+              title: "Review & Submit",
+              desc: "Edit the draft, download, and submit. We track your status and remind you about deadlines when you win.",
+              emoji: "🏆",
             },
           ].map((item) => (
             <div
               key={item.step}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center"
+              className="bg-gray-900 border border-gray-800 rounded-xl p-5 sm:p-6"
             >
-              <div className="w-12 h-12 bg-emerald-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                {item.icon}
+              <div className="flex sm:flex-col items-start sm:items-center gap-4 sm:gap-0 sm:text-center">
+                <div className="text-3xl sm:mb-3">{item.emoji}</div>
+                <div>
+                  <div className="text-[11px] text-emerald-400 font-medium mb-1">
+                    Step {item.step}
+                  </div>
+                  <h3 className="text-base font-semibold mb-1.5">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-              <p className="text-gray-400 text-sm">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Grant database by tier */}
-      <section id="grants" className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-center mb-4">
-          {grants.length} Grants We Track in Texas
+      <section id="grants" className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
+          {grants.length} Grants We Track
         </h2>
-        <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
+        <p className="text-gray-400 text-center mb-8 sm:mb-12 text-sm sm:text-base max-w-2xl mx-auto">
           Organized by impact. Start with the essentials — they&apos;re the
           biggest money and easiest to get.
         </p>
+
         {tiers.map((tier) => {
           const tierGrants = grants.filter((g) => g.tier === tier);
           return (
-            <div key={tier} className="mb-12">
-              <div className="flex items-center gap-3 mb-2">
+            <div key={tier} className="mb-8 sm:mb-12">
+              {/* Tier header */}
+              <div className="flex items-center gap-2 mb-1.5">
                 <span
-                  className={`text-xs font-medium px-2.5 py-1 rounded-full ${tierBadgeColors[tier]}`}
+                  className={`text-[11px] sm:text-xs font-medium px-2.5 py-1 rounded-full border ${tierBadgeColors[tier]}`}
                 >
                   {tierLabels[tier]}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-[11px] text-gray-500">
                   {tierGrants.length} programs
                 </span>
               </div>
-              <p className="text-sm text-gray-400 mb-4">
+              <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
                 {tierDescriptions[tier]}
               </p>
-              <div className="grid gap-3">
+
+              {/* Grant cards */}
+              <div className="grid gap-2.5">
                 {tierGrants.map((grant) => (
                   <div
                     key={grant.id}
-                    className={`border rounded-xl p-5 transition hover:brightness-110 ${tierColors[tier]}`}
+                    className={`bg-gray-900/80 border rounded-xl p-4 sm:p-5 transition ${tierCardColors[tier]}`}
                   >
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="text-base font-semibold text-white">
-                            {grant.name}
-                          </h3>
-                          {grant.recurring && (
-                            <span className="text-[10px] bg-blue-900/50 text-blue-400 px-1.5 py-0.5 rounded">
-                              Recurring
-                            </span>
-                          )}
-                          <span className="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
-                            {grant.difficulty}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-400 mb-2">
-                          {grant.description}
-                        </p>
-                        <div className="flex flex-wrap gap-1.5 text-[11px]">
-                          <span className="bg-gray-800/80 text-gray-300 px-2 py-0.5 rounded">
-                            {grant.source}
-                          </span>
-                        </div>
+                    {/* Mobile: stacked layout */}
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="text-sm sm:text-base font-semibold text-white leading-snug">
+                        {grant.name}
+                      </h3>
+                      <div className="text-emerald-400 font-bold text-sm sm:text-base whitespace-nowrap">
+                        {grant.amount}
                       </div>
-                      <div className="text-right flex-shrink-0">
-                        <div className="text-emerald-400 font-bold">
-                          {grant.amount}
-                        </div>
-                        <div className="text-[11px] text-gray-500 mt-1">
-                          {grant.deadline}
-                        </div>
-                      </div>
+                    </div>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-2.5 leading-relaxed">
+                      {grant.description}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {grant.recurring && (
+                        <span className="text-[10px] bg-blue-900/50 text-blue-400 px-1.5 py-0.5 rounded">
+                          Recurring
+                        </span>
+                      )}
+                      <span className="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+                        {grant.difficulty}
+                      </span>
+                      <span className="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+                        {grant.source}
+                      </span>
+                      <span className="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+                        {grant.deadline}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -332,53 +298,54 @@ export default function Home() {
             </div>
           );
         })}
-        <div className="text-center">
+
+        <div className="text-center mt-6">
           <Link
             href="/dashboard"
-            className="inline-block bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-lg font-medium transition shadow-lg shadow-emerald-900/30"
+            className="inline-block bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-medium transition shadow-lg shadow-emerald-900/30 text-sm sm:text-base"
           >
             See Which Grants You Qualify For
           </Link>
         </div>
       </section>
 
-      {/* ROI calculator */}
-      <section className="max-w-4xl mx-auto px-6 py-16">
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 md:p-12">
-          <h2 className="text-2xl font-bold text-center mb-8">
+      {/* ROI section */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-10">
+          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8">
             The Math Is Simple
           </h2>
-          <div className="grid md:grid-cols-3 gap-6 text-center">
-            <div>
-              <div className="text-3xl font-bold text-red-400 mb-2">
+          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-6">
+            <div className="flex sm:flex-col items-center sm:text-center gap-4 sm:gap-2 bg-gray-800/50 sm:bg-transparent rounded-xl p-4 sm:p-0">
+              <div className="text-2xl sm:text-3xl font-bold text-red-400">
                 $0
               </div>
-              <div className="text-sm text-gray-400">
-                What most centers claim in grants because the process is too hard
+              <div className="text-xs sm:text-sm text-gray-400 leading-tight">
+                What most centers claim because the process is too hard
               </div>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-amber-400 mb-2">
-                $2,388
+            <div className="flex sm:flex-col items-center sm:text-center gap-4 sm:gap-2 bg-gray-800/50 sm:bg-transparent rounded-xl p-4 sm:p-0">
+              <div className="text-2xl sm:text-3xl font-bold text-amber-400 whitespace-nowrap">
+                $2,388/yr
               </div>
-              <div className="text-sm text-gray-400">
-                GrantReady costs per year ($199/mo)
+              <div className="text-xs sm:text-sm text-gray-400 leading-tight">
+                GrantReady costs per year
               </div>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-emerald-400 mb-2">
-                $50,000+
+            <div className="flex sm:flex-col items-center sm:text-center gap-4 sm:gap-2 bg-gray-800/50 sm:bg-transparent rounded-xl p-4 sm:p-0">
+              <div className="text-2xl sm:text-3xl font-bold text-emerald-400">
+                $50K+
               </div>
-              <div className="text-sm text-gray-400">
+              <div className="text-xs sm:text-sm text-gray-400 leading-tight">
                 Potential annual funding from CACFP + Rising Star + one grant
               </div>
             </div>
           </div>
-          <div className="text-center mt-8">
-            <p className="text-emerald-400 font-semibold text-lg">
+          <div className="text-center mt-6 sm:mt-8 pt-6 border-t border-gray-800">
+            <p className="text-emerald-400 font-semibold text-base sm:text-lg">
               20x+ return on investment
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Even one $10K grant pays for 4+ years of GrantReady
             </p>
           </div>
@@ -386,40 +353,44 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="max-w-4xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-center mb-4">Simple Pricing</h2>
-        <p className="text-gray-400 text-center mb-10">
+      <section id="pricing" className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
+          Simple Pricing
+        </h2>
+        <p className="text-gray-400 text-center mb-8 text-sm sm:text-base">
           One plan. Everything included. Cancel anytime.
         </p>
-        <div className="max-w-md mx-auto bg-gray-900 border border-emerald-800 rounded-2xl p-8">
+        <div className="max-w-md mx-auto bg-gray-900 border-2 border-emerald-800 rounded-2xl p-6 sm:p-8">
           <div className="text-center mb-6">
-            <div className="text-4xl font-bold">
+            <div className="text-4xl sm:text-5xl font-bold">
               $199
-              <span className="text-lg text-gray-400 font-normal">/month</span>
+              <span className="text-base sm:text-lg text-gray-400 font-normal">
+                /mo
+              </span>
             </div>
-            <div className="text-sm text-gray-400 mt-1">
+            <div className="text-sm text-gray-400 mt-2">
               14-day free trial. No credit card required.
             </div>
           </div>
           <ul className="space-y-3 mb-8">
             {[
-              "All 16 Texas grant programs tracked & matched",
-              "Deadline alerts — never miss a window again",
-              "AI-drafted narratives tailored to each grant",
-              "Auto-filled budgets from your center profile",
-              "Application status tracking",
-              "Post-award reporting reminders",
+              "All 16 Texas grant programs tracked",
+              "Personalized grant matching",
+              "Deadline alerts via email",
+              "AI-drafted narratives & budgets",
+              "Auto-filled applications",
+              "Status tracking & reporting reminders",
               "Unlimited applications",
             ].map((feature) => (
               <li key={feature} className="flex gap-3 text-sm text-gray-300">
                 <CheckIcon />
-                {feature}
+                <span>{feature}</span>
               </li>
             ))}
           </ul>
           <Link
             href="/dashboard"
-            className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-lg font-medium transition"
+            className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-medium transition text-base"
           >
             Start Free Trial
           </Link>
@@ -427,31 +398,40 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="max-w-4xl mx-auto px-6 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-4">
-          Every month without GrantReady
-          <br />
-          is money your center doesn&apos;t get back.
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 leading-snug">
+          Every month without GrantReady is money your center doesn&apos;t get
+          back.
         </h2>
-        <p className="text-gray-400 mb-8 max-w-xl mx-auto">
+        <p className="text-gray-400 mb-6 sm:mb-8 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
           The grants exist. The money is allocated. Your center qualifies. The
-          only thing standing between you and that funding is the application
-          process — and that&apos;s exactly what we automate.
+          only thing in the way is the application — and that&apos;s what we
+          automate.
         </p>
         <Link
           href="/dashboard"
-          className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-lg text-lg font-medium transition shadow-lg shadow-emerald-900/30"
+          className="inline-block bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl text-base sm:text-lg font-medium transition shadow-lg shadow-emerald-900/30"
         >
           Get Started Free
         </Link>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 px-6 py-8 text-center text-sm text-gray-500">
+      <footer className="border-t border-gray-800 px-4 sm:px-6 py-6 sm:py-8 text-center text-xs sm:text-sm text-gray-500">
         <span className="text-emerald-400 font-semibold">GrantReady</span>{" "}
         &copy; {new Date().getFullYear()}. Helping Texas childcare directors win
         the funding they deserve.
       </footer>
+
+      {/* Mobile sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-950/95 backdrop-blur-md border-t border-gray-800 p-3 sm:hidden z-50">
+        <Link
+          href="/dashboard"
+          className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-medium transition text-sm"
+        >
+          See Your Grants — Free
+        </Link>
+      </div>
     </div>
   );
 }
