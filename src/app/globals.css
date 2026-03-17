@@ -3,14 +3,16 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-brand-50: #f0fdf4;
-  --color-brand-100: #dcfce7;
-  --color-brand-200: #bbf7d0;
-  --color-brand-500: #22c55e;
-  --color-brand-600: #16a34a;
-  --color-brand-700: #15803d;
-  --color-brand-800: #166534;
-  --color-brand-900: #14532d;
+  --color-brand-50: #ecfdf5;
+  --color-brand-100: #d1fae5;
+  --color-brand-200: #a7f3d0;
+  --color-brand-300: #6ee7b7;
+  --color-brand-400: #34d399;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
+  --color-brand-800: #065f46;
+  --color-brand-900: #064e3b;
   --color-warm-50: #fafaf9;
   --color-warm-100: #f5f5f4;
   --color-warm-200: #e7e5e4;
@@ -47,4 +49,31 @@ html {
 }
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Subtle entrance animations */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out both;
+}
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+
+/* Decorative mesh gradient for hero */
+.hero-gradient {
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 0%, rgba(16,185,129,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 0% 40%, rgba(5,150,105,0.08) 0%, transparent 60%),
+    linear-gradient(to bottom, #ecfdf5 0%, #fafaf9 100%);
+}
+
+/* Glass card effect */
+.glass {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
