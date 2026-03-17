@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import type { User } from "@supabase/supabase-js";
 import {
   grants,
   tierLabels,
   type GrantTier,
   type GrantStatus,
 } from "@/lib/grants";
+import { createClient } from "@/lib/supabase/client";
 
 const statusLabel: Record<GrantStatus, string> = {
   open: "Open",
@@ -46,7 +48,16 @@ export default function Dashboard() {
 }
 
 function DashboardContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const supabase = useMemo(() => createClient(), []);
+  const initialExpandedId = useMemo(() => {
+    const grantParam = searchParams.get("grant");
+    if (!grantParam) return null;
+    const id = Number(grantParam);
+    return Number.isNaN(id) ? null : id;
+  }, [searchParams]);
+  const [user, setUser] = useState<User | null>(null);
   const [showSignup, setShowSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [centerName, setCenterName] = useState("");
@@ -55,21 +66,26 @@ function DashboardContent() {
   const [submitted, setSubmitted] = useState(false);
   const [filter, setFilter] = useState<FilterType>("all");
   const [search, setSearch] = useState("");
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(initialExpandedId);
 
   useEffect(() => {
-    const grantParam = searchParams.get("grant");
-    if (grantParam) {
-      const id = Number(grantParam);
-      if (!isNaN(id)) {
-        setExpandedId(id);
-        setTimeout(() => {
-          const el = document.getElementById(`grant-${id}`);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 100);
-      }
-    }
-  }, [searchParams]);
+    if (initialExpandedId === null) return;
+    setTimeout(() => {
+      const el = document.getElementById(`grant-${initialExpandedId}`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  }, [initialExpandedId]);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const {
+        data: { user: sessionUser },
+      } = await supabase.auth.getUser();
+      setUser(sessionUser);
+    };
+
+    void loadUser();
+  }, [supabase]);
 
   const filtered = grants
     .filter((g) => filter === "all" || g.tier === filter)
@@ -95,6 +111,12 @@ function DashboardContent() {
     setSubmitted(true);
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  };
+
   return (
     <div className="min-h-screen bg-warm-50 pb-20 sm:pb-0">
       {/* Nav */}
@@ -108,12 +130,17 @@ function DashboardContent() {
               GrantReady
             </span>
           </Link>
-          <button
-            onClick={() => setShowSignup(true)}
-            className="text-xs sm:text-sm bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-4 sm:px-5 py-2.5 rounded-xl transition font-semibold shadow-md shadow-brand-600/25"
-          >
-            Start Free Trial
-          </button>
+          <div className="flex items-center gap-2.5">
+            <div className="hidden sm:block rounded-xl border border-warm-200 bg-white/80 px-3 py-2 text-xs text-warm-600">
+              {user?.email ?? "Authenticated user"}
+            </div>
+            <button
+              onClick={handleSignOut}
+              className="text-xs sm:text-sm bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-4 sm:px-5 py-2.5 rounded-xl transition font-semibold shadow-md shadow-brand-600/25"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -124,6 +151,10 @@ function DashboardContent() {
             Texas Childcare Grants
           </h1>
           <div className="flex items-center gap-3 mt-2">
+            <span className="text-warm-500 text-sm">
+              Signed in as {user?.email ?? "loading..."}
+            </span>
+            <span className="w-1 h-1 rounded-full bg-warm-300" />
             <span className="text-warm-400 text-sm">
               {grants.length} programs
             </span>

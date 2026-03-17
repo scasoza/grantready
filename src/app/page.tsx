@@ -30,7 +30,7 @@ export default function Home() {
               Pricing
             </a>
             <Link
-              href="/dashboard"
+              href="/login"
               className="text-sm bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-5 py-2.5 rounded-xl transition font-semibold shadow-md shadow-brand-600/25"
             >
               Get Started
@@ -62,7 +62,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 animate-fade-up animate-delay-300">
             <Link
-              href="/dashboard"
+              href="/login"
               className="bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-8 py-4 rounded-2xl text-base font-semibold transition shadow-lg shadow-brand-600/25 text-center"
             >
               Browse grants for free
@@ -224,7 +224,7 @@ export default function Home() {
               ))}
             </ul>
             <Link
-              href="/dashboard"
+              href="/login"
               className="block text-center bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-7 py-3.5 rounded-xl font-semibold transition shadow-lg shadow-brand-600/20 text-sm"
             >
               Start free trial
@@ -254,7 +254,7 @@ export default function Home() {
       {/* Mobile sticky CTA */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-warm-200 p-3 sm:hidden z-50">
         <Link
-          href="/dashboard"
+          href="/login"
           className="block w-full text-center bg-gradient-to-b from-brand-500 to-brand-600 text-white py-3 rounded-xl font-semibold transition shadow-lg shadow-brand-600/25 text-sm"
         >
           Browse grants

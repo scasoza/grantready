@@ -1,0 +1,202 @@
+"use client";
+
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+type OnboardingStep = 1 | 2;
+
+export default function OnboardingPage() {
+  const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
+  const [step, setStep] = useState<OnboardingStep>(1);
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [centerName, setCenterName] = useState("");
+  const [address, setAddress] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.replace("/login");
+      }
+    };
+
+    void loadUser();
+  }, [router, supabase]);
+
+  const hasLicense = licenseNumber.trim().length > 0;
+  const hasNameAndAddress = centerName.trim().length > 0 && address.trim().length > 0;
+
+  const moveToReview = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage(null);
+
+    if (!hasLicense && !hasNameAndAddress) {
+      setErrorMessage("Enter a license number or both center name and address.");
+      return;
+    }
+
+    setStep(2);
+  };
+
+  const submitCenter = async () => {
+    setSubmitting(true);
+    setErrorMessage(null);
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      setSubmitting(false);
+      router.replace("/login");
+      return;
+    }
+
+    const { error } = await supabase.from("centers").insert({
+      user_id: user.id,
+      license_number: licenseNumber.trim() || null,
+      center_name: centerName.trim() || null,
+      address: address.trim() || null,
+    });
+
+    setSubmitting(false);
+
+    if (error) {
+      setErrorMessage(error.message);
+      return;
+    }
+
+    router.push("/dashboard");
+    router.refresh();
+  };
+
+  return (
+    <div className="min-h-screen bg-warm-50 px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">Center onboarding</p>
+          <h1 className="mt-2 text-2xl sm:text-3xl font-extrabold text-warm-900 tracking-tight">Set up your center profile</h1>
+          <p className="mt-2 text-sm text-warm-500">We use this information to match grants and prefill application data.</p>
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-warm-200 bg-white p-4 sm:p-5">
+          <div className="flex items-center gap-3 text-sm">
+            <span className={`h-8 w-8 rounded-full flex items-center justify-center font-bold ${step === 1 ? "bg-brand-600 text-white" : "bg-brand-100 text-brand-700"}`}>1</span>
+            <span className="font-semibold text-warm-800">Enter center details</span>
+            <span className="h-px flex-1 bg-warm-200" />
+            <span className={`h-8 w-8 rounded-full flex items-center justify-center font-bold ${step === 2 ? "bg-brand-600 text-white" : "bg-warm-100 text-warm-500"}`}>2</span>
+            <span className="font-semibold text-warm-800">Confirm</span>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-warm-200 bg-white p-6 sm:p-8 shadow-sm">
+          {step === 1 ? (
+            <form onSubmit={moveToReview} className="space-y-4">
+              <div>
+                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Texas childcare license number</label>
+                <input
+                  type="text"
+                  value={licenseNumber}
+                  onChange={(event) => setLicenseNumber(event.target.value)}
+                  placeholder="e.g. 123456"
+                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm"
+                />
+              </div>
+
+              <div className="flex items-center gap-3 text-xs text-warm-400">
+                <div className="h-px flex-1 bg-warm-200" />
+                <span>OR</span>
+                <div className="h-px flex-1 bg-warm-200" />
+              </div>
+
+              <div>
+                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Center name</label>
+                <input
+                  type="text"
+                  value={centerName}
+                  onChange={(event) => setCenterName(event.target.value)}
+                  placeholder="Sunshine Learning Center"
+                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Center address</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(event) => setAddress(event.target.value)}
+                  placeholder="123 Main St, Dallas, TX"
+                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm"
+                />
+              </div>
+
+              {errorMessage && (
+                <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage}</p>
+              )}
+
+              <button
+                type="submit"
+                className="w-full sm:w-auto bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-7 py-3 rounded-xl transition font-semibold shadow-md shadow-brand-600/20"
+              >
+                Continue
+              </button>
+            </form>
+          ) : (
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-xl font-bold text-warm-900">Confirm your center details</h2>
+                <p className="text-sm text-warm-500 mt-1">Verify this information before saving to your account.</p>
+              </div>
+
+              <dl className="rounded-2xl border border-warm-200 bg-warm-50/70 p-4 sm:p-5 space-y-3">
+                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                  <dt className="text-warm-500 font-semibold">License number</dt>
+                  <dd className="text-warm-800">{licenseNumber || "Not provided"}</dd>
+                </div>
+                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                  <dt className="text-warm-500 font-semibold">Center name</dt>
+                  <dd className="text-warm-800">{centerName || "Not provided"}</dd>
+                </div>
+                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                  <dt className="text-warm-500 font-semibold">Address</dt>
+                  <dd className="text-warm-800">{address || "Not provided"}</dd>
+                </div>
+              </dl>
+
+              {errorMessage && (
+                <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage}</p>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="rounded-xl border border-warm-200 px-5 py-3 text-sm font-semibold text-warm-700 hover:bg-warm-50"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={submitCenter}
+                  disabled={submitting}
+                  className="bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-6 py-3 rounded-xl transition font-semibold shadow-md shadow-brand-600/20 disabled:opacity-60"
+                >
+                  {submitting ? "Saving..." : "Save and continue"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

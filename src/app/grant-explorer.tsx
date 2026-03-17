@@ -324,7 +324,7 @@ export default function GrantExplorer() {
 
       <div className="text-center sm:text-left mt-6">
         <Link
-          href="/dashboard"
+          href="/login"
           className="inline-block bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-8 py-4 rounded-2xl font-semibold transition shadow-lg shadow-brand-600/20 text-sm"
         >
           See full details and eligibility
