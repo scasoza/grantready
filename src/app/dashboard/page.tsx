@@ -6,8 +6,10 @@ import Link from "next/link";
 import {
   grants,
   tierLabels,
+  checkEligibility,
   type GrantTier,
   type GrantStatus,
+  type CenterInfo,
 } from "@/lib/grants";
 
 const statusLabel: Record<GrantStatus, string> = {
@@ -35,6 +37,29 @@ const diffStyle: Record<string, string> = {
   Hard: "text-red-500",
 };
 
+const metroOptions = [
+  "Houston",
+  "Dallas",
+  "Fort Worth",
+  "San Antonio",
+  "Austin",
+  "El Paso",
+  "Other",
+];
+
+const defaultCenter: CenterInfo = {
+  licensed: true,
+  servesMeals: true,
+  ccsEnrolled: false,
+  trsStars: 0,
+  isFamilyChildcare: false,
+  isRural: false,
+  employeeCount: 10,
+  isNonprofit: false,
+  metroArea: "",
+  servesUnder5: true,
+};
+
 type FilterType = "all" | GrantTier;
 
 export default function Dashboard() {
@@ -56,6 +81,16 @@ function DashboardContent() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const [showQualifier, setShowQualifier] = useState(false);
+  const [center, setCenter] = useState<CenterInfo>(defaultCenter);
+  const [qualifying, setQualifying] = useState(false);
+
+  const qualifiedIds = qualifying
+    ? new Set(grants.filter((g) => checkEligibility(center, g)).map((g) => g.id))
+    : null;
+
+  const qualifiedCount = qualifiedIds ? qualifiedIds.size : grants.length;
 
   useEffect(() => {
     const grantParam = searchParams.get("grant");
@@ -138,6 +173,159 @@ function DashboardContent() {
           </div>
         </div>
 
+        {/* Qualification banner */}
+        {!showQualifier && !qualifying && (
+          <button
+            onClick={() => setShowQualifier(true)}
+            className="w-full mb-6 bg-gradient-to-r from-brand-600 via-brand-500 to-emerald-500 rounded-2xl p-4 sm:p-5 text-left group hover:shadow-lg hover:shadow-brand-600/15 transition-all duration-200"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-sm sm:text-base">
+                    Which grants does your center qualify for?
+                  </h3>
+                  <p className="text-white/70 text-xs sm:text-sm mt-0.5">
+                    Answer a few quick questions to filter to your matches
+                  </p>
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-white/60 group-hover:translate-x-0.5 transition flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
+        )}
+
+        {/* Qualification form expanded */}
+        {(showQualifier || qualifying) && (
+          <div className="mb-6 bg-white border-2 border-brand-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-gradient-to-r from-brand-600 via-brand-500 to-emerald-500 px-5 py-3.5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-white font-bold text-sm">
+                  Center Qualification Filter
+                  {qualifying && (
+                    <span className="ml-2 bg-white/20 text-white text-xs px-2.5 py-0.5 rounded-full font-semibold">
+                      {qualifiedCount} of {grants.length} match
+                    </span>
+                  )}
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setShowQualifier(false);
+                  setQualifying(false);
+                }}
+                className="text-white/70 hover:text-white transition p-1"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-5 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+                {[
+                  { key: "licensed" as const, label: "Licensed childcare center" },
+                  { key: "servesMeals" as const, label: "Serve meals / snacks" },
+                  { key: "ccsEnrolled" as const, label: "CCS provider enrolled" },
+                  { key: "isFamilyChildcare" as const, label: "Family childcare provider" },
+                  { key: "isRural" as const, label: "Rural area (pop. < 20,000)" },
+                  { key: "isNonprofit" as const, label: "Nonprofit organization" },
+                  { key: "servesUnder5" as const, label: "Serve children under 5" },
+                ].map((item) => (
+                  <label
+                    key={item.key}
+                    className="flex items-center gap-3 text-sm text-warm-700 cursor-pointer select-none group"
+                  >
+                    <div className="relative flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={center[item.key] as boolean}
+                        onChange={(e) =>
+                          setCenter({ ...center, [item.key]: e.target.checked })
+                        }
+                        className="sr-only peer"
+                      />
+                      <div className="w-5 h-5 rounded-md border-2 border-warm-300 bg-white peer-checked:bg-brand-500 peer-checked:border-brand-500 transition flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    </div>
+                    <span className="group-hover:text-warm-900 transition">{item.label}</span>
+                  </label>
+                ))}
+
+                <div className="flex items-center gap-3">
+                  <label className="text-sm text-warm-700 whitespace-nowrap font-medium">TRS Level</label>
+                  <select
+                    value={center.trsStars}
+                    onChange={(e) => setCenter({ ...center, trsStars: Number(e.target.value) })}
+                    className="flex-1 bg-warm-50 border border-warm-200 rounded-xl px-3 py-2 text-sm text-warm-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                  >
+                    <option value={0}>None</option>
+                    <option value={2}>2-Star</option>
+                    <option value={3}>3-Star</option>
+                    <option value={4}>4-Star</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="text-sm text-warm-700 whitespace-nowrap font-medium">Employees</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={999}
+                    value={center.employeeCount}
+                    onChange={(e) => setCenter({ ...center, employeeCount: Number(e.target.value) || 1 })}
+                    className="w-24 bg-warm-50 border border-warm-200 rounded-xl px-3 py-2 text-sm text-warm-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                  />
+                </div>
+                <div className="flex items-center gap-3 sm:col-span-2">
+                  <label className="text-sm text-warm-700 whitespace-nowrap font-medium">Metro area</label>
+                  <select
+                    value={center.metroArea}
+                    onChange={(e) => setCenter({ ...center, metroArea: e.target.value })}
+                    className="flex-1 max-w-xs bg-warm-50 border border-warm-200 rounded-xl px-3 py-2 text-sm text-warm-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                  >
+                    <option value="">Select...</option>
+                    {metroOptions.map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-warm-100 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => setQualifying(true)}
+                  className="bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white text-sm px-6 py-2.5 rounded-xl font-semibold transition shadow-md shadow-brand-600/20"
+                >
+                  Show my grants
+                </button>
+                {qualifying && (
+                  <button
+                    onClick={() => setQualifying(false)}
+                    className="text-sm text-warm-400 hover:text-warm-600 transition font-medium"
+                  >
+                    Clear filter
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Search */}
         <div className="relative mb-4">
           <svg
@@ -194,7 +382,7 @@ function DashboardContent() {
         </div>
 
         {/* Tip banner */}
-        {filter === "all" && search === "" && (
+        {filter === "all" && search === "" && !qualifying && (
           <div className="bg-gradient-to-r from-brand-50 to-emerald-50/50 border border-brand-100 rounded-2xl p-4 sm:p-5 mb-6 flex gap-3.5 items-start">
             <div className="w-8 h-8 bg-brand-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="w-4 h-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -210,10 +398,29 @@ function DashboardContent() {
           </div>
         )}
 
+        {/* Qualifying results banner */}
+        {qualifying && (
+          <div className="bg-gradient-to-r from-emerald-50 to-brand-50/50 border border-emerald-200 rounded-2xl p-4 sm:p-5 mb-6 flex gap-3.5 items-center">
+            <div className="w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <p className="text-sm text-emerald-800">
+              <span className="font-bold">{qualifiedCount} grants</span> match your center profile.
+              {qualifiedCount < grants.length && (
+                <span className="text-emerald-600"> Non-matching grants are dimmed below.</span>
+              )}
+            </p>
+          </div>
+        )}
+
         {/* Grant list */}
         <div className="space-y-2.5">
           {filtered.map((grant) => {
             const isExpanded = expandedId === grant.id;
+            const qualified = qualifiedIds === null || qualifiedIds.has(grant.id);
+            const dimmed = qualifiedIds !== null && !qualified;
             return (
               <div
                 key={grant.id}
@@ -222,7 +429,7 @@ function DashboardContent() {
                   isExpanded
                     ? "border-brand-200 shadow-md shadow-brand-500/[0.06] ring-1 ring-brand-100"
                     : "border-warm-200/80 hover:shadow-md hover:-translate-y-px"
-                }`}
+                } ${dimmed ? "opacity-40" : ""}`}
               >
                 <button
                   onClick={() =>
@@ -240,6 +447,14 @@ function DashboardContent() {
                         <div className="min-w-0">
                           <h3 className="text-sm sm:text-base font-bold text-warm-900 leading-snug">
                             {grant.name}
+                            {qualifiedIds !== null && qualified && (
+                              <span className="ml-2 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold align-middle">
+                                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                                Qualified
+                              </span>
+                            )}
                           </h3>
                           <p className="text-xs text-warm-400 mt-0.5 truncate">
                             {grant.source}

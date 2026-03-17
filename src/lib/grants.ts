@@ -161,14 +161,14 @@ export const grants: Grant[] = [
     source: "Federal Office of Head Start",
     amount: "Varies — large competitive awards",
     deadline: "Federal grant cycles",
-    eligibility: "Public/private nonprofit and for-profit agencies",
+    eligibility: "Public/private agencies serving low-income children under 5",
     description:
-      "Comprehensive federal funding covering program operations, facility improvements, staff salaries, and educational materials for centers serving low-income children under 5.",
+      "Comprehensive federal funding covering program operations, facility improvements, staff salaries, and educational materials for centers serving low-income children birth to age 5.",
     tier: "growth",
     status: "upcoming",
     difficulty: "Hard",
     recurring: true,
-    criteria: { servesUnder5: true },
+    criteria: { licensed: true, servesUnder5: true },
   },
   {
     id: 7,
@@ -176,9 +176,9 @@ export const grants: Grant[] = [
     source: "U.S. Department of Agriculture",
     amount: "Varies by project",
     deadline: "Rolling applications",
-    eligibility: "Centers in rural areas (population < 20,000)",
+    eligibility: "Centers in rural areas (population under 20,000)",
     description:
-      "Grants and low-interest loans for purchasing, constructing, or improving childcare facilities. Covers equipment and project expenses in rural Texas communities.",
+      "Grants and low-interest loans for purchasing, constructing, or improving childcare facilities in communities with populations under 20,000. Covers equipment and project expenses.",
     tier: "growth",
     status: "open",
     difficulty: "Medium",
@@ -198,7 +198,7 @@ export const grants: Grant[] = [
     status: "ongoing",
     difficulty: "Easy",
     recurring: true,
-    criteria: { maxEmployees: 100 },
+    criteria: { maxEmployees: 99 },
   },
   {
     id: 9,
@@ -220,7 +220,7 @@ export const grants: Grant[] = [
   {
     id: 10,
     name: "T.E.A.C.H. Early Childhood Texas Scholarships",
-    source: "State of Texas",
+    source: "TXAEYC / Texas Workforce Commission",
     amount: "Full tuition for degree coursework",
     deadline: "Rolling applications",
     eligibility: "Early childhood educators in licensed settings",
