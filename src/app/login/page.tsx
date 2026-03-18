@@ -114,6 +114,7 @@ export default function LoginPage() {
               : "Continue to set up your center profile and start applying for grants."}
           </p>
 
+          {/* Google OAuth — hidden until credentials are configured
           <button
             type="button"
             onClick={signInWithGoogle}
@@ -128,6 +129,7 @@ export default function LoginPage() {
             <span className="text-xs font-semibold uppercase tracking-wide text-warm-400">or</span>
             <div className="h-px flex-1 bg-warm-200" />
           </div>
+          */}
 
           <form onSubmit={signInWithEmail} className="space-y-3.5">
             <div>
