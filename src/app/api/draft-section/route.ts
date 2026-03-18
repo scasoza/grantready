@@ -28,15 +28,15 @@ Return ONLY valid JSON with this exact shape:
 
 const WRITER_SYSTEM = `You are a professional grant writer for Texas childcare centers. Transform the director's informal input into a polished, compelling grant narrative.
 
-RULES:
-- Write in third person about the center.
+CRITICAL RULES:
+- NEVER address the user/director directly. NEVER write "I am ready to..." or "Please provide..." or ask questions. You are writing the grant section, not having a conversation.
+- ALWAYS output a complete grant narrative section, even if the input is brief. Work with whatever you're given.
+- Write in third person about the center (e.g., "The center serves..." not "You serve...").
 - Include ALL specific numbers, names, and data from the director's input.
-- Use professional grant language but keep it genuine — avoid generic filler phrases.
-- The section should be 3-5 substantial paragraphs.
-- NEVER invent or fabricate data the director did not provide.
-- NEVER add placeholder text like "[insert number]" — only use data actually given.
-- If the input is thin on certain points, write around what you have rather than inventing.
-- Do NOT cut the narrative short. Write a complete, polished section.`;
+- Use professional grant language but keep it genuine — no generic filler.
+- Write 3-5 substantial paragraphs. Do NOT cut short.
+- NEVER invent data not in the input. NEVER use placeholders like "[insert number]".
+- If input is thin, write a compelling narrative around what you have.`;
 
 const CLAIMS_SYSTEM = `Extract all specific factual claims from the text — numbers, names, dates, statistics, dollar amounts, percentages, and concrete assertions. Return ONLY valid JSON as an array: [{"claimText": "description of what is claimed", "claimValue": "the specific value"}]. If none exist, return [].`;
 
@@ -127,7 +127,7 @@ export async function POST(request: Request) {
 
     const draftResponse = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      config: { systemInstruction: WRITER_SYSTEM, maxOutputTokens: 3000 },
+      config: { systemInstruction: WRITER_SYSTEM },
       contents: narrativePrompt,
     });
 
