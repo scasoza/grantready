@@ -6,6 +6,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { grants } from "@/lib/grants";
 import { getSectionsForGrant } from "@/lib/grant-sections";
+import VoiceMemoRecorder from "@/components/VoiceMemoRecorder";
+import { compareEmphasis } from "@/lib/rubric-compare";
 
 interface Claim {
   id?: string;
@@ -41,6 +43,10 @@ export default function SectionDetailPage() {
   const [voiceBlob, setVoiceBlob] = useState<Blob | null>(null);
   const [voiceDuration, setVoiceDuration] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [priorInput, setPriorInput] = useState<string | null>(null);
+  const [priorGrantName, setPriorGrantName] = useState<string | null>(null);
+  const [priorGrantId, setPriorGrantId] = useState<number | null>(null);
+  const [showReuse, setShowReuse] = useState(false);
 
   // Load existing section data
   useEffect(() => {
@@ -82,6 +88,36 @@ export default function SectionDetailPage() {
         setFollowUp(section.ai_follow_up || null);
         setFollowUpResponse(section.follow_up_response || "");
         setStatus(section.status || "pending");
+
+        // Check for prior applications (different grants, same section type)
+        if (section.status === "pending") {
+          const { data: otherApps } = await supabase
+            .from("applications")
+            .select("id, grant_id")
+            .eq("center_id", centers.id)
+            .neq("grant_id", String(grantId));
+
+          if (otherApps && otherApps.length > 0) {
+            for (const otherApp of otherApps) {
+              const { data: priorSection } = await supabase
+                .from("application_sections")
+                .select("text_input")
+                .eq("application_id", otherApp.id)
+                .eq("section_type", sectionType)
+                .in("status", ["verified", "draft_generated"])
+                .single();
+
+              if (priorSection?.text_input) {
+                setPriorInput(priorSection.text_input);
+                setPriorGrantId(Number(otherApp.grant_id));
+                const priorGrant = grants.find((g) => g.id === Number(otherApp.grant_id));
+                setPriorGrantName(priorGrant?.name || `Grant #${otherApp.grant_id}`);
+                setShowReuse(true);
+                break;
+              }
+            }
+          }
+        }
 
         // Load claims
         if (section.id) {
@@ -295,6 +331,61 @@ export default function SectionDetailPage() {
       </nav>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* Returning user: reuse prior input */}
+        {showReuse && priorInput && priorGrantId && (
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
+            <h3 className="text-sm font-bold text-blue-900 mb-2">
+              You answered this section before
+            </h3>
+            <p className="text-xs text-blue-700 mb-3">
+              From your <span className="font-semibold">{priorGrantName}</span> application.
+            </p>
+
+            {/* Rubric comparison */}
+            {(() => {
+              const comparison = compareEmphasis(grantId, priorGrantId);
+              return comparison.newAreas.length > 0 ? (
+                <div className="bg-white/60 rounded-xl p-3 mb-3">
+                  <p className="text-xs font-semibold text-blue-800 mb-1">
+                    Different emphasis needed:
+                  </p>
+                  <p className="text-xs text-blue-700">
+                    This grant focuses on{" "}
+                    <span className="font-semibold">
+                      {comparison.newAreas.join(", ")}
+                    </span>
+                    {comparison.droppedAreas.length > 0 && (
+                      <> (your last application emphasized {comparison.droppedAreas.join(", ")})</>
+                    )}
+                  </p>
+                </div>
+              ) : null;
+            })()}
+
+            <div className="bg-white/60 rounded-xl p-3 mb-4 max-h-32 overflow-y-auto">
+              <p className="text-xs text-blue-700 whitespace-pre-wrap">{priorInput}</p>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setTextInput(priorInput);
+                  setShowReuse(false);
+                }}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition"
+              >
+                Use this + update
+              </button>
+              <button
+                onClick={() => setShowReuse(false)}
+                className="flex-1 bg-white border border-blue-200 text-blue-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition hover:bg-blue-50"
+              >
+                Start fresh
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Step 1: Input */}
         {status === "pending" || status === "input_given" ? (
           <div className="space-y-4">
@@ -345,8 +436,37 @@ export default function SectionDetailPage() {
 
               {/* Voice memo or text input */}
               {inputMode === "voice" ? (
-                <div className="bg-warm-50 rounded-xl border border-warm-200 p-4 text-center text-warm-500 text-sm">
-                  Voice recording coming soon — please type for now.
+                <div className="space-y-3">
+                  <VoiceMemoRecorder
+                    disabled={isGenerating}
+                    onRecordingComplete={async (blob, duration) => {
+                      setVoiceBlob(blob);
+                      setVoiceDuration(duration);
+                      // Transcribe via API
+                      const formData = new FormData();
+                      formData.append("audio", blob, "memo.webm");
+                      try {
+                        const res = await fetch("/api/transcribe", {
+                          method: "POST",
+                          body: formData,
+                        });
+                        if (res.ok) {
+                          const { transcript } = await res.json();
+                          setTextInput((prev) =>
+                            prev ? prev + "\n\n" + transcript : transcript
+                          );
+                        }
+                      } catch {
+                        // Transcription failed silently — user can still type
+                      }
+                    }}
+                  />
+                  {textInput && (
+                    <div className="bg-warm-50 rounded-xl border border-warm-200 p-3">
+                      <p className="text-xs font-semibold text-warm-500 mb-1">Transcription:</p>
+                      <p className="text-sm text-warm-700">{textInput}</p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <textarea
