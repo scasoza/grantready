@@ -335,15 +335,13 @@ function DashboardContent() {
                       <span className="text-warm-400 font-medium">Amount</span>
                       <span className="text-warm-800 font-bold">{grant.amount}</span>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSignup(true);
-                      }}
-                      className="w-full sm:w-auto bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white text-sm px-7 py-3 rounded-xl transition font-semibold shadow-md shadow-brand-600/20"
+                    <Link
+                      href={`/apply/${grant.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full sm:w-auto bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white text-sm px-7 py-3 rounded-xl transition font-semibold shadow-md shadow-brand-600/20 inline-block text-center"
                     >
                       Start Application
-                    </button>
+                    </Link>
                   </div>
                 )}
               </div>
