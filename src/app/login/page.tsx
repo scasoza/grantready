@@ -30,16 +30,41 @@ export default function LoginPage() {
     }
   };
 
+  const [isSignUp, setIsSignUp] = useState(false);
+
   const signInWithEmail = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage(null);
     setLoadingEmail(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding` },
+      });
+      setLoadingEmail(false);
+      if (error) {
+        setErrorMessage(error.message);
+        return;
+      }
+      setErrorMessage(null);
+      setIsSignUp(false);
+      // Show confirmation message
+      setConfirmationSent(true);
+      return;
+    }
 
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoadingEmail(false);
 
     if (error) {
+      if (error.message.toLowerCase().includes("invalid")) {
+        // Account doesn't exist — switch to signup mode
+        setIsSignUp(true);
+        setErrorMessage(null);
+        return;
+      }
       setErrorMessage(error.message);
       return;
     }
@@ -47,6 +72,8 @@ export default function LoginPage() {
     router.push("/onboarding");
     router.refresh();
   };
+
+  const [confirmationSent, setConfirmationSent] = useState(false);
 
   return (
     <div className="min-h-screen bg-warm-50 px-4 py-12 sm:px-6">
@@ -59,8 +86,33 @@ export default function LoginPage() {
         </Link>
 
         <div className="bg-white border border-warm-200/80 rounded-3xl p-6 sm:p-8 shadow-sm">
-          <h1 className="text-2xl font-extrabold text-warm-900 tracking-tight">Log in to your account</h1>
-          <p className="text-sm text-warm-500 mt-2 mb-6">Continue to set up your center profile and start applying for grants.</p>
+          {confirmationSent ? (
+            <div className="text-center py-4">
+              <div className="w-14 h-14 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">✉️</span>
+              </div>
+              <h1 className="text-xl font-extrabold text-warm-900 mb-2">Check your email</h1>
+              <p className="text-sm text-warm-500 mb-4">
+                We sent a confirmation link to <span className="font-semibold text-warm-700">{email}</span>.
+                Click the link to activate your account.
+              </p>
+              <button
+                onClick={() => { setConfirmationSent(false); setIsSignUp(false); }}
+                className="text-sm text-brand-600 font-semibold hover:text-brand-700 transition"
+              >
+                Back to login
+              </button>
+            </div>
+          ) : (
+          <>
+          <h1 className="text-2xl font-extrabold text-warm-900 tracking-tight">
+            {isSignUp ? "Create your account" : "Log in to your account"}
+          </h1>
+          <p className="text-sm text-warm-500 mt-2 mb-6">
+            {isSignUp
+              ? "Enter a password to create your GrantReady account."
+              : "Continue to set up your center profile and start applying for grants."}
+          </p>
 
           <button
             type="button"
@@ -111,9 +163,29 @@ export default function LoginPage() {
               disabled={loadingGoogle || loadingEmail}
               className="w-full bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white py-3 rounded-xl font-semibold transition shadow-md shadow-brand-600/20 disabled:opacity-60"
             >
-              {loadingEmail ? "Signing in..." : "Continue with email"}
+              {loadingEmail
+                ? (isSignUp ? "Creating account..." : "Signing in...")
+                : (isSignUp ? "Create account" : "Continue with email")}
             </button>
           </form>
+
+          <p className="text-center text-xs text-warm-400 mt-5">
+            {isSignUp ? (
+              <>Already have an account?{" "}
+                <button onClick={() => { setIsSignUp(false); setErrorMessage(null); }} className="text-brand-600 font-semibold hover:text-brand-700">
+                  Log in
+                </button>
+              </>
+            ) : (
+              <>Don&apos;t have an account?{" "}
+                <button onClick={() => { setIsSignUp(true); setErrorMessage(null); }} className="text-brand-600 font-semibold hover:text-brand-700">
+                  Sign up
+                </button>
+              </>
+            )}
+          </p>
+          </>
+          )}
         </div>
       </div>
     </div>
