@@ -212,32 +212,51 @@ export default function SectionDetailPage() {
 
       const result = await response.json();
 
-      setAiDraft(result.draft);
+      // Handle insufficient input — show follow-up instead of draft
+      if (result.insufficient) {
+        setFollowUp(result.followUp || "Can you add more specific details? Numbers, names, and real examples make the strongest applications.");
+        setStatus("input_given");
+        if (sectionId) {
+          await supabase
+            .from("application_sections")
+            .update({
+              ai_follow_up: result.followUp,
+              status: "input_given",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", sectionId);
+        }
+        return;
+      }
+
+      setAiDraft(result.draft || "");
       setClaims(
         (result.claims || []).map((c: { claimText: string; claimValue: string }) => ({
           ...c,
           verified: false,
         }))
       );
-
-      // Check if input was sufficient or if we need follow-up
-      if (result.followUp) {
-        setFollowUp(result.followUp);
-      }
+      setFollowUp(null);
 
       // Save draft to database
       if (sectionId) {
+        // Clear old claims first
+        await supabase
+          .from("verified_claims")
+          .delete()
+          .eq("section_id", sectionId);
+
         await supabase
           .from("application_sections")
           .update({
             ai_draft: result.draft,
-            ai_follow_up: result.followUp || null,
+            ai_follow_up: null,
             status: "draft_generated",
             updated_at: new Date().toISOString(),
           })
           .eq("id", sectionId);
 
-        // Save claims
+        // Save new claims
         if (result.claims?.length) {
           await supabase.from("verified_claims").insert(
             result.claims.map((c: { claimText: string; claimValue: string }) => ({
@@ -504,8 +523,8 @@ export default function SectionDetailPage() {
           </div>
         ) : null}
 
-        {/* Follow-up question */}
-        {followUp && !followUpResponse && status === "draft_generated" && (
+        {/* Follow-up question — shown when input is insufficient or draft needs more */}
+        {followUp && (status === "input_given" || status === "draft_generated") && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
             <p className="text-sm font-semibold text-amber-800 mb-2">
               We need a bit more to strengthen this section:
@@ -520,23 +539,71 @@ export default function SectionDetailPage() {
             />
             <button
               onClick={async () => {
-                if (sectionId) {
-                  await supabase
-                    .from("application_sections")
-                    .update({ follow_up_response: followUpResponse })
-                    .eq("id", sectionId);
-                }
-                // Re-generate with follow-up
-                setStatus("input_given");
-                setTextInput(textInput + "\n\n" + followUpResponse);
+                const combined = textInput + "\n\n" + followUpResponse;
+                setTextInput(combined);
+                setFollowUpResponse("");
                 setAiDraft("");
                 setClaims([]);
                 setFollowUp(null);
-                generateDraft();
+                if (sectionId) {
+                  await supabase
+                    .from("application_sections")
+                    .update({ follow_up_response: followUpResponse, text_input: combined })
+                    .eq("id", sectionId);
+                }
+                // Re-generate with combined input
+                setIsGenerating(true);
+                setError(null);
+                try {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  const { data: center } = await supabase
+                    .from("centers").select("*").eq("user_id", user?.id).single();
+                  const centerData: Record<string, string> = {};
+                  if (center) {
+                    if (center.center_name) centerData.centerName = center.center_name;
+                    if (center.enrollment_count) centerData.enrollmentCount = String(center.enrollment_count);
+                    if (center.staff_count) centerData.staffCount = String(center.staff_count);
+                    if (center.city) centerData.city = center.city;
+                    if (center.zip) centerData.zip = center.zip;
+                  }
+                  const res = await fetch("/api/draft-section", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      sectionType,
+                      sectionTitle: sectionTemplate?.title || sectionType,
+                      prompt: sectionTemplate?.prompt || "",
+                      subPrompts: sectionTemplate?.subPrompts || [],
+                      userInput: combined,
+                      centerData,
+                    }),
+                  });
+                  const result = await res.json();
+                  if (result.insufficient) {
+                    setFollowUp(result.followUp);
+                    setStatus("input_given");
+                  } else {
+                    setAiDraft(result.draft || "");
+                    setClaims((result.claims || []).map((c: { claimText: string; claimValue: string }) => ({ ...c, verified: false })));
+                    setStatus("draft_generated");
+                    if (sectionId) {
+                      await supabase.from("verified_claims").delete().eq("section_id", sectionId);
+                      await supabase.from("application_sections").update({ ai_draft: result.draft, status: "draft_generated", updated_at: new Date().toISOString() }).eq("id", sectionId);
+                      if (result.claims?.length) {
+                        await supabase.from("verified_claims").insert(result.claims.map((c: { claimText: string; claimValue: string }) => ({ section_id: sectionId, claim_text: c.claimText, claim_value: c.claimValue, verified: false })));
+                      }
+                    }
+                  }
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : "Something went wrong");
+                } finally {
+                  setIsGenerating(false);
+                }
               }}
-              className="mt-3 bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition"
+              disabled={!followUpResponse.trim() || isGenerating}
+              className="mt-3 bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-50"
             >
-              Update draft with this info
+              {isGenerating ? "Regenerating..." : "Update and regenerate draft"}
             </button>
           </div>
         )}

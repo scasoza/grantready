@@ -15,20 +15,43 @@ type Claim = {
   claimValue: string;
 };
 
-const WRITER_SYSTEM =
-  "You are a professional grant writer for Texas childcare centers. Your job is to transform the director's informal input into a polished, compelling grant narrative. Write in third person about the center. Include specific numbers and data from the input. Use professional grant language but keep it genuine - avoid generic filler. The section should be 2-4 paragraphs.";
+const SUFFICIENCY_SYSTEM = `You evaluate whether a childcare center director's input contains enough substance to write a compelling grant narrative section.
 
-const CLAIMS_SYSTEM =
-  "Extract all specific factual claims from the text, including numbers, names, dates, and statistics. Return ONLY valid JSON as an array of objects with exactly this shape: [{\"claimText\": string, \"claimValue\": string}]. If none exist, return [].";
+RULES:
+- The input must contain at least ONE specific detail: a number, a name, an example, a concrete situation, or a real challenge.
+- Generic, placeholder, or test inputs like "testing", "asdf", "hello", "I need money" are INSUFFICIENT.
+- Very short inputs (under 20 meaningful words) are usually INSUFFICIENT unless they contain specific data.
+- You are looking for substance, not polish. Informal language is fine as long as it contains real information.
+
+Return ONLY valid JSON with this exact shape:
+{"sufficient": true/false, "followUp": "question to ask if insufficient, or null if sufficient"}`;
+
+const WRITER_SYSTEM = `You are a professional grant writer for Texas childcare centers. Transform the director's informal input into a polished, compelling grant narrative.
+
+RULES:
+- Write in third person about the center.
+- Include ALL specific numbers, names, and data from the director's input.
+- Use professional grant language but keep it genuine — avoid generic filler phrases.
+- The section should be 3-5 substantial paragraphs.
+- NEVER invent or fabricate data the director did not provide.
+- NEVER add placeholder text like "[insert number]" — only use data actually given.
+- If the input is thin on certain points, write around what you have rather than inventing.
+- Do NOT cut the narrative short. Write a complete, polished section.`;
+
+const CLAIMS_SYSTEM = `Extract all specific factual claims from the text — numbers, names, dates, statistics, dollar amounts, percentages, and concrete assertions. Return ONLY valid JSON as an array: [{"claimText": "description of what is claimed", "claimValue": "the specific value"}]. If none exist, return [].`;
 
 function getAI() {
   return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 }
 
-function parseClaims(raw: string): Claim[] {
+function parseJSON(raw: string): unknown {
   const cleaned = raw.trim().replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
+  return JSON.parse(cleaned);
+}
+
+function parseClaims(raw: string): Claim[] {
   try {
-    const parsed: unknown = JSON.parse(cleaned);
+    const parsed = parseJSON(raw);
     if (!Array.isArray(parsed)) return [];
     return parsed
       .filter(
@@ -39,7 +62,7 @@ function parseClaims(raw: string): Claim[] {
         claimText: typeof item.claimText === "string" ? item.claimText.trim() : "",
         claimValue: typeof item.claimValue === "string" ? item.claimValue.trim() : "",
       }))
-      .filter((item) => item.claimText.length > 0 || item.claimValue.length > 0);
+      .filter((item) => item.claimText.length > 0);
   } catch {
     return [];
   }
@@ -58,46 +81,68 @@ export async function POST(request: Request) {
 
     const ai = getAI();
 
+    // Step 1: Sufficiency check
+    const sufficiencyResponse = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      config: { systemInstruction: SUFFICIENCY_SYSTEM, maxOutputTokens: 300 },
+      contents: `Section: ${sectionTitle}\nExpected content: ${prompt}\nSub-prompts the director should address:\n${(subPrompts ?? []).map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\nDirector's input:\n"${userInput}"`,
+    });
+
+    try {
+      const sufficiency = parseJSON(sufficiencyResponse.text || "{}") as {
+        sufficient?: boolean;
+        followUp?: string | null;
+      };
+
+      if (sufficiency.sufficient === false) {
+        return NextResponse.json({
+          draft: null,
+          claims: [],
+          followUp: sufficiency.followUp || "Can you add more specific details? Numbers, names, and real examples make the strongest applications.",
+          insufficient: true,
+        });
+      }
+    } catch {
+      // If sufficiency check fails to parse, proceed with drafting
+    }
+
+    // Step 2: Generate draft
     const centerDataText = Object.entries(centerData ?? {})
       .map(([key, value]) => `- ${key}: ${value}`)
       .join("\n");
 
     const narrativePrompt = [
-      `Section Type: ${sectionType}`,
-      `Section Title: ${sectionTitle}`,
+      `Section: ${sectionTitle}`,
+      `Grant section prompt: ${prompt}`,
       "",
-      "Primary Prompt:",
-      prompt,
-      "",
-      "Sub-prompts:",
+      "Points the director should address:",
       ...(subPrompts ?? []).map((item, index) => `${index + 1}. ${item}`),
       "",
-      "Director Input:",
+      "Director's input (use their words and data, write professionally):",
       userInput,
       "",
-      "Relevant Center Data:",
-      centerDataText || "(none provided)",
+      "Center data on file:",
+      centerDataText || "(none)",
     ].join("\n");
 
-    // Generate draft
     const draftResponse = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      config: { systemInstruction: WRITER_SYSTEM, maxOutputTokens: 1200 },
+      config: { systemInstruction: WRITER_SYSTEM, maxOutputTokens: 3000 },
       contents: narrativePrompt,
     });
 
     const draft = draftResponse.text?.trim() || "";
 
-    // Extract claims
+    // Step 3: Extract claims
     const claimsResponse = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      config: { systemInstruction: CLAIMS_SYSTEM, maxOutputTokens: 800 },
-      contents: `Draft to analyze:\n\n${draft}`,
+      config: { systemInstruction: CLAIMS_SYSTEM, maxOutputTokens: 1000 },
+      contents: `Extract factual claims from this grant narrative:\n\n${draft}`,
     });
 
     const claims = parseClaims(claimsResponse.text || "[]");
 
-    return NextResponse.json({ draft, claims });
+    return NextResponse.json({ draft, claims, followUp: null, insufficient: false });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to draft section";

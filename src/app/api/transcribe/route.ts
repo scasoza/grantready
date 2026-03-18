@@ -1,14 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
-let aiClient: GoogleGenAI | null = null;
-
-function getAI(): GoogleGenAI {
-  if (!aiClient) {
-    aiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
-  }
-
-  return aiClient;
+function getAI() {
+  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 }
 
 export async function POST(request: Request) {
@@ -18,6 +12,11 @@ export async function POST(request: Request) {
 
     if (!(audio instanceof Blob)) {
       throw new Error("Missing or invalid 'audio' file in form data.");
+    }
+
+    // Check minimum size — very short recordings produce hallucinations
+    if (audio.size < 1000) {
+      return NextResponse.json({ transcript: "", error: "Recording too short" });
     }
 
     const arrayBuffer = await audio.arrayBuffer();
@@ -36,14 +35,21 @@ export async function POST(request: Request) {
               },
             },
             {
-              text: "Transcribe this audio recording exactly as spoken. Return only the transcription text, nothing else.",
+              text: `Transcribe the spoken words in this audio recording.
+RULES:
+- Return ONLY the exact words spoken, nothing else.
+- If the audio is silent, empty, or unintelligible, return exactly: [no speech detected]
+- Do NOT make up or hallucinate any content.
+- Do NOT add any commentary, notes, or formatting.
+- Transcribe in the language spoken (likely English or Spanish).`,
             },
           ],
         },
       ],
     });
 
-    const transcript = response.text ?? "";
+    const raw = response.text?.trim() ?? "";
+    const transcript = raw === "[no speech detected]" ? "" : raw;
     return NextResponse.json({ transcript });
   } catch (error) {
     const message =
