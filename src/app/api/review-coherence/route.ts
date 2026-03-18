@@ -1,13 +1,9 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
-type CoherenceSection = {
+type SectionInput = {
   title: string;
   draft: string;
-};
-
-type ReviewCoherenceRequest = {
-  sections: CoherenceSection[];
 };
 
 type CoherenceIssue = {
@@ -16,115 +12,83 @@ type CoherenceIssue = {
   description: string;
 };
 
-type CoherenceReview = {
-  issues: CoherenceIssue[];
-  summary: string;
-};
+const SYSTEM_PROMPT =
+  'You are a grant application reviewer. Analyze these sections for strategic contradictions - places where claims in one section conflict with or undermine claims in another. Focus on: staffing claims vs budget vs sustainability, population numbers across sections, timeline consistency, and whether the overall narrative is coherent. Return ONLY valid JSON with this exact shape: { "issues": [{ "severity": "warning" | "error", "sections": ["section1", "section2"], "description": "what conflicts" }], "summary": "overall assessment" }';
 
-const REVIEW_SYSTEM_PROMPT =
-  'You are a grant application reviewer. Analyze these sections for strategic contradictions - places where claims in one section conflict with or undermine claims in another. Focus on: staffing claims vs budget vs sustainability, population numbers across sections, timeline consistency, and whether the overall narrative is coherent. Return JSON with this exact shape: { issues: Array<{ severity: "warning" | "error", sections: string[], description: string }>, summary: string }';
-
-function extractTextFromResponse(response: Anthropic.Messages.Message): string {
-  return response.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
-    .join("\n")
-    .trim();
+function getAI() {
+  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 }
 
-function parseCoherenceReview(raw: string): CoherenceReview {
-  const cleaned = raw
-    .trim()
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/```$/i, "");
+function parseReview(raw: string): {
+  issues: CoherenceIssue[];
+  summary: string;
+} {
+  const cleaned = raw.trim().replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
+  try {
+    const review = JSON.parse(cleaned);
 
-  const parsed: unknown = JSON.parse(cleaned);
+    const issues: CoherenceIssue[] = Array.isArray(review.issues)
+      ? review.issues
+          .map(
+            (item: {
+              severity?: string;
+              sections?: unknown[];
+              description?: string;
+            }) => ({
+              severity: (item.severity === "error" ? "error" : "warning") as
+                | "error"
+                | "warning",
+              sections: Array.isArray(item.sections)
+                ? item.sections.filter(
+                    (value): value is string => typeof value === "string"
+                  )
+                : [],
+              description:
+                typeof item.description === "string" ? item.description : "",
+            })
+          )
+          .filter(
+            (item: CoherenceIssue) => item.description.length > 0
+          )
+      : [];
 
-  if (typeof parsed !== "object" || parsed === null) {
-    throw new Error("Review response was not an object");
+    return {
+      issues,
+      summary: typeof review.summary === "string" ? review.summary : "",
+    };
+  } catch {
+    return { issues: [], summary: "Unable to parse coherence review." };
   }
-
-  const review = parsed as { issues?: unknown; summary?: unknown };
-  const issues = Array.isArray(review.issues)
-    ? review.issues
-        .filter(
-          (
-            item
-          ): item is {
-            severity?: unknown;
-            sections?: unknown;
-            description?: unknown;
-          } => typeof item === "object" && item !== null
-        )
-        .map((item) => ({
-          severity: (item.severity === "error" ? "error" : "warning") as "error" | "warning",
-          sections: Array.isArray(item.sections)
-            ? item.sections.filter(
-                (value): value is string => typeof value === "string"
-              )
-            : [],
-          description:
-            typeof item.description === "string" ? item.description : "",
-        }))
-        .filter((item) => item.description.length > 0)
-    : [];
-
-  return {
-    issues,
-    summary: typeof review.summary === "string" ? review.summary : "",
-  };
 }
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as ReviewCoherenceRequest;
+    const { sections } = (await request.json()) as { sections: SectionInput[] };
 
-    if (!Array.isArray(body.sections)) {
+    if (!sections || sections.length === 0) {
       return NextResponse.json(
-        { error: "Invalid request body: sections must be an array" },
-        { status: 400 }
+        { issues: [], summary: "No sections provided." },
+        { status: 200 }
       );
     }
 
-    const sections: CoherenceSection[] = body.sections
-      .filter(
-        (section): section is CoherenceSection =>
-          typeof section === "object" &&
-          section !== null &&
-          typeof section.title === "string" &&
-          typeof section.draft === "string"
-      )
-      .map((section) => ({
-        title: section.title.trim(),
-        draft: section.draft.trim(),
-      }))
-      .filter((section) => section.title.length > 0 || section.draft.length > 0);
+    const ai = getAI();
 
-    const anthropic = new Anthropic();
-
-    const userPrompt = sections
-      .map(
-        (section, index) =>
-          `Section ${index + 1}: ${section.title || "(untitled)"}\n${section.draft || "(empty draft)"}`
-      )
+    const sectionsText = sections
+      .map((s) => `## ${s.title}\n\n${s.draft}`)
       .join("\n\n---\n\n");
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      system: REVIEW_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: userPrompt }],
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      config: { systemInstruction: SYSTEM_PROMPT, maxOutputTokens: 1000 },
+      contents: `Review these grant application sections for coherence:\n\n${sectionsText}`,
     });
 
-    const raw = extractTextFromResponse(response);
-    const review = parseCoherenceReview(raw);
-
-    return NextResponse.json(review);
+    const result = parseReview(response.text || "{}");
+    return NextResponse.json(result);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to review coherence";
-
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

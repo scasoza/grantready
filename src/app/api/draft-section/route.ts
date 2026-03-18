@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
 type DraftSectionRequest = {
@@ -15,39 +15,34 @@ type Claim = {
   claimValue: string;
 };
 
-const WRITER_SYSTEM_PROMPT =
+const WRITER_SYSTEM =
   "You are a professional grant writer for Texas childcare centers. Your job is to transform the director's informal input into a polished, compelling grant narrative. Write in third person about the center. Include specific numbers and data from the input. Use professional grant language but keep it genuine - avoid generic filler. The section should be 2-4 paragraphs.";
 
-const CLAIMS_SYSTEM_PROMPT =
+const CLAIMS_SYSTEM =
   "Extract all specific factual claims from the text, including numbers, names, dates, and statistics. Return ONLY valid JSON as an array of objects with exactly this shape: [{\"claimText\": string, \"claimValue\": string}]. If none exist, return [].";
 
-function extractTextFromResponse(response: Anthropic.Messages.Message): string {
-  return response.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
-    .join("\n")
-    .trim();
+function getAI() {
+  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 }
 
 function parseClaims(raw: string): Claim[] {
-  const cleaned = raw.trim().replace(/^```json\s*/i, "").replace(/```$/i, "");
-  const parsed: unknown = JSON.parse(cleaned);
-
-  if (!Array.isArray(parsed)) {
-    throw new Error("Claims response was not an array");
+  const cleaned = raw.trim().replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
+  try {
+    const parsed: unknown = JSON.parse(cleaned);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (item): item is { claimText?: unknown; claimValue?: unknown } =>
+          typeof item === "object" && item !== null
+      )
+      .map((item) => ({
+        claimText: typeof item.claimText === "string" ? item.claimText.trim() : "",
+        claimValue: typeof item.claimValue === "string" ? item.claimValue.trim() : "",
+      }))
+      .filter((item) => item.claimText.length > 0 || item.claimValue.length > 0);
+  } catch {
+    return [];
   }
-
-  return parsed
-    .filter((item): item is { claimText?: unknown; claimValue?: unknown } =>
-      typeof item === "object" && item !== null
-    )
-    .map((item) => ({
-      claimText:
-        typeof item.claimText === "string" ? item.claimText.trim() : "",
-      claimValue:
-        typeof item.claimValue === "string" ? item.claimValue.trim() : "",
-    }))
-    .filter((item) => item.claimText.length > 0 || item.claimValue.length > 0);
 }
 
 export async function POST(request: Request) {
@@ -61,13 +56,13 @@ export async function POST(request: Request) {
       centerData,
     } = (await request.json()) as DraftSectionRequest;
 
-    const anthropic = new Anthropic();
+    const ai = getAI();
 
     const centerDataText = Object.entries(centerData ?? {})
       .map(([key, value]) => `- ${key}: ${value}`)
       .join("\n");
 
-    const narrativeUserPrompt = [
+    const narrativePrompt = [
       `Section Type: ${sectionType}`,
       `Section Title: ${sectionTitle}`,
       "",
@@ -84,35 +79,28 @@ export async function POST(request: Request) {
       centerDataText || "(none provided)",
     ].join("\n");
 
-    const draftResponse = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1200,
-      system: WRITER_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: narrativeUserPrompt }],
+    // Generate draft
+    const draftResponse = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      config: { systemInstruction: WRITER_SYSTEM, maxOutputTokens: 1200 },
+      contents: narrativePrompt,
     });
 
-    const draft = extractTextFromResponse(draftResponse);
+    const draft = draftResponse.text?.trim() || "";
 
-    const claimsResponse = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 800,
-      system: CLAIMS_SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: `Draft to analyze:\n\n${draft}`,
-        },
-      ],
+    // Extract claims
+    const claimsResponse = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      config: { systemInstruction: CLAIMS_SYSTEM, maxOutputTokens: 800 },
+      contents: `Draft to analyze:\n\n${draft}`,
     });
 
-    const claimsRaw = extractTextFromResponse(claimsResponse);
-    const claims = parseClaims(claimsRaw);
+    const claims = parseClaims(claimsResponse.text || "[]");
 
     return NextResponse.json({ draft, claims });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to draft section";
-
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
