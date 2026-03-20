@@ -59,23 +59,24 @@ export default function DashboardPage() {
 
       setUserEmail(user.email ?? "");
 
-      const { data: centerData } = await supabase
+      const { data: centerRows } = await supabase
         .from("centers")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .limit(1);
 
-      if (!centerData) {
+      if (!centerRows || centerRows.length === 0) {
         router.replace("/onboarding");
         return;
       }
 
-      setCenter(centerData as Center);
+      const currentCenter = centerRows[0] as Center;
+      setCenter(currentCenter);
 
       const { data: completedData } = await supabase
         .from("center_data")
         .select("data_value")
-        .eq("center_id", centerData.id)
+        .eq("center_id", currentCenter.id)
         .eq("data_key", "completed_tasks")
         .maybeSingle();
 
