@@ -8,6 +8,24 @@ type CheckoutResponse = {
   error?: string;
 };
 
+const freeFeatures = [
+  "Funding snapshot with dollar estimate",
+  "Full TRS certification roadmap (visible and actionable)",
+  "Staff credential tracker (data entry and gap detection)",
+  "Deadline and expiration alerts",
+  "3 AI document generations per month",
+];
+
+const proFeatures = [
+  "Everything in Free, plus:",
+  "Unlimited AI document generation",
+  "TRS self-assessment auto-fill",
+  "Room self-check tool (ECERS-3 / ITERS-3)",
+  "Staff auto-email for expiring certifications",
+  "Concierge application submission",
+  "Printable staff credentials binder",
+];
+
 export default function PricingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -43,40 +61,47 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-warm-50 px-4 py-10 sm:px-6">
-      <div className="mx-auto max-w-3xl">
+    <main className="min-h-screen bg-warm-50 px-4 py-10 text-warm-900 sm:px-6">
+      <div className="mx-auto max-w-4xl">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-warm-600 hover:text-warm-900 transition"
+          className="inline-flex items-center gap-2 text-sm font-medium text-warm-600 transition hover:text-warm-900"
         >
           <span aria-hidden="true">←</span>
-          Back to home
+          Back
         </Link>
 
-        <div className="mt-8 min-h-[72vh] flex items-center justify-center">
-          <div className="w-full max-w-md rounded-2xl border border-warm-200 bg-white p-6 sm:p-8 shadow-md">
-            <p className="text-sm font-semibold text-brand-700">Single plan</p>
-            <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-warm-900">
-              GrantReady Pro
-            </h1>
-
-            <div className="mt-4 flex items-baseline gap-1">
-              <span className="text-4xl font-extrabold tracking-tight text-warm-900">$199</span>
-              <span className="text-sm font-medium text-warm-500">/month</span>
-            </div>
+        <section className="mt-8 grid gap-6 md:grid-cols-2">
+          <article className="rounded-2xl border border-warm-200 bg-white p-6 shadow-sm sm:p-8">
+            <h1 className="text-2xl font-bold tracking-tight">Free</h1>
+            <p className="mt-3 text-4xl font-extrabold tracking-tight">$0</p>
 
             <ul className="mt-6 space-y-3 text-sm text-warm-700">
-              {[
-                "AI-powered grant narrative drafting",
-                "Voice memo input — talk, don't type",
-                "Claim-level fact verification",
-                "Cross-section coherence check",
-                "Budget builder with examples",
-                "Unlimited applications",
-                "14-day free trial",
-              ].map((feature) => (
+              {freeFeatures.map((feature) => (
                 <li key={feature} className="flex items-start gap-2.5">
-                  <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-gradient-to-r from-brand-500 to-brand-600" />
+                  <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-gradient-to-b from-brand-500 to-brand-600" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/quiz"
+              className="mt-8 inline-flex w-full items-center justify-center rounded-2xl border border-warm-200 px-4 py-3 text-sm font-semibold text-warm-900 transition hover:bg-warm-100"
+            >
+              Get Started Free
+            </Link>
+          </article>
+
+          <article className="rounded-2xl border-2 border-green-500 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-2xl font-bold tracking-tight">Pro</h2>
+            <p className="mt-3 text-4xl font-extrabold tracking-tight">$49/month</p>
+            <p className="mt-2 text-sm text-warm-600">No contracts. Cancel anytime.</p>
+
+            <ul className="mt-6 space-y-3 text-sm text-warm-700">
+              {proFeatures.map((feature) => (
+                <li key={feature} className="flex items-start gap-2.5">
+                  <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-gradient-to-b from-brand-500 to-brand-600" />
                   <span>{feature}</span>
                 </li>
               ))}
@@ -92,13 +117,18 @@ export default function PricingPage() {
               type="button"
               onClick={handleStartTrial}
               disabled={isLoading}
-              className="mt-6 w-full rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-brand-600/25 transition hover:from-brand-600 hover:to-brand-700 disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-8 inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:from-brand-600 hover:to-brand-700 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isLoading ? "Redirecting to checkout..." : "Start Free Trial"}
+              {isLoading ? "Redirecting..." : "Start 14-Day Free Trial"}
             </button>
-          </div>
-        </div>
+          </article>
+        </section>
+
+        <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-warm-600">
+          The free plan is fully functional for providers who write documents manually and fill the
+          TWC portal themselves. Pro removes friction.
+        </p>
       </div>
-    </div>
+    </main>
   );
 }

@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GrantReady — Grant Application Assembly for Childcare Directors",
+  title: "GrantReady — More Funding for Your Childcare Center",
   description:
-    "Stop spending 30 hours on grant applications. GrantReady finds childcare grants, tracks deadlines, and drafts your applications with AI. Starting at $199/month.",
+    "Texas childcare providers miss an average of $14,000/yr in funding they already qualify for. GrantReady shows you what you are missing and walks you through every step to get it.",
 };
 
 export default function RootLayout({

@@ -13,6 +13,11 @@ export default function OnboardingPage() {
   const [licenseNumber, setLicenseNumber] = useState("");
   const [centerName, setCenterName] = useState("");
   const [address, setAddress] = useState("");
+  const [county, setCounty] = useState("");
+  const [licensedCapacity, setLicensedCapacity] = useState("");
+  const [enrollmentCount, setEnrollmentCount] = useState("");
+  const [staffCount, setStaffCount] = useState("");
+  const [ccsCount, setCcsCount] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -29,6 +34,56 @@ export default function OnboardingPage() {
 
     void loadUser();
   }, [router, supabase]);
+
+  useEffect(() => {
+    const rawQuizData = window.localStorage.getItem("grantready_quiz");
+    if (!rawQuizData) {
+      return;
+    }
+
+    try {
+      const quizData = JSON.parse(rawQuizData) as {
+        county?: unknown;
+        licensedCapacity?: unknown;
+        currentEnrollment?: unknown;
+        staffCount?: unknown;
+        acceptsCCS?: unknown;
+        ccsCount?: unknown;
+      };
+
+      setCounty(typeof quizData.county === "string" ? quizData.county : "");
+      setLicensedCapacity(
+        quizData.licensedCapacity !== undefined && quizData.licensedCapacity !== null
+          ? String(quizData.licensedCapacity)
+          : "",
+      );
+      setEnrollmentCount(
+        quizData.currentEnrollment !== undefined && quizData.currentEnrollment !== null
+          ? String(quizData.currentEnrollment)
+          : "",
+      );
+      setStaffCount(
+        quizData.staffCount !== undefined && quizData.staffCount !== null ? String(quizData.staffCount) : "",
+      );
+      setCcsCount(
+        quizData.acceptsCCS === "Yes" && quizData.ccsCount !== undefined && quizData.ccsCount !== null
+          ? String(quizData.ccsCount)
+          : "",
+      );
+    } catch {
+      // Ignore invalid localStorage payloads.
+    }
+  }, []);
+
+  const toNullableNumber = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const parsed = Number(trimmed);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
 
   const hasLicense = licenseNumber.trim().length > 0;
   const hasNameAndAddress = centerName.trim().length > 0 && address.trim().length > 0;
@@ -65,6 +120,11 @@ export default function OnboardingPage() {
       license_number: licenseNumber.trim() || null,
       center_name: centerName.trim() || null,
       address: address.trim() || null,
+      county: county.trim() || null,
+      licensed_capacity: toNullableNumber(licensedCapacity),
+      enrollment_count: toNullableNumber(enrollmentCount),
+      staff_count: toNullableNumber(staffCount),
+      ccs_count: toNullableNumber(ccsCount),
     });
 
     setSubmitting(false);
@@ -74,6 +134,7 @@ export default function OnboardingPage() {
       return;
     }
 
+    window.localStorage.removeItem("grantready_quiz");
     router.push("/dashboard");
     router.refresh();
   };
@@ -139,6 +200,61 @@ export default function OnboardingPage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">County</label>
+                <input
+                  type="text"
+                  value={county}
+                  onChange={(event) => setCounty(event.target.value)}
+                  placeholder="Dallas County"
+                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Licensed capacity</label>
+                <input
+                  type="number"
+                  value={licensedCapacity}
+                  onChange={(event) => setLicensedCapacity(event.target.value)}
+                  min={0}
+                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Current enrollment</label>
+                <input
+                  type="number"
+                  value={enrollmentCount}
+                  onChange={(event) => setEnrollmentCount(event.target.value)}
+                  min={0}
+                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Staff count</label>
+                <input
+                  type="number"
+                  value={staffCount}
+                  onChange={(event) => setStaffCount(event.target.value)}
+                  min={0}
+                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">CCS count</label>
+                <input
+                  type="number"
+                  value={ccsCount}
+                  onChange={(event) => setCcsCount(event.target.value)}
+                  min={0}
+                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm"
+                />
+              </div>
+
               {errorMessage && (
                 <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage}</p>
               )}
@@ -169,6 +285,26 @@ export default function OnboardingPage() {
                 <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">Address</dt>
                   <dd className="text-warm-800">{address || "Not provided"}</dd>
+                </div>
+                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                  <dt className="text-warm-500 font-semibold">County</dt>
+                  <dd className="text-warm-800">{county || "Not provided"}</dd>
+                </div>
+                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                  <dt className="text-warm-500 font-semibold">Licensed capacity</dt>
+                  <dd className="text-warm-800">{licensedCapacity || "Not provided"}</dd>
+                </div>
+                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                  <dt className="text-warm-500 font-semibold">Current enrollment</dt>
+                  <dd className="text-warm-800">{enrollmentCount || "Not provided"}</dd>
+                </div>
+                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                  <dt className="text-warm-500 font-semibold">Staff count</dt>
+                  <dd className="text-warm-800">{staffCount || "Not provided"}</dd>
+                </div>
+                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                  <dt className="text-warm-500 font-semibold">CCS count</dt>
+                  <dd className="text-warm-800">{ccsCount || "Not provided"}</dd>
                 </div>
               </dl>
 

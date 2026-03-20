@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { estimateRevenueIncrease } from "@/lib/trs-tasks";
 
 type QuizAnswers = {
@@ -61,24 +61,20 @@ const currency = new Intl.NumberFormat("en-US", {
 
 export default function FundingSnapshotPage() {
   const router = useRouter();
-  const quizData = useMemo(() => {
-    if (typeof window === "undefined") {
-      return null;
-    }
+  const [mounted, setMounted] = useState(false);
+  const [quizData, setQuizData] = useState<QuizAnswers | null>(null);
 
+  useEffect(() => {
     const raw = window.localStorage.getItem("grantready_quiz");
-    if (!raw) {
-      return null;
-    }
-
-    return parseQuizData(raw);
+    setQuizData(raw ? parseQuizData(raw) : null);
+    setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!quizData) {
+    if (mounted && !quizData) {
       router.replace("/quiz");
     }
-  }, [quizData, router]);
+  }, [mounted, quizData, router]);
 
   const revenue = useMemo(() => {
     if (!quizData) {
@@ -88,7 +84,7 @@ export default function FundingSnapshotPage() {
     return estimateRevenueIncrease(quizData.ccsCount, 0);
   }, [quizData]);
 
-  if (!quizData || !revenue) {
+  if (!mounted || !quizData || !revenue) {
     return (
       <div className="min-h-screen bg-warm-50 px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-5xl rounded-2xl border border-warm-200 bg-white p-6 text-sm text-warm-500">Loading funding snapshot...</div>
