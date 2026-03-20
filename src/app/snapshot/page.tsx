@@ -183,7 +183,7 @@ export default function FundingSnapshotPage() {
         <section className="rounded-2xl border border-warm-200 bg-white p-6 text-center sm:p-8">
           <h2 className="text-2xl font-extrabold tracking-tight text-warm-900">Create a free account to start your roadmap</h2>
           <Link
-            href="/login"
+            href="/login?mode=signup"
             className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-b from-brand-500 to-brand-600 px-6 py-4 text-base font-semibold text-white shadow-md shadow-brand-600/20 hover:from-brand-600 hover:to-brand-700 sm:w-auto"
           >
             Create Free Account

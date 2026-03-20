@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -31,6 +31,13 @@ export default function LoginPage() {
   };
 
   const [isSignUp, setIsSignUp] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "signup") {
+      setIsSignUp(true);
+    }
+  }, []);
 
   const signInWithEmail = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -184,6 +191,7 @@ export default function LoginPage() {
               </>
             )}
           </p>
+          <a href='/pricing' className='text-sm text-warm-400 hover:text-warm-500 mt-4 inline-block'>See pricing →</a>
           </>
           )}
         </div>

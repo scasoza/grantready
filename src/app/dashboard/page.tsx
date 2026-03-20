@@ -104,7 +104,7 @@ export default function DashboardPage() {
   const completedCount = completedTasks.size;
   const totalCount = trsTasks.length;
   const progressPct = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
-  const revenueProjection = estimateRevenueIncrease(center?.ccs_count ?? 10, 0);
+  const revenueProjection = estimateRevenueIncrease(center?.ccs_count ?? 0, 0);
 
   const taskTitleById = useMemo(() => {
     return Object.fromEntries(trsTasks.map((task) => [task.id, task.title]));

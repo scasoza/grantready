@@ -78,7 +78,7 @@ export default function OnboardingPage() {
         quizData.staffCount !== undefined && quizData.staffCount !== null ? String(quizData.staffCount) : "",
       );
       setCcsCount(
-        quizData.acceptsCCS === "Yes" && quizData.ccsCount !== undefined && quizData.ccsCount !== null
+        String(quizData.acceptsCCS).toLowerCase() === "yes" && quizData.ccsCount !== undefined && quizData.ccsCount !== null
           ? String(quizData.ccsCount)
           : "",
       );
@@ -124,6 +124,15 @@ export default function OnboardingPage() {
     if (userError || !user) {
       setSubmitting(false);
       router.replace("/login");
+      return;
+    }
+
+    const { data: existing } = await supabase.from("centers").select("id").eq("user_id", user.id).limit(1);
+    if (existing && existing.length > 0) {
+      // Center already exists, just go to dashboard
+      window.localStorage.removeItem("grantready_quiz");
+      setSubmitting(false);
+      router.replace("/dashboard");
       return;
     }
 
