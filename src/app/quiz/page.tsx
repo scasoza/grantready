@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type YesNo = "yes" | "no" | "";
 
@@ -19,7 +19,8 @@ type QuizAnswers = {
   trsExperience: string;
 };
 
-const TOTAL_STEPS = 9;
+const ALL_QUESTION_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+const OPENING_QUESTION_INDICES = [0, 1, 8];
 
 const initialAnswers: QuizAnswers = {
   centerType: "",
@@ -39,10 +40,50 @@ export default function QuizPage() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>(initialAnswers);
 
-  const progressPercent = useMemo(() => ((step + 1) / TOTAL_STEPS) * 100, [step]);
+  const activeQuestionIndices = useMemo(
+    () =>
+      answers.centerType === "Thinking about opening"
+        ? OPENING_QUESTION_INDICES
+        : ALL_QUESTION_INDICES,
+    [answers.centerType],
+  );
+  const totalSteps = activeQuestionIndices.length;
+  const currentQuestionIndex = activeQuestionIndices[step] ?? activeQuestionIndices[0];
+  const progressPercent = useMemo(() => ((step + 1) / totalSteps) * 100, [step, totalSteps]);
+
+  useEffect(() => {
+    let isCancelled = false;
+    const storedStart = localStorage.getItem("grantready_quiz_start");
+    if (!storedStart) {
+      return () => {
+        isCancelled = true;
+      };
+    }
+
+    localStorage.removeItem("grantready_quiz_start");
+
+    try {
+      const parsed = JSON.parse(storedStart) as { centerType?: string };
+      if (typeof parsed.centerType === "string" && parsed.centerType.length > 0) {
+        queueMicrotask(() => {
+          if (isCancelled) {
+            return;
+          }
+          setAnswers((prev) => ({ ...prev, centerType: parsed.centerType ?? "" }));
+          setStep(1);
+        });
+      }
+    } catch {
+      // Ignore invalid start payloads.
+    }
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const canGoNext = useMemo(() => {
-    switch (step) {
+    switch (currentQuestionIndex) {
       case 0:
         return answers.centerType.length > 0;
       case 1:
@@ -70,7 +111,7 @@ export default function QuizPage() {
       default:
         return false;
     }
-  }, [answers, step]);
+  }, [answers, currentQuestionIndex]);
 
   const updateAnswer = <K extends keyof QuizAnswers>(key: K, value: QuizAnswers[K]) => {
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -82,13 +123,25 @@ export default function QuizPage() {
   };
 
   const saveAndContinue = () => {
-    const payload = {
-      ...answers,
-      licensedCapacity: toNumberOrNull(answers.licensedCapacity),
-      currentEnrollment: toNumberOrNull(answers.currentEnrollment),
-      ccsCount: answers.acceptsCCS === "yes" ? toNumberOrNull(answers.ccsCount) : null,
-      staffCount: toNumberOrNull(answers.staffCount),
-    };
+    const payload =
+      answers.centerType === "Thinking about opening"
+        ? {
+            ...answers,
+            licensedCapacity: 0,
+            currentEnrollment: 0,
+            acceptsCCS: "No",
+            ccsCount: 0,
+            staffCount: 0,
+            hasCurriculum: "No",
+            teacherCredentials: "No",
+          }
+        : {
+            ...answers,
+            licensedCapacity: toNumberOrNull(answers.licensedCapacity),
+            currentEnrollment: toNumberOrNull(answers.currentEnrollment),
+            ccsCount: answers.acceptsCCS === "yes" ? toNumberOrNull(answers.ccsCount) : null,
+            staffCount: toNumberOrNull(answers.staffCount),
+          };
 
     localStorage.setItem("grantready_quiz", JSON.stringify(payload));
     router.push("/snapshot");
@@ -100,7 +153,7 @@ export default function QuizPage() {
       return;
     }
 
-    if (step === TOTAL_STEPS - 1) {
+    if (step === totalSteps - 1) {
       saveAndContinue();
       return;
     }
@@ -122,7 +175,7 @@ export default function QuizPage() {
 
         <div className="mb-8">
           <div className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-warm-500">
-            <span>Step {step + 1} of 9</span>
+            <span>Step {step + 1} of {totalSteps}</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-warm-200">
             <div
@@ -133,7 +186,7 @@ export default function QuizPage() {
         </div>
 
         <form onSubmit={onSubmit} className="flex flex-1 flex-col rounded-2xl border border-warm-200 bg-white p-5 sm:p-8 shadow-sm">
-          <div className="flex-1">{renderQuestion(step, answers, updateAnswer)}</div>
+          <div className="flex-1">{renderQuestion(currentQuestionIndex, answers, updateAnswer)}</div>
 
           <div className="mt-8 flex items-center justify-between gap-3">
             {step === 0 ? (
@@ -153,7 +206,7 @@ export default function QuizPage() {
               disabled={!canGoNext}
               className="rounded-xl bg-brand-500 px-6 py-3 text-base font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {step === TOTAL_STEPS - 1 ? "Finish" : "Next"}
+              {step === totalSteps - 1 ? "Finish" : "Next"}
             </button>
           </div>
         </form>
@@ -163,11 +216,11 @@ export default function QuizPage() {
 }
 
 function renderQuestion(
-  step: number,
+  questionIndex: number,
   answers: QuizAnswers,
   updateAnswer: <K extends keyof QuizAnswers>(key: K, value: QuizAnswers[K]) => void,
 ) {
-  switch (step) {
+  switch (questionIndex) {
     case 0:
       return (
         <div className="space-y-5">

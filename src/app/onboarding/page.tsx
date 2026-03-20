@@ -144,8 +144,8 @@ export default function OnboardingPage() {
       <div className="mx-auto max-w-2xl">
         <div className="mb-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">Center onboarding</p>
-          <h1 className="mt-2 text-2xl sm:text-3xl font-extrabold text-warm-900 tracking-tight">Set up your center profile</h1>
-          <p className="mt-2 text-sm text-warm-500">We use this information to match grants and prefill application data.</p>
+          <h1 className="mt-2 text-2xl sm:text-3xl font-extrabold text-warm-900 tracking-tight">Tell us about your center</h1>
+          <p className="mt-2 text-sm text-warm-500">This helps us personalize your TRS certification roadmap.</p>
         </div>
 
         <div className="mb-6 rounded-2xl border border-warm-200 bg-white p-4 sm:p-5">

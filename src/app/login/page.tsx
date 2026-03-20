@@ -110,8 +110,8 @@ export default function LoginPage() {
           </h1>
           <p className="text-sm text-warm-500 mt-2 mb-6">
             {isSignUp
-              ? "Enter a password to create your GrantReady account."
-              : "Continue to set up your center profile and start applying for grants."}
+              ? "Create your free account to access your roadmap."
+              : "See your TRS certification roadmap and start earning more."}
           </p>
 
           <button

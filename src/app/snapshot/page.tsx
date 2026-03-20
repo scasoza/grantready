@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { estimateRevenueIncrease } from "@/lib/trs-tasks";
 
 type QuizAnswers = {
+  centerType: string;
   ccsCount: number;
   currentEnrollment: number;
   hasCurriculum: "Yes" | "Sort of" | "No";
@@ -19,6 +20,7 @@ function parseQuizData(raw: string): QuizAnswers | null {
 
     const ccsCount = Number(parsed.ccsCount);
     const currentEnrollment = Number(parsed.currentEnrollment);
+    const centerType = typeof parsed.centerType === "string" ? parsed.centerType : "";
 
     const hasCurriculum = parsed.hasCurriculum;
     const teacherCredentials = parsed.teacherCredentials;
@@ -42,6 +44,7 @@ function parseQuizData(raw: string): QuizAnswers | null {
     }
 
     return {
+      centerType,
       ccsCount,
       currentEnrollment,
       hasCurriculum,
@@ -83,6 +86,7 @@ export default function FundingSnapshotPage() {
 
     return estimateRevenueIncrease(quizData.ccsCount, 0);
   }, [quizData]);
+  const isThinkingAboutOpening = quizData?.centerType === "Thinking about opening";
 
   if (!mounted || !quizData || !revenue) {
     return (
@@ -95,14 +99,31 @@ export default function FundingSnapshotPage() {
   return (
     <div className="min-h-screen bg-warm-50 px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-5xl space-y-8">
+        <header className="flex items-start justify-between">
+          <Link href="/" className="inline-flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-700 rounded-xl flex items-center justify-center shadow-md shadow-brand-600/25">
+              <span className="text-white font-extrabold text-sm">G</span>
+            </div>
+            <span className="text-lg font-bold text-warm-900 tracking-tight">GrantReady</span>
+          </Link>
+        </header>
+
         <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Funding Snapshot</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-emerald-900 sm:text-4xl">
-            You could be earning an additional {currency.format(revenue.annualIncrease)} per year
+            {isThinkingAboutOpening
+              ? "Here is what you could earn once you open"
+              : `You could be earning an additional ${currency.format(revenue.annualIncrease)} per year`}
           </h1>
-          <p className="mt-3 text-base text-emerald-800">
-            That is {currency.format(revenue.monthlyIncrease)} more per month from higher CCS reimbursement rates.
-          </p>
+          {isThinkingAboutOpening ? (
+            <p className="mt-3 text-base text-emerald-800">
+              $0 estimated right now. Complete TRS certification after opening to unlock higher reimbursement rates.
+            </p>
+          ) : (
+            <p className="mt-3 text-base text-emerald-800">
+              That is {currency.format(revenue.monthlyIncrease)} more per month from higher CCS reimbursement rates.
+            </p>
+          )}
         </section>
 
         <section className="space-y-4">
@@ -123,7 +144,7 @@ export default function FundingSnapshotPage() {
                 You reported: Curriculum {quizData.hasCurriculum}, teacher credentials {quizData.teacherCredentials}, TRS experience {quizData.trsExperience}.
               </p>
               <Link
-                href="/login"
+                href="/dashboard"
                 className="inline-flex rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-600/20 hover:from-brand-600 hover:to-brand-700"
               >
                 See your roadmap &rarr;
@@ -150,7 +171,7 @@ export default function FundingSnapshotPage() {
           </div>
         </section>
 
-        {quizData.ccsCount > 0 && (
+        {quizData.ccsCount > 0 && !isThinkingAboutOpening && (
           <section className="space-y-4">
             <h2 className="text-xl font-bold text-warm-900">Already Using</h2>
             <article className="rounded-2xl border border-warm-200 bg-white p-5 text-warm-800">
