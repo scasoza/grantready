@@ -27,9 +27,14 @@ function formatCurrency(value: number) {
 
 function actionHref(task: TrsTask) {
   if (!task.action) return null;
-  if (task.action.type === "link" && task.action.href) return task.action.href;
+  if (task.action.type === "generate-doc" && task.action.docType) {
+    return `/apply/trs/${task.action.docType}`;
+  }
   if (task.action.type === "staff-tracker") return "/staff";
-  return "/documents";
+  if (task.action.type === "room-check") return "/dashboard";
+  if (task.action.type === "self-assessment") return "/dashboard";
+  if (task.action.type === "link" && task.action.href) return task.action.href;
+  return null;
 }
 
 export default function DashboardPage() {
@@ -207,8 +212,16 @@ export default function DashboardPage() {
               <div className="mt-3">
                 <Link
                   href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel={href.startsWith("http") ? "noreferrer" : undefined}
+                  target={task.action.type === "link" ? "_blank" : undefined}
+                  rel={task.action.type === "link" ? "noreferrer" : undefined}
+                  onClick={() => {
+                    if (task.action?.type === "room-check") {
+                      window.alert("Room self-check coming soon");
+                    }
+                    if (task.action?.type === "self-assessment") {
+                      window.alert("Self-assessment auto-fill coming soon");
+                    }
+                  }}
                   className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
                 >
                   {task.action.label}

@@ -267,6 +267,7 @@ function renderQuestion(
         <div className="space-y-5">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">How many children are you licensed for?</h1>
           <input
+            key={`number-${questionIndex}`}
             type="number"
             min="0"
             inputMode="numeric"
@@ -281,6 +282,7 @@ function renderQuestion(
         <div className="space-y-5">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Current enrollment?</h1>
           <input
+            key={`number-${questionIndex}`}
             type="number"
             min="0"
             inputMode="numeric"
@@ -294,7 +296,7 @@ function renderQuestion(
       return (
         <div className="space-y-5">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Do you accept CCS (subsidized) children?</h1>
-          <div className="flex gap-3">
+          <div key={`choices-${questionIndex}`} className="flex gap-3">
             <button
               type="button"
               onClick={() => {
@@ -328,6 +330,7 @@ function renderQuestion(
             <div className="space-y-2">
               <label className="block text-base font-semibold text-warm-700">How many?</label>
               <input
+                key={`number-${questionIndex}`}
                 type="number"
                 min="0"
                 inputMode="numeric"
@@ -344,6 +347,7 @@ function renderQuestion(
         <div className="space-y-5">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">How many staff, including yourself?</h1>
           <input
+            key={`number-${questionIndex}`}
             type="number"
             min="0"
             inputMode="numeric"
@@ -357,7 +361,7 @@ function renderQuestion(
       return (
         <div className="space-y-5">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Do you have a written curriculum?</h1>
-          <div className="flex flex-wrap gap-3">
+          <div key={`choices-${questionIndex}`} className="flex flex-wrap gap-3">
             {["Yes", "Sort of", "No"].map((option) => (
               <button
                 key={option}
@@ -379,7 +383,7 @@ function renderQuestion(
       return (
         <div className="space-y-5">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Do all lead teachers hold a CDA or higher?</h1>
-          <div className="flex flex-wrap gap-3">
+          <div key={`choices-${questionIndex}`} className="flex flex-wrap gap-3">
             {["Yes", "Not sure", "No"].map((option) => (
               <button
                 key={option}
@@ -401,7 +405,7 @@ function renderQuestion(
       return (
         <div className="space-y-5">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Have you looked into Texas Rising Star before?</h1>
-          <div className="flex flex-wrap gap-3">
+          <div key={`choices-${questionIndex}`} className="flex flex-wrap gap-3">
             {["Yes, applied", "Yes, looked", "No"].map((option) => (
               <button
                 key={option}
