@@ -271,11 +271,11 @@ export default function DashboardPage() {
             </span>
             GrantReady
           </Link>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-warm-600">{userEmail}</span>
+          <div className="flex items-center gap-2 text-sm min-w-0">
+            <span className="text-warm-600 hidden sm:inline truncate max-w-[200px]">{userEmail}</span>
             <button
               onClick={() => void handleSignOut()}
-              className="rounded-xl bg-brand-500 px-3 py-1.5 text-white hover:bg-brand-600"
+              className="rounded-xl bg-brand-500 px-3 py-1.5 text-white hover:bg-brand-600 whitespace-nowrap"
             >
               Sign out
             </button>
