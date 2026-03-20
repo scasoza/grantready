@@ -27,12 +27,7 @@ function formatCurrency(value: number) {
 
 function actionHref(task: TrsTask) {
   if (!task.action) return null;
-  if (task.action.type === "generate-doc" && task.action.docType) {
-    return `/apply/trs/${task.action.docType}`;
-  }
   if (task.action.type === "staff-tracker") return "/staff";
-  if (task.action.type === "room-check") return "/dashboard";
-  if (task.action.type === "self-assessment") return "/dashboard";
   if (task.action.type === "link" && task.action.href) return task.action.href;
   return null;
 }
@@ -209,24 +204,55 @@ export default function DashboardPage() {
               </p>
             )}
 
-            {!isBlocked && task.action && href && (
+            {!isBlocked && task.action && (
               <div className="mt-3">
-                <Link
-                  href={href}
-                  target={task.action.type === "link" ? "_blank" : undefined}
-                  rel={task.action.type === "link" ? "noreferrer" : undefined}
-                  onClick={() => {
-                    if (task.action?.type === "room-check") {
-                      window.alert("Room self-check coming soon");
-                    }
-                    if (task.action?.type === "self-assessment") {
-                      window.alert("Self-assessment auto-fill coming soon");
-                    }
-                  }}
-                  className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
-                >
-                  {task.action.label}
-                </Link>
+                {task.action.type === "generate-doc" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.alert(
+                        "Document generation for " +
+                          task.title +
+                          " is coming soon. For now, you can write this document manually."
+                      );
+                    }}
+                    className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
+                  >
+                    {task.action.label}
+                  </button>
+                )}
+                {task.action.type === "room-check" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.alert("Room self-check tool coming soon.");
+                    }}
+                    className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
+                  >
+                    {task.action.label}
+                  </button>
+                )}
+                {task.action.type === "self-assessment" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.alert("Self-assessment auto-fill coming soon.");
+                    }}
+                    className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
+                  >
+                    {task.action.label}
+                  </button>
+                )}
+                {href && (task.action.type === "staff-tracker" || task.action.type === "link") && (
+                  <Link
+                    href={href}
+                    target={task.action.type === "link" ? "_blank" : undefined}
+                    rel={task.action.type === "link" ? "noreferrer" : undefined}
+                    className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
+                  >
+                    {task.action.label}
+                  </Link>
+                )}
               </div>
             )}
           </div>

@@ -321,8 +321,8 @@ export default function StaffTrackerPage() {
     const role = addForm.role.trim();
     const email = addForm.email.trim();
 
-    if (!name || !role || !addForm.hireDate || !email) {
-      setErrorMessage("Name, role, hire date, and email are required.");
+    if (!name) {
+      setErrorMessage("Name is required.");
       return;
     }
 
@@ -363,8 +363,8 @@ export default function StaffTrackerPage() {
     const role = editDraft.role.trim();
     const email = editDraft.email.trim();
 
-    if (!name || !role || !editDraft.hireDate || !email) {
-      setErrorMessage("Name, role, hire date, and email are required.");
+    if (!name) {
+      setErrorMessage("Name is required.");
       return;
     }
 
@@ -475,12 +475,15 @@ export default function StaffTrackerPage() {
                   onChange={(event) => setAddForm((prev) => ({ ...prev, role: event.target.value }))}
                   className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
-                <input
-                  type="date"
-                  value={addForm.hireDate}
-                  onChange={(event) => setAddForm((prev) => ({ ...prev, hireDate: event.target.value }))}
-                  className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                />
+                <div>
+                  <p className="text-xs text-warm-500 mb-1">Hire date</p>
+                  <input
+                    type="date"
+                    value={addForm.hireDate}
+                    onChange={(event) => setAddForm((prev) => ({ ...prev, hireDate: event.target.value }))}
+                    className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
                 <input
                   type="email"
                   placeholder="Email"
