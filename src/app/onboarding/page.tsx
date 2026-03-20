@@ -29,6 +29,18 @@ export default function OnboardingPage() {
 
       if (!user) {
         router.replace("/login");
+        return;
+      }
+
+      // If user already has a center, skip onboarding
+      const { data: existingCenter } = await supabase
+        .from("centers")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1);
+
+      if (existingCenter && existingCenter.length > 0) {
+        router.replace("/dashboard");
       }
     };
 
@@ -135,8 +147,7 @@ export default function OnboardingPage() {
     }
 
     window.localStorage.removeItem("grantready_quiz");
-    router.push("/dashboard");
-    router.refresh();
+    router.replace("/dashboard");
   };
 
   return (
