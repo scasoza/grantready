@@ -14,11 +14,16 @@ export default function LoginPage() {
   const [loadingEmail, setLoadingEmail] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const getNextUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("next") || "/onboarding";
+  };
+
   const signInWithGoogle = async () => {
     setErrorMessage(null);
     setLoadingGoogle(true);
 
-    const redirectTo = `${window.location.origin}/auth/callback?next=/onboarding`;
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(getNextUrl())}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo },
@@ -48,7 +53,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding` },
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(getNextUrl())}` },
       });
       setLoadingEmail(false);
       if (error) {
@@ -76,8 +81,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/onboarding");
-    router.refresh();
+    router.replace(getNextUrl());
   };
 
   const [confirmationSent, setConfirmationSent] = useState(false);

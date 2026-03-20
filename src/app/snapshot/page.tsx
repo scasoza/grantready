@@ -113,15 +113,21 @@ export default function FundingSnapshotPage() {
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-emerald-900 sm:text-4xl">
             {isThinkingAboutOpening
               ? "Here is what you could earn once you open"
-              : `You could be earning an additional ${currency.format(revenue.annualIncrease)} per year`}
+              : quizData.ccsCount > 0
+                ? `You could be earning an additional ${currency.format(revenue.annualIncrease)} per year`
+                : "TRS certification unlocks higher reimbursement rates"}
           </h1>
           {isThinkingAboutOpening ? (
             <p className="mt-3 text-base text-emerald-800">
               $0 estimated right now. Complete TRS certification after opening to unlock higher reimbursement rates.
             </p>
-          ) : (
+          ) : quizData.ccsCount > 0 ? (
             <p className="mt-3 text-base text-emerald-800">
               That is {currency.format(revenue.monthlyIncrease)} more per month from higher CCS reimbursement rates.
+            </p>
+          ) : (
+            <p className="mt-3 text-base text-emerald-800">
+              You don&apos;t currently accept CCS children, but TRS certification positions you for higher reimbursements if you do — and signals quality to all parents.
             </p>
           )}
         </section>
@@ -135,14 +141,17 @@ export default function FundingSnapshotPage() {
                 Quality rating that increases your CCS reimbursement rates by up to 9%
               </p>
               <p className="text-sm text-warm-900">
-                <span className="font-semibold">Estimated value:</span> {currency.format(revenue.annualIncrease)}
+                <span className="font-semibold">Estimated value:</span>{" "}
+                {quizData.ccsCount > 0 ? currency.format(revenue.annualIncrease) : "Depends on future CCS enrollment"}
               </p>
               <p className="text-sm text-warm-900">
                 <span className="font-semibold">What&apos;s required:</span> 22 tasks to complete, estimated 8 weeks
               </p>
-              <p className="text-xs text-warm-500">
-                You reported: Curriculum {quizData.hasCurriculum}, teacher credentials {quizData.teacherCredentials}, TRS experience {quizData.trsExperience}.
-              </p>
+              {!isThinkingAboutOpening && (
+                <p className="text-xs text-warm-500">
+                  You reported: Curriculum {quizData.hasCurriculum}, teacher credentials {quizData.teacherCredentials}, TRS experience {quizData.trsExperience}.
+                </p>
+              )}
               <Link
                 href="/dashboard"
                 className="inline-flex rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-600/20 hover:from-brand-600 hover:to-brand-700"

@@ -52,12 +52,9 @@ export default function QuizPage() {
   const progressPercent = useMemo(() => ((step + 1) / totalSteps) * 100, [step, totalSteps]);
 
   useEffect(() => {
-    let isCancelled = false;
     const storedStart = localStorage.getItem("grantready_quiz_start");
     if (!storedStart) {
-      return () => {
-        isCancelled = true;
-      };
+      return;
     }
 
     localStorage.removeItem("grantready_quiz_start");
@@ -65,21 +62,12 @@ export default function QuizPage() {
     try {
       const parsed = JSON.parse(storedStart) as { centerType?: string };
       if (typeof parsed.centerType === "string" && parsed.centerType.length > 0) {
-        queueMicrotask(() => {
-          if (isCancelled) {
-            return;
-          }
-          setAnswers((prev) => ({ ...prev, centerType: parsed.centerType ?? "" }));
-          setStep(1);
-        });
+        setAnswers((prev) => ({ ...prev, centerType: parsed.centerType ?? "" }));
       }
     } catch {
       // Ignore invalid start payloads.
     }
 
-    return () => {
-      isCancelled = true;
-    };
   }, []);
 
   const canGoNext = useMemo(() => {

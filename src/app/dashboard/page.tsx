@@ -40,6 +40,7 @@ export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState<string>("");
   const [center, setCenter] = useState<Center | null>(null);
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
+  const [comingSoonId, setComingSoonId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -206,42 +207,21 @@ export default function DashboardPage() {
 
             {!isBlocked && task.action && (
               <div className="mt-3">
-                {task.action.type === "generate-doc" && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      window.alert(
-                        "Document generation for " +
-                          task.title +
-                          " is coming soon. For now, you can write this document manually."
-                      );
-                    }}
-                    className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
-                  >
-                    {task.action.label}
-                  </button>
-                )}
-                {task.action.type === "room-check" && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      window.alert("Room self-check tool coming soon.");
-                    }}
-                    className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
-                  >
-                    {task.action.label}
-                  </button>
-                )}
-                {task.action.type === "self-assessment" && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      window.alert("Self-assessment auto-fill coming soon.");
-                    }}
-                    className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
-                  >
-                    {task.action.label}
-                  </button>
+                {(task.action.type === "generate-doc" || task.action.type === "room-check" || task.action.type === "self-assessment") && (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setComingSoonId(comingSoonId === task.id ? null : task.id)}
+                      className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
+                    >
+                      {task.action.label}
+                    </button>
+                    {comingSoonId === task.id && (
+                      <p className="mt-2 text-xs text-brand-600 bg-brand-50 rounded-md px-3 py-2">
+                        Coming soon — upgrade to Pro for early access. For now, you can complete this step manually.
+                      </p>
+                    )}
+                  </div>
                 )}
                 {href && (task.action.type === "staff-tracker" || task.action.type === "link") && (
                   <Link
