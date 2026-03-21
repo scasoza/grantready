@@ -272,7 +272,7 @@ export default function ReadinessPage() {
                     {!check.passed && check.fixHref && (
                       <Link
                         href={check.fixHref}
-                        className="shrink-0 rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                        className="shrink-0 rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
                       >
                         Fix
                       </Link>

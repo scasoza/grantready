@@ -96,7 +96,7 @@ export default function LoginPage() {
           <span className="text-lg font-bold text-warm-900 tracking-tight">GrantReady</span>
         </Link>
 
-        <div className="bg-white border border-warm-200/80 rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div className="bg-white border border-warm-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
           {confirmationSent ? (
             <div className="text-center py-4">
               <div className="w-14 h-14 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -183,19 +183,19 @@ export default function LoginPage() {
           <p className="text-center text-xs text-warm-400 mt-5">
             {isSignUp ? (
               <>Already have an account?{" "}
-                <button onClick={() => { setIsSignUp(false); setErrorMessage(null); }} className="text-brand-600 font-semibold hover:text-brand-700">
+                <button onClick={() => { setIsSignUp(false); setErrorMessage(null); }} className="text-brand-600 font-semibold hover:text-brand-700 py-1 px-1">
                   Log in
                 </button>
               </>
             ) : (
               <>Don&apos;t have an account?{" "}
-                <button onClick={() => { setIsSignUp(true); setErrorMessage(null); }} className="text-brand-600 font-semibold hover:text-brand-700">
+                <button onClick={() => { setIsSignUp(true); setErrorMessage(null); }} className="text-brand-600 font-semibold hover:text-brand-700 py-1 px-1">
                   Sign up
                 </button>
               </>
             )}
           </p>
-          <a href='/pricing' className='text-sm text-warm-400 hover:text-warm-500 mt-4 inline-block'>See pricing →</a>
+          <a href="/pricing" className="text-sm text-warm-400 hover:text-warm-500 mt-4 inline-block py-2">See pricing →</a>
           </>
           )}
         </div>

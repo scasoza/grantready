@@ -443,7 +443,7 @@ export default function TrsDocPage() {
       {/* Header */}
       <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm border-b border-warm-200/40 shadow-sm">
         <div className="px-4 sm:px-6 py-3.5 flex items-center gap-3 max-w-3xl mx-auto">
-          <Link href="/dashboard" className="text-warm-400 hover:text-warm-600 transition">
+          <Link href="/dashboard" className="text-warm-400 hover:text-warm-600 transition p-2 -m-2" aria-label="Back to dashboard">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -597,7 +597,7 @@ export default function TrsDocPage() {
                       <div className="flex gap-1.5 flex-shrink-0">
                         <button
                           onClick={() => toggleClaim(i, true)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                          className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition ${
                             claim.verified
                               ? "bg-brand-500 text-white"
                               : "bg-warm-100 text-warm-500 hover:bg-brand-50 hover:text-brand-600"
@@ -611,7 +611,7 @@ export default function TrsDocPage() {
                               correctClaim(i, claim.claimValue);
                             toggleClaim(i, false);
                           }}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                          className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition ${
                             !claim.verified && claim.correctedValue !== undefined
                               ? "bg-amber-500 text-white"
                               : "bg-warm-100 text-warm-500 hover:bg-amber-50 hover:text-amber-600"

@@ -68,16 +68,18 @@ export default function DashboardPage() {
       const currentCenter = centerRows[0] as Center;
       setCenter(currentCenter);
 
-      // 3. Completed prep tasks
-      const { data: completedData } = await supabase
-        .from("center_data")
-        .select("data_value")
-        .eq("center_id", currentCenter.id)
-        .eq("data_key", "completed_tasks")
-        .maybeSingle();
-      if (completedData?.data_value) {
+      // 3-6. Load all data in parallel
+      const [completedResult, staffResult, appResult, subResult] = await Promise.all([
+        supabase.from("center_data").select("data_value").eq("center_id", currentCenter.id).eq("data_key", "completed_tasks").maybeSingle(),
+        supabase.from("center_data").select("data_value").eq("center_id", currentCenter.id).eq("data_key", "staff_members").maybeSingle(),
+        supabase.from("applications").select("id").eq("center_id", currentCenter.id).eq("grant_id", "trs").maybeSingle(),
+        supabase.from("submissions").select("status, requested_at").eq("center_id", currentCenter.id).order("requested_at", { ascending: false }).limit(1),
+      ]);
+
+      // Completed prep tasks
+      if (completedResult.data?.data_value) {
         try {
-          const raw = completedData.data_value;
+          const raw = completedResult.data.data_value;
           const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
           if (Array.isArray(parsed)) {
             setCompletedTasks(new Set(parsed.filter((id): id is string => typeof id === "string")));
@@ -87,37 +89,24 @@ export default function DashboardPage() {
         }
       }
 
-      // 4. Staff members + alerts
-      const { data: staffData } = await supabase
-        .from("center_data")
-        .select("data_value")
-        .eq("center_id", currentCenter.id)
-        .eq("data_key", "staff_members")
-        .maybeSingle();
+      // Staff members + alerts
       const staffMembers = parseStaffMembers(
-        (staffData as { data_value: string } | null)?.data_value ?? null
+        (staffResult.data as { data_value: string } | null)?.data_value ?? null
       );
       const staffAlerts = getStaffAlerts(staffMembers);
 
-      // 5. TRS application + sections
-      const { data: appRow } = await supabase
-        .from("applications")
-        .select("id")
-        .eq("center_id", currentCenter.id)
-        .eq("grant_id", "trs")
-        .single();
-
+      // TRS application + sections
       let sectionRows: SectionStatus[] = [];
-      if (appRow) {
+      if (appResult.data) {
         const { data: secData } = await supabase
           .from("application_sections")
           .select("section_type, status, input_hash")
-          .eq("application_id", appRow.id);
+          .eq("application_id", appResult.data.id);
         sectionRows = (secData as SectionStatus[] | null) ?? [];
       }
       setSections(sectionRows);
 
-      // 5b. Stale document detection
+      // Stale document detection
       const centerJson = JSON.stringify({ ...currentCenter });
       const staleDocs: { docType: string; title: string }[] = [];
       for (const sec of sectionRows) {
@@ -128,15 +117,9 @@ export default function DashboardPage() {
 
       setAttentionItems(getAttentionItems(staffAlerts, staleDocs));
 
-      // 6. Submission status
-      const { data: subRows } = await supabase
-        .from("submissions")
-        .select("status, requested_at")
-        .eq("center_id", currentCenter.id)
-        .order("requested_at", { ascending: false })
-        .limit(1);
-      if (subRows && subRows.length > 0) {
-        setSubmission(subRows[0] as SubmissionRow);
+      // Submission status
+      if (subResult.data && subResult.data.length > 0) {
+        setSubmission(subResult.data[0] as SubmissionRow);
       }
 
       setLoading(false);
@@ -288,7 +271,7 @@ export default function DashboardPage() {
             <span className="text-warm-600 hidden sm:inline truncate max-w-[200px]">{userEmail}</span>
             <button
               onClick={() => void handleSignOut()}
-              className="rounded-xl bg-brand-500 px-3 py-1.5 text-white hover:bg-brand-600 whitespace-nowrap"
+              className="rounded-xl bg-brand-500 px-4 py-2 text-white hover:bg-brand-600 whitespace-nowrap"
             >
               Sign out
             </button>
@@ -411,7 +394,7 @@ export default function DashboardPage() {
                               type="checkbox"
                               checked={false}
                               onChange={() => void toggleTask(task.id)}
-                              className="mt-1 h-4 w-4 rounded border-warm-300 text-brand-500 focus:ring-brand-500"
+                              className="mt-0.5 h-5 w-5 rounded border-warm-300 text-brand-500 focus:ring-brand-500 cursor-pointer"
                             />
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -436,7 +419,7 @@ export default function DashboardPage() {
                                     href={href}
                                     target={isExternal ? "_blank" : undefined}
                                     rel={isExternal ? "noreferrer" : undefined}
-                                    className="inline-flex rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-700 hover:bg-warm-100"
+                                    className="inline-flex rounded-lg border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 hover:bg-warm-100"
                                   >
                                     {task.action!.label}
                                   </Link>
@@ -460,7 +443,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setShowCompleted(!showCompleted)}
-              className="text-sm font-medium text-warm-500 hover:text-warm-700"
+              className="text-sm font-medium text-warm-500 hover:text-warm-700 py-2 px-1"
             >
               {showCompleted ? "Hide" : "Show"} {totalDone} completed task
               {totalDone !== 1 ? "s" : ""}
@@ -501,11 +484,11 @@ export default function DashboardPage() {
         )}
 
         {/* Footer links */}
-        <footer className="flex gap-4 pt-4 text-sm text-warm-500">
-          <Link href="/staff" className="hover:text-warm-700">
+        <footer className="flex gap-6 pt-4 text-sm text-warm-500">
+          <Link href="/staff" className="hover:text-warm-700 py-2">
             Staff Tracker
           </Link>
-          <Link href="/documents" className="hover:text-warm-700">
+          <Link href="/documents" className="hover:text-warm-700 py-2">
             Documents
           </Link>
         </footer>

@@ -178,7 +178,7 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-warm-200 bg-white p-6 sm:p-8 shadow-sm">
+        <div className="rounded-2xl border border-warm-200 bg-white p-6 sm:p-8 shadow-sm">
           {step === 1 ? (
             <form onSubmit={moveToReview} className="space-y-4">
               <div>
@@ -235,6 +235,7 @@ export default function OnboardingPage() {
                 <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Licensed capacity</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={licensedCapacity}
                   onChange={(event) => setLicensedCapacity(event.target.value)}
                   min={0}
@@ -246,6 +247,7 @@ export default function OnboardingPage() {
                 <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Current enrollment</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={enrollmentCount}
                   onChange={(event) => setEnrollmentCount(event.target.value)}
                   min={0}
@@ -257,6 +259,7 @@ export default function OnboardingPage() {
                 <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Staff count</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={staffCount}
                   onChange={(event) => setStaffCount(event.target.value)}
                   min={0}
@@ -268,6 +271,7 @@ export default function OnboardingPage() {
                 <label className="block text-xs text-warm-500 mb-1.5 font-semibold">CCS count</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={ccsCount}
                   onChange={(event) => setCcsCount(event.target.value)}
                   min={0}
@@ -294,35 +298,35 @@ export default function OnboardingPage() {
               </div>
 
               <dl className="rounded-2xl border border-warm-200 bg-warm-50/70 p-4 sm:p-5 space-y-3">
-                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">License number</dt>
                   <dd className="text-warm-800">{licenseNumber || "Not provided"}</dd>
                 </div>
-                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">Center name</dt>
                   <dd className="text-warm-800">{centerName || "Not provided"}</dd>
                 </div>
-                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">Address</dt>
                   <dd className="text-warm-800">{address || "Not provided"}</dd>
                 </div>
-                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">County</dt>
                   <dd className="text-warm-800">{county || "Not provided"}</dd>
                 </div>
-                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">Licensed capacity</dt>
                   <dd className="text-warm-800">{licensedCapacity || "Not provided"}</dd>
                 </div>
-                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">Current enrollment</dt>
                   <dd className="text-warm-800">{enrollmentCount || "Not provided"}</dd>
                 </div>
-                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">Staff count</dt>
                   <dd className="text-warm-800">{staffCount || "Not provided"}</dd>
                 </div>
-                <div className="grid grid-cols-[160px_1fr] gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">CCS count</dt>
                   <dd className="text-warm-800">{ccsCount || "Not provided"}</dd>
                 </div>
