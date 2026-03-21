@@ -7,15 +7,12 @@ export default function Logo({ size = 32, className = "" }: { size?: number; cla
       className={className}
       aria-label="CareLadder logo"
     >
-      <rect width="512" height="512" rx="115" fill="#ffffff" />
-      <g transform="rotate(12 256 256)">
-        <g stroke="#0d9488" strokeWidth="48" strokeLinecap="round" strokeLinejoin="round" fill="none">
-          <line x1="382" y1="164" x2="382" y2="420" />
-          <line x1="130" y1="276" x2="382" y2="276" />
-          <path d="M 382 164 L 242 164 A 112 112 0 0 0 130 276 A 112 112 0 0 0 242 388 L 382 388" />
-        </g>
-        <circle cx="382" cy="100" r="24" fill="#0d9488" />
-      </g>
+      <rect width="512" height="512" rx="112" fill="#0d9488" />
+      <path d="M 310 140 L 220 140 A 116 116 0 0 0 220 372 L 310 372"
+            stroke="white" strokeWidth="52" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <line x1="220" y1="200" x2="370" y2="200" stroke="white" strokeWidth="40" strokeLinecap="round" />
+      <line x1="220" y1="256" x2="370" y2="256" stroke="white" strokeWidth="40" strokeLinecap="round" />
+      <line x1="220" y1="312" x2="370" y2="312" stroke="white" strokeWidth="40" strokeLinecap="round" />
     </svg>
   );
 }
