@@ -605,10 +605,10 @@ export default function TrsDocPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="h-7 w-7 rounded-lg bg-white/20 flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">G</span>
+                      <span className="text-white text-xs font-bold">C</span>
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-white/80">GrantReady</p>
+                      <p className="text-xs font-semibold text-white/80">CareLadder</p>
                       <p className="text-[10px] text-white/60">TRS Certification Document</p>
                     </div>
                   </div>
@@ -642,7 +642,7 @@ export default function TrsDocPage() {
               {/* Document footer */}
               <div className="border-t border-warm-100 px-5 py-3 bg-warm-50/50">
                 <p className="text-[10px] text-warm-400 text-center">
-                  Prepared by GrantReady AI for TRS certification
+                  Prepared by CareLadder AI for TRS certification
                 </p>
               </div>
             </div>

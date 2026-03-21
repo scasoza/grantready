@@ -274,9 +274,9 @@ export default function DashboardPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-sm font-extrabold text-white">
-              G
+              C
             </span>
-            <span className="text-sm font-bold text-warm-900">GrantReady</span>
+            <span className="text-sm font-bold text-warm-900">CareLadder</span>
           </Link>
           <button
             onClick={() => void handleSignOut()}

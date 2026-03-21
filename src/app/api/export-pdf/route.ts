@@ -80,7 +80,7 @@ function buildStaffBinderHtml(
     <div class="doc-date">Generated ${escapeHtml(date)}</div>
   </div>
   ${staff.length === 0 ? '<p style="color:#777;">No staff members on file.</p>' : staffRows}
-  <div class="footer">GrantReady — ${escapeHtml(centerName)} — Confidential</div>
+  <div class="footer">CareLadder — ${escapeHtml(centerName)} — Confidential</div>
 </body>
 </html>`;
 }
@@ -127,7 +127,7 @@ function buildStandardDocHtml(
   <div class="doc-body">
     ${paragraphs || '<p class="empty-notice">No content has been drafted for this document yet.</p>'}
   </div>
-  <div class="footer">GrantReady — ${escapeHtml(centerName)} — Confidential</div>
+  <div class="footer">CareLadder — ${escapeHtml(centerName)} — Confidential</div>
 </body>
 </html>`;
 }

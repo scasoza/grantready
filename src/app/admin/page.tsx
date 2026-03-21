@@ -158,7 +158,7 @@ export default function AdminPage() {
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-500 text-sm font-extrabold text-white">
               G
             </span>
-            GrantReady
+            CareLadder
           </Link>
           <span className="text-sm text-warm-500">Admin</span>
         </div>

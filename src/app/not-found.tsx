@@ -8,7 +8,7 @@ export default function NotFound() {
           <div className="h-10 w-10 rounded-lg bg-brand-600 hover:bg-brand-700 flex items-center justify-center text-white font-bold">
             G
           </div>
-          <span className="text-xl font-semibold text-warm-900">GrantReady</span>
+          <span className="text-xl font-semibold text-warm-900">CareLadder</span>
         </div>
 
         <p className="text-6xl font-extrabold text-warm-200">404</p>

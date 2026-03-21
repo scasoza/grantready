@@ -160,9 +160,9 @@ export default function QuizPage() {
         <header className="mb-4 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-xl bg-brand-600 flex items-center justify-center">
-              <span className="text-white text-xs font-extrabold">G</span>
+              <span className="text-white text-xs font-extrabold">C</span>
             </div>
-            <span className="text-sm font-bold tracking-tight">GrantReady</span>
+            <span className="text-sm font-bold tracking-tight">CareLadder</span>
           </Link>
           <span className="text-xs font-semibold text-warm-400">{step + 1} / {totalSteps}</span>
         </header>

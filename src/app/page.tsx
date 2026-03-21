@@ -54,9 +54,9 @@ export default function Home() {
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="inline-flex items-center gap-2.5">
             <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-white font-extrabold text-sm">G</span>
+              <span className="text-white font-extrabold text-sm">C</span>
             </div>
-            <span className="text-base font-extrabold tracking-tight">GrantReady</span>
+            <span className="text-base font-extrabold tracking-tight">CareLadder</span>
           </div>
           <Link href="/login" className="rounded-xl border border-warm-200 bg-white/80 px-4 py-2 text-sm font-semibold text-warm-700 hover:bg-white transition">
             Log in
@@ -142,7 +142,7 @@ export default function Home() {
 
       <footer className="px-4 sm:px-6 py-6 text-center space-y-2">
         <p className="text-[11px] text-warm-400">Built for Texas childcare providers</p>
-        <p className="text-[10px] text-warm-300">© 2026 GrantReady · <Link href="/pricing" className="hover:text-warm-500 transition">Pricing</Link></p>
+        <p className="text-[10px] text-warm-300">© 2026 CareLadder · <Link href="/pricing" className="hover:text-warm-500 transition">Pricing</Link></p>
       </footer>
     </div>
   );

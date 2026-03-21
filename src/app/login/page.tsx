@@ -87,9 +87,9 @@ export default function LoginPage() {
       <div className="bg-brand-700 px-4 py-8 sm:py-12 text-center">
         <Link href="/" className="inline-flex items-center gap-2.5">
           <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-            <span className="text-white font-extrabold text-sm">G</span>
+            <span className="text-white font-extrabold text-sm">C</span>
           </div>
-          <span className="text-lg font-bold text-white tracking-tight">GrantReady</span>
+          <span className="text-lg font-bold text-white tracking-tight">CareLadder</span>
         </Link>
         <p className="mt-2 text-sm text-brand-200">Texas childcare funding, simplified.</p>
       </div>

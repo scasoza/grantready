@@ -19,9 +19,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "GrantReady — More Funding for Your Childcare Center",
+  title: "CareLadder — More Funding for Your Childcare Center",
   description:
-    "Texas childcare providers miss an average of $14,000/yr in funding they already qualify for. GrantReady shows you what you are missing and walks you through every step to get it.",
+    "Texas childcare providers miss an average of $14,000/yr in funding they already qualify for. CareLadder shows you what you are missing and walks you through every step to get it.",
 };
 
 export default function RootLayout({
