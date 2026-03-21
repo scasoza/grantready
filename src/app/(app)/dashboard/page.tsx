@@ -528,39 +528,32 @@ export default function DashboardPage() {
                   <h3 className="text-xs font-medium text-warm-400 mb-2">
                     {group.label}
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-1">
                     {group.tasks.map((task) => {
                       const href = actionHref(task);
                       const isExternal = task.action?.type === "link";
                       return (
                         <div
                           key={task.id}
-                          className="rounded-lg border border-warm-100 bg-white px-4 py-3"
+                          className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-warm-50 transition"
                         >
-                          <div className="flex items-start gap-3">
-                            <input
-                              type="checkbox"
-                              checked={false}
-                              onChange={() => void toggleTask(task.id)}
-                              className="mt-0.5 h-5 w-5 shrink-0 rounded border-warm-300 text-brand-500 focus:ring-brand-500 cursor-pointer"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <h3 className="text-sm font-semibold text-warm-900">{task.title}</h3>
-                              <p className="mt-0.5 text-xs text-warm-500 line-clamp-2">{task.context}</p>
-                              {href && (
-                                <div className="mt-2">
-                                  <Link
-                                    href={href}
-                                    target={isExternal ? "_blank" : undefined}
-                                    rel={isExternal ? "noreferrer" : undefined}
-                                    className="inline-flex rounded-lg border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 hover:bg-warm-100"
-                                  >
-                                    {task.action!.label}
-                                  </Link>
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                          <input
+                            type="checkbox"
+                            checked={false}
+                            onChange={() => void toggleTask(task.id)}
+                            className="h-4.5 w-4.5 shrink-0 rounded border-warm-300 text-brand-500 focus:ring-brand-500 cursor-pointer"
+                          />
+                          <span className="text-sm text-warm-800 flex-1 min-w-0 truncate">{task.title}</span>
+                          {href && (
+                            <Link
+                              href={href}
+                              target={isExternal ? "_blank" : undefined}
+                              rel={isExternal ? "noreferrer" : undefined}
+                              className="text-xs text-brand-600 hover:text-brand-700 font-medium shrink-0 py-1"
+                            >
+                              {task.action?.type === "link" ? "Open" : "Go"}
+                            </Link>
+                          )}
                         </div>
                       );
                     })}
