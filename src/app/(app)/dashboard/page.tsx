@@ -309,23 +309,31 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* First-visit welcome */}
-        {totalDone === 0 && !submission && (
-          <section className="animate-fade-up rounded-xl bg-brand-800 p-5 text-white shadow-lg">
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-600">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                </svg>
+        {/* Journey steps */}
+        {!submission && (
+          <div className="flex items-center gap-1 px-1">
+            {[
+              { label: "Documents", done: pendingPaperwork.length === 0 && completedPaperwork.length > 0, active: autoFocusZone === "paperwork" || autoFocusZone === "attention" },
+              { label: "Center prep", done: pendingPrep.length === 0 && completedPrep.length > 0, active: autoFocusZone === "prep" },
+              { label: "Submit", done: !!submission, active: allComplete },
+            ].map((s, i) => (
+              <div key={s.label} className="flex items-center flex-1">
+                {i > 0 && <div className={`h-px flex-1 mx-1 ${s.done || s.active ? "bg-brand-400" : "bg-warm-200"}`} />}
+                <div className="flex flex-col items-center gap-1">
+                  <div className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${
+                    s.done ? "bg-brand-500 text-white" : s.active ? "bg-brand-100 text-brand-700 ring-2 ring-brand-500" : "bg-warm-100 text-warm-400"
+                  }`}>
+                    {s.done ? (
+                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : i + 1}
+                  </div>
+                  <span className={`text-[10px] font-medium ${s.active ? "text-brand-700" : "text-warm-400"}`}>{s.label}</span>
+                </div>
               </div>
-              <div>
-                <h2 className="text-base font-bold">Your TRS certification starts here</h2>
-                <p className="mt-1 text-sm text-brand-200 leading-relaxed">
-                  We generate your documents, track credentials, and submit when ready. Tap below to begin.
-                </p>
-              </div>
-            </div>
-          </section>
+            ))}
+          </div>
         )}
 
         {/* Next step suggestion */}
