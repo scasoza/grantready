@@ -177,7 +177,7 @@ export default function SectionDetailPage() {
   );
 
   // Handle voice recording complete
-  const handleRecordingComplete = async (blob: Blob) => {
+  const handleRecordingComplete = async (blob: Blob, _durationSeconds: number) => {
     setIsTranscribing(true);
     const formData = new FormData();
     formData.append("audio", blob, "memo.webm");
