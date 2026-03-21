@@ -410,7 +410,9 @@ export default function TrsDocPage() {
 
     const inputHash = JSON.stringify({ ...center });
 
-    const { error: updateError } = await supabase
+    // Try with input_hash first, fall back without if column doesn't exist yet
+    let updateError = null;
+    const { error: err1 } = await supabase
       .from("application_sections")
       .update({
         status: "verified",
@@ -418,6 +420,20 @@ export default function TrsDocPage() {
         updated_at: new Date().toISOString(),
       })
       .eq("id", sectionId);
+
+    if (err1?.message?.includes("input_hash")) {
+      // Column doesn't exist yet — save without it
+      const { error: err2 } = await supabase
+        .from("application_sections")
+        .update({
+          status: "verified",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", sectionId);
+      updateError = err2;
+    } else {
+      updateError = err1;
+    }
 
     if (updateError) {
       setError("Failed to save: " + updateError.message);
@@ -524,8 +540,33 @@ export default function TrsDocPage() {
               disabled={isGenerating || !textInput.trim()}
               className="w-full bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white py-3.5 rounded-xl font-semibold transition shadow-md shadow-brand-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isGenerating ? "Writing your draft..." : "Generate professional draft"}
+              {isGenerating ? "Generating..." : "Generate professional draft"}
             </button>
+            {isGenerating && (
+              <div className="mt-4 rounded-2xl border border-brand-200 bg-brand-50 p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-warm-900">Writing your professional draft</p>
+                    <p className="text-xs text-warm-500">This usually takes 10-15 seconds</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-xs text-brand-700">
+                    <svg className="h-4 w-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    Checking your input has enough detail
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-brand-700">
+                    <div className="h-4 w-4 animate-pulse rounded-full bg-brand-400" />
+                    Drafting professional narrative from your words
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-warm-400">
+                    <div className="h-4 w-4 rounded-full bg-warm-200" />
+                    Extracting facts for verification
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -547,16 +588,33 @@ export default function TrsDocPage() {
         {/* DRAFT PHASE */}
         {aiDraft && (status === "draft_generated" || status === "verified") && (
           <div className="space-y-4">
-            <div className="bg-white border border-warm-200/80 rounded-2xl p-5 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-bold text-warm-900">Document Draft</h2>
-                {status === "verified" && (
-                  <span className="text-xs font-semibold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">
-                    Approved
+            <div className="rounded-2xl border border-warm-200 bg-white shadow-sm overflow-hidden">
+              {/* Document header */}
+              <div className="bg-warm-50 border-b border-warm-200 px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-6 w-6 rounded bg-brand-500 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">G</span>
+                      </div>
+                      <span className="text-xs font-semibold text-warm-600">GrantReady</span>
+                    </div>
+                    <h3 className="mt-2 text-base font-bold text-warm-900">{template.title}</h3>
+                    <p className="text-xs text-warm-500">Generated {new Date().toLocaleDateString()}</p>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                    Draft
                   </span>
-                )}
+                </div>
               </div>
-              <div className="prose prose-sm text-warm-700 whitespace-pre-wrap">{aiDraft}</div>
+              {/* Document body */}
+              <div className="px-5 py-4">
+                <div className="prose prose-sm max-w-none text-warm-800 leading-relaxed">
+                  {aiDraft.split("\n\n").map((para, i) => (
+                    <p key={i} className="mb-3 last:mb-0">{para}</p>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Claim verification */}
