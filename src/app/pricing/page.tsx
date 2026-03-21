@@ -19,8 +19,8 @@ const freeFeatures = [
 const proFeatures = [
   "Everything in Free, plus:",
   "Unlimited AI document generation",
-  "Readiness report with cross-document validation",
-  "Concierge application submission",
+  "Readiness report — we check your documents match",
+  "We submit your TRS application for you",
   "Printable staff credentials binder",
 ];
 
@@ -59,17 +59,26 @@ export default function PricingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-warm-50 px-4 py-10 text-warm-900 sm:px-6">
-      <div className="mx-auto max-w-4xl">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-warm-600 transition hover:text-warm-900"
-        >
-          <span aria-hidden="true">←</span>
-          Back
-        </Link>
+    <main className="min-h-screen bg-warm-50 text-warm-900">
+      {/* Nav */}
+      <nav className="sticky top-0 z-40 border-b border-warm-200/40 bg-white/90 backdrop-blur-sm shadow-sm">
+        <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3 sm:px-6">
+          <Link href="/dashboard" className="text-warm-400 hover:text-warm-600 transition p-2 -m-2" aria-label="Back">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </Link>
+          <h1 className="text-sm font-bold text-warm-900">Pricing</h1>
+        </div>
+      </nav>
 
-        <section className="mt-8 grid gap-6 md:grid-cols-2">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-extrabold tracking-tight text-warm-900">Simple, transparent pricing</h2>
+          <p className="mt-2 text-sm text-warm-500">Start free. Upgrade when you need more.</p>
+        </div>
+
+        <section className="grid gap-6 md:grid-cols-2">
           <article className="rounded-2xl border border-warm-200 bg-white p-6 shadow-sm sm:p-8">
             <h1 className="text-2xl font-bold tracking-tight">Free</h1>
             <p className="mt-3 text-4xl font-extrabold tracking-tight">$0</p>
@@ -122,9 +131,8 @@ export default function PricingPage() {
           </article>
         </section>
 
-        <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-warm-600">
-          The free plan is fully functional for providers who write documents manually and fill the
-          TWC portal themselves. Pro removes friction.
+        <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-warm-500">
+          Free gets you started. Pro takes care of the hard parts so you can focus on your kids.
         </p>
       </div>
     </main>
