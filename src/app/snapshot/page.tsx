@@ -90,10 +90,20 @@ export default function FundingSnapshotPage() {
 
   if (!mounted || !quizData || !revenue) {
     return (
-      <div className="min-h-screen bg-warm-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-warm-200 border-t-brand-500" />
-          <p className="mt-3 text-sm text-warm-400">Calculating your funding...</p>
+      <div className="min-h-screen bg-warm-50 px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-5xl animate-pulse space-y-6">
+          <div className="rounded-2xl bg-emerald-100/50 p-6 space-y-3">
+            <div className="h-3 w-24 rounded bg-emerald-200/70" />
+            <div className="h-8 w-3/4 rounded bg-emerald-200/70" />
+            <div className="h-4 w-1/2 rounded bg-emerald-200/70" />
+          </div>
+          <div className="h-5 w-40 rounded bg-warm-200/70" />
+          <div className="rounded-2xl border border-warm-200 bg-white p-5 space-y-3">
+            <div className="h-4 w-48 rounded bg-warm-200/70" />
+            <div className="h-3 w-full rounded bg-warm-200/70" />
+            <div className="h-3 w-2/3 rounded bg-warm-200/70" />
+            <div className="h-10 w-40 rounded-xl bg-warm-200/70" />
+          </div>
         </div>
       </div>
     );
