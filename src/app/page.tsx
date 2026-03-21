@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -82,13 +83,22 @@ export default function Home() {
                       role="radio"
                       aria-checked={isSelected}
                       onClick={() => setSelected(option)}
-                      className={`w-full rounded-xl border p-4 text-left text-base transition ${
+                      className={`w-full flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-base transition ${
                         isSelected
-                          ? "border-brand-500 bg-brand-50"
+                          ? "border-brand-500 bg-brand-50 shadow-sm shadow-brand-500/10"
                           : "border-warm-200 bg-white hover:border-warm-300"
                       }`}
                     >
-                      {option}
+                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${
+                        isSelected ? "border-brand-500 bg-brand-500" : "border-warm-300"
+                      }`}>
+                        {isSelected && (
+                          <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </span>
+                      <span className={isSelected ? "font-semibold text-warm-900" : "text-warm-700"}>{option}</span>
                     </button>
                   );
                 })}
@@ -106,7 +116,14 @@ export default function Home() {
           </div>
 
           <p className="mt-8 text-sm italic text-warm-500">
-            &quot;GrantReady helped me find $18,000 in funding I did not know I qualified for.&quot; — Maria S., Center Director, Houston (42 children)
+            &quot;I had no idea we qualified for that much. GrantReady walked me through every step.&quot; — Sandra T., Center Director, San Antonio
+          </p>
+
+          <p className="mt-6 text-sm text-warm-400">
+            Already have an account?{" "}
+            <Link href="/login" className="text-brand-600 font-semibold hover:text-brand-700">
+              Log in
+            </Link>
           </p>
         </div>
       </main>
