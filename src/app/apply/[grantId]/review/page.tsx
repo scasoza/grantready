@@ -164,8 +164,11 @@ export default function ReviewApplicationPage() {
         .map((template) => ({ template, row: sectionsByType.get(template.type) }))
         .filter(
           (entry) =>
-            !!entry.row?.ai_draft &&
-            (entry.row.status === "draft_generated" || entry.row.status === "verified")
+            // Budget sections don't have ai_draft — they store data in budget_items
+            entry.template.type === "budget"
+              ? entry.row?.status === "verified"
+              : !!entry.row?.ai_draft &&
+                (entry.row.status === "draft_generated" || entry.row.status === "verified")
         ),
     [sectionTemplates, sectionsByType]
   );
@@ -305,7 +308,11 @@ export default function ReviewApplicationPage() {
                     </span>
                   </div>
 
-                  <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-warm-800">{row.ai_draft}</p>
+                  {template.type === "budget" ? (
+                    <p className="mt-4 text-sm text-warm-600 italic">Budget saved. View details in the budget editor.</p>
+                  ) : (
+                    <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-warm-800">{row.ai_draft}</p>
+                  )}
 
                   <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-warm-500">
                     <span>{claimCount} extracted claim{claimCount === 1 ? "" : "s"}</span>

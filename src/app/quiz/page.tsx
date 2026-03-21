@@ -54,6 +54,8 @@ export default function QuizPage() {
   useEffect(() => {
     const storedStart = localStorage.getItem("grantready_quiz_start");
     if (!storedStart) {
+      // No start data means user navigated directly — send them to landing page
+      router.replace("/");
       return;
     }
 

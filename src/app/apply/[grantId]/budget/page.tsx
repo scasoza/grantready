@@ -40,14 +40,14 @@ export default function BudgetPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: center } = await supabase
+      const { data: center, error: centerError } = await supabase
         .from("centers").select("id").eq("user_id", user.id).single();
-      if (!center) return;
+      if (centerError || !center) return;
 
-      const { data: app } = await supabase
+      const { data: app, error: appError } = await supabase
         .from("applications").select("id")
         .eq("center_id", center.id).eq("grant_id", String(grantId)).single();
-      if (!app) return;
+      if (appError || !app) return;
 
       setApplicationId(app.id);
 
