@@ -387,7 +387,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setExpandedZone(activeZone === "attention" ? null : "attention")}
-              className="flex items-center gap-2 mb-3 w-full text-left py-1"
+              className="flex items-center gap-2 w-full text-left py-2.5 px-3 rounded-xl bg-white border border-warm-100 shadow-sm mb-3"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">{attentionItems.length}</span>
               <div className="flex-1 min-w-0">
@@ -431,7 +431,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setExpandedZone(activeZone === "paperwork" ? null : "paperwork")}
-              className="flex items-center gap-2 mb-3 w-full text-left py-1"
+              className="flex items-center gap-2 w-full text-left py-2.5 px-3 rounded-xl bg-white border border-warm-100 shadow-sm mb-3"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-100 text-brand-700 text-xs font-bold">{pendingPaperwork.length}</span>
               <div className="flex-1 min-w-0">
@@ -484,7 +484,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setExpandedZone(activeZone === "prep" ? null : "prep")}
-              className="flex items-center gap-2 mb-3 w-full text-left py-1"
+              className="flex items-center gap-2 w-full text-left py-2.5 px-3 rounded-xl bg-white border border-warm-100 shadow-sm mb-3"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-warm-200 text-warm-500 text-xs font-bold">{pendingPrep.length}</span>
               <div className="flex-1 min-w-0">
