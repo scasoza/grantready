@@ -430,34 +430,20 @@ export default function DashboardPage() {
                       return (
                         <div
                           key={task.id}
-                          className="rounded-2xl border border-warm-200 bg-white p-4"
+                          className="rounded-xl border border-warm-200 bg-white px-4 py-3"
                         >
                           <div className="flex items-start gap-3">
                             <input
                               type="checkbox"
                               checked={false}
                               onChange={() => void toggleTask(task.id)}
-                              className="mt-0.5 h-5 w-5 rounded border-warm-300 text-brand-500 focus:ring-brand-500 cursor-pointer"
+                              className="mt-0.5 h-5 w-5 shrink-0 rounded border-warm-300 text-brand-500 focus:ring-brand-500 cursor-pointer"
                             />
                             <div className="min-w-0 flex-1">
-                              <div className="flex flex-wrap items-start justify-between gap-2">
-                                <div className="min-w-0 flex-1">
-                                  <h3 className="font-semibold text-warm-900">{task.title}</h3>
-                                  <p className="mt-1 text-sm text-warm-500">{task.context}</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <span className="rounded-lg bg-warm-100 px-2 py-1 text-xs text-warm-700">
-                                    {task.effort}
-                                  </span>
-                                  <span
-                                    className={`rounded-lg border px-2 py-1 text-xs ${categoryColors[task.category]}`}
-                                  >
-                                    {categoryLabels[task.category]}
-                                  </span>
-                                </div>
-                              </div>
+                              <h3 className="text-sm font-semibold text-warm-900">{task.title}</h3>
+                              <p className="mt-0.5 text-xs text-warm-500 line-clamp-2">{task.context}</p>
                               {href && (
-                                <div className="mt-3">
+                                <div className="mt-2">
                                   <Link
                                     href={href}
                                     target={isExternal ? "_blank" : undefined}
@@ -529,15 +515,6 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {/* Footer links */}
-        <footer className="flex gap-6 pt-4 text-sm text-warm-500">
-          <Link href="/staff" className="hover:text-warm-700 py-2">
-            Staff Tracker
-          </Link>
-          <Link href="/documents" className="hover:text-warm-700 py-2">
-            Documents
-          </Link>
-        </footer>
       </main>
     </div>
   );
