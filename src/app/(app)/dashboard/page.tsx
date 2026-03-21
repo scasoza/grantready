@@ -447,16 +447,18 @@ export default function DashboardPage() {
         {pendingPrep.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-3">
-              <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-              <h2 className="text-base font-bold text-warm-900">Your center prep</h2>
-              <span className="text-xs text-warm-400">{pendingPrep.length} remaining</span>
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-warm-200 text-warm-500">
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              </span>
+              <h2 className="text-sm font-bold text-warm-700">Center prep</h2>
+              <span className="text-xs text-warm-400">· {pendingPrep.length} left</span>
             </div>
             <div className="mt-3 space-y-5">
               {prepGroups.map((group) => (
                 <div key={group.label}>
-                  <h3 className="text-sm font-semibold text-warm-600 uppercase tracking-wide mb-2">
+                  <h3 className="text-xs font-medium text-warm-400 mb-2">
                     {group.label}
                   </h3>
                   <div className="space-y-3">
