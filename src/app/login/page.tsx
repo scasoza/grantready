@@ -71,13 +71,7 @@ export default function LoginPage() {
     setLoadingEmail(false);
 
     if (error) {
-      if (error.message.toLowerCase().includes("invalid")) {
-        // Account doesn't exist — switch to signup mode
-        setIsSignUp(true);
-        setErrorMessage(null);
-        return;
-      }
-      setErrorMessage(error.message);
+      setErrorMessage("Email or password is incorrect. Try again or sign up below.");
       return;
     }
 
@@ -85,6 +79,7 @@ export default function LoginPage() {
   };
 
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   return (
     <div className="min-h-screen bg-warm-50 px-4 py-12 sm:px-6">
@@ -163,6 +158,23 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm"
               />
+              {!isSignUp && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!email.trim()) { setErrorMessage("Enter your email first."); return; }
+                    const { error } = await supabase.auth.resetPasswordForEmail(email);
+                    if (error) { setErrorMessage(error.message); }
+                    else { setErrorMessage(null); setResetSent(true); }
+                  }}
+                  className="text-xs text-brand-600 hover:text-brand-700 mt-1 py-1"
+                >
+                  Forgot password?
+                </button>
+              )}
+              {resetSent && (
+                <p className="mt-1 text-xs text-emerald-700">Check your email for a password reset link.</p>
+              )}
             </div>
 
             {errorMessage && (

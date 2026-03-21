@@ -176,6 +176,7 @@ export default function StaffTrackerPage() {
   const [addForm, setAddForm] = useState(emptyAddForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<EditableStaffDraft | null>(null);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -343,6 +344,8 @@ export default function StaffTrackerPage() {
     await persistStaff(nextStaff);
     setShowAddForm(false);
     setAddForm(emptyAddForm);
+    setSavedMessage("Staff member saved");
+    setTimeout(() => setSavedMessage(null), 2000);
   };
 
   const startEdit = (member: StaffMember) => {
@@ -387,6 +390,8 @@ export default function StaffTrackerPage() {
 
     await persistStaff(nextStaff);
     cancelEdit();
+    setSavedMessage("Staff member saved");
+    setTimeout(() => setSavedMessage(null), 2000);
   };
 
   const handleDelete = async (member: StaffMember) => {
@@ -461,22 +466,28 @@ export default function StaffTrackerPage() {
           {showAddForm && (
             <form onSubmit={handleAddStaff} className="mt-4 rounded-2xl border border-warm-200 bg-warm-50 p-4">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={addForm.name}
-                  onChange={(event) => setAddForm((prev) => ({ ...prev, name: event.target.value }))}
-                  className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                />
-                <input
-                  type="text"
-                  placeholder="Lead Teacher"
-                  value={addForm.role}
-                  onChange={(event) => setAddForm((prev) => ({ ...prev, role: event.target.value }))}
-                  className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                />
                 <div>
-                  <p className="text-xs text-warm-500 mb-1">Hire date</p>
+                  <label className="block text-xs text-warm-500 mb-1 font-semibold">Name</label>
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={addForm.name}
+                    onChange={(event) => setAddForm((prev) => ({ ...prev, name: event.target.value }))}
+                    className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-warm-500 mb-1 font-semibold">Role</label>
+                  <input
+                    type="text"
+                    placeholder="Lead Teacher"
+                    value={addForm.role}
+                    onChange={(event) => setAddForm((prev) => ({ ...prev, role: event.target.value }))}
+                    className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-warm-500 mb-1 font-semibold">Hire date</label>
                   <input
                     type="date"
                     value={addForm.hireDate}
@@ -484,13 +495,16 @@ export default function StaffTrackerPage() {
                     className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={addForm.email}
-                  onChange={(event) => setAddForm((prev) => ({ ...prev, email: event.target.value }))}
-                  className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                />
+                <div>
+                  <label className="block text-xs text-warm-500 mb-1 font-semibold">Email</label>
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={addForm.email}
+                    onChange={(event) => setAddForm((prev) => ({ ...prev, email: event.target.value }))}
+                    className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
@@ -513,6 +527,12 @@ export default function StaffTrackerPage() {
                 </button>
               </div>
             </form>
+          )}
+
+          {savedMessage && (
+            <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+              {savedMessage}
+            </p>
           )}
 
           {errorMessage && (
@@ -538,65 +558,83 @@ export default function StaffTrackerPage() {
                     {isEditing && editDraft ? (
                       <div className="space-y-3">
                         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                          <input
-                            type="text"
-                            value={editDraft.name}
-                            onChange={(event) =>
-                              setEditDraft((prev) => (prev ? { ...prev, name: event.target.value } : prev))
-                            }
-                            placeholder="Name"
-                            className="rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                          />
-                          <input
-                            type="text"
-                            value={editDraft.role}
-                            onChange={(event) =>
-                              setEditDraft((prev) => (prev ? { ...prev, role: event.target.value } : prev))
-                            }
-                            placeholder="Role"
-                            className="rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                          />
-                          <input
-                            type="email"
-                            value={editDraft.email}
-                            onChange={(event) =>
-                              setEditDraft((prev) => (prev ? { ...prev, email: event.target.value } : prev))
-                            }
-                            placeholder="Email"
-                            className="rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                          />
-                          <input
-                            type="date"
-                            value={editDraft.hireDate}
-                            onChange={(event) =>
-                              setEditDraft((prev) => (prev ? { ...prev, hireDate: event.target.value } : prev))
-                            }
-                            className="rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                          />
-                          <input
-                            type="date"
-                            value={editDraft.cprExpiry}
-                            onChange={(event) =>
-                              setEditDraft((prev) => (prev ? { ...prev, cprExpiry: event.target.value } : prev))
-                            }
-                            className="rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                          />
-                          <input
-                            type="number"
-                            min={0}
-                            step={1}
-                            value={editDraft.trainingHours}
-                            onChange={(event) =>
-                              setEditDraft((prev) => (prev ? { ...prev, trainingHours: event.target.value } : prev))
-                            }
-                            placeholder="Training hours"
-                            className="rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                          />
+                          <div>
+                            <label className="block text-xs text-warm-500 mb-1 font-semibold">Name</label>
+                            <input
+                              type="text"
+                              value={editDraft.name}
+                              onChange={(event) =>
+                                setEditDraft((prev) => (prev ? { ...prev, name: event.target.value } : prev))
+                              }
+                              placeholder="Name"
+                              className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-warm-500 mb-1 font-semibold">Role</label>
+                            <input
+                              type="text"
+                              value={editDraft.role}
+                              onChange={(event) =>
+                                setEditDraft((prev) => (prev ? { ...prev, role: event.target.value } : prev))
+                              }
+                              placeholder="Role"
+                              className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-warm-500 mb-1 font-semibold">Email</label>
+                            <input
+                              type="email"
+                              value={editDraft.email}
+                              onChange={(event) =>
+                                setEditDraft((prev) => (prev ? { ...prev, email: event.target.value } : prev))
+                              }
+                              placeholder="Email"
+                              className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-warm-500 mb-1 font-semibold">Hire date</label>
+                            <input
+                              type="date"
+                              value={editDraft.hireDate}
+                              onChange={(event) =>
+                                setEditDraft((prev) => (prev ? { ...prev, hireDate: event.target.value } : prev))
+                              }
+                              className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-warm-500 mb-1 font-semibold">CPR expiry date</label>
+                            <input
+                              type="date"
+                              value={editDraft.cprExpiry}
+                              onChange={(event) =>
+                                setEditDraft((prev) => (prev ? { ...prev, cprExpiry: event.target.value } : prev))
+                              }
+                              className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-warm-500 mb-1 font-semibold">Training hours (annual)</label>
+                            <input
+                              type="number"
+                              min={0}
+                              step={1}
+                              value={editDraft.trainingHours}
+                              onChange={(event) =>
+                                setEditDraft((prev) => (prev ? { ...prev, trainingHours: event.target.value } : prev))
+                              }
+                              placeholder="Training hours"
+                              className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            />
+                          </div>
                         </div>
 
                         <div>
-                          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-warm-500">
-                            Credential Type
+                          <label className="mb-1 block text-xs font-semibold text-warm-500">
+                            Credential
                           </label>
                           <select
                             value={editDraft.credentialType}

@@ -424,7 +424,7 @@ export default function TrsDocPage() {
       return;
     }
     setStatus("verified");
-    router.push("/dashboard");
+    router.replace("/dashboard");
   };
 
   const allClaimsVerified = claims.length === 0 || claims.every((c) => c.verified);

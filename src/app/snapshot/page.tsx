@@ -136,7 +136,7 @@ export default function FundingSnapshotPage() {
           <h2 className="text-xl font-bold text-warm-900">Eligible Now - Action Needed</h2>
           <article className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6 shadow-sm">
             <div className="space-y-3">
-              <p className="text-sm font-semibold text-brand-700">Texas Rising Star Certification</p>
+              <p className="text-sm font-semibold text-brand-700">Texas Rising Star (TRS) Certification</p>
               <p className="text-sm text-warm-700">
                 Quality rating that increases your CCS reimbursement rates by up to 9%
               </p>

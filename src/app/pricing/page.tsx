@@ -84,7 +84,7 @@ export default function PricingPage() {
             </ul>
 
             <Link
-              href="/quiz"
+              href="/login?mode=signup"
               className="mt-8 inline-flex w-full items-center justify-center rounded-2xl border border-warm-200 px-4 py-3 text-sm font-semibold text-warm-900 transition hover:bg-warm-100"
             >
               Get Started Free

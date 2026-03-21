@@ -212,6 +212,9 @@ export default function ReadinessPage() {
                 >
                   {submitting ? "Submitting..." : "Submit my application"}
                 </button>
+                <p className="mt-2 text-xs text-warm-500">
+                  We&apos;ll submit your TRS certification request to your local Workforce Board on your behalf. You&apos;ll see the status update on your dashboard.
+                </p>
               </div>
             )}
 
