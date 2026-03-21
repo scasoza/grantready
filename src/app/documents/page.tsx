@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { grants } from "@/lib/grants";
 import { createClient } from "@/lib/supabase/client";
 import LoadingScreen from "@/components/LoadingScreen";
+import BottomNav from "@/components/BottomNav";
 
 type SectionStatus = "pending" | "input_given" | "draft_generated" | "verified";
 
@@ -191,7 +192,7 @@ export default function DocumentsPage() {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 pb-24 sm:pb-6">
         {errorMessage && (
           <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {errorMessage}
@@ -274,6 +275,7 @@ export default function DocumentsPage() {
           </div>
         )}
       </main>
+      <BottomNav />
     </div>
   );
 }

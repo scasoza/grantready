@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import LoadingScreen from "@/components/LoadingScreen";
+import BottomNav from "@/components/BottomNav";
 
 type CredentialType = "none" | "cda" | "associates" | "bachelors" | "masters";
 
@@ -426,7 +427,7 @@ export default function StaffTrackerPage() {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 space-y-5">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 pb-24 sm:pb-6 space-y-5">
         {/* Alerts */}
         {alerts.length > 0 && (
           <section className="space-y-2">
@@ -744,6 +745,7 @@ export default function StaffTrackerPage() {
           </div>
         </section>
       </div>
+      <BottomNav />
     </div>
   );
 }
