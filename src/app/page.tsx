@@ -73,9 +73,18 @@ export default function Home() {
             Texas childcare providers miss an average of <span className="font-semibold text-brand-700">$14,000/yr</span> in funding they already qualify for. See what you&apos;re missing — free, 5 minutes, no account needed.
           </p>
 
-          <div className="animate-fade-up animate-delay-200 mt-8 flex justify-center">
-            <div className="w-full max-w-sm">
-              <div className="space-y-3" role="radiogroup" aria-label="Provider type">
+          {/* Trust badge */}
+          <div className="animate-fade-up animate-delay-200 mt-6 inline-flex items-center gap-2 rounded-full bg-brand-50 border border-brand-200 px-4 py-1.5">
+            <svg className="h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-xs font-medium text-brand-700">Free · 5 min · No account required</span>
+          </div>
+
+          <div className="animate-fade-up animate-delay-300 mt-6 flex justify-center">
+            <div className="w-full max-w-sm rounded-2xl bg-white border border-warm-200 p-5 shadow-lg">
+              <p className="text-sm font-medium text-warm-700 mb-3">I am a...</p>
+              <div className="space-y-2" role="radiogroup" aria-label="Provider type">
                 {options.map((option) => {
                   const isSelected = selected === option;
 
@@ -86,22 +95,22 @@ export default function Home() {
                       role="radio"
                       aria-checked={isSelected}
                       onClick={() => setSelected(option)}
-                      className={`w-full flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-base transition ${
+                      className={`w-full flex items-center gap-3 rounded-lg px-3.5 py-3 text-left text-sm transition ${
                         isSelected
-                          ? "border-brand-500 bg-brand-50 shadow-sm shadow-brand-500/10"
-                          : "border-warm-200 bg-white hover:border-warm-300"
+                          ? "bg-brand-50 ring-2 ring-brand-500"
+                          : "bg-warm-50 hover:bg-warm-100"
                       }`}
                     >
-                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${
+                      <span className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border-2 transition ${
                         isSelected ? "border-brand-500 bg-brand-500" : "border-warm-300"
                       }`}>
                         {isSelected && (
-                          <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <svg className="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                           </svg>
                         )}
                       </span>
-                      <span className={isSelected ? "font-semibold text-warm-900" : "text-warm-700"}>{option}</span>
+                      <span className={isSelected ? "font-medium text-warm-900" : "text-warm-600"}>{option}</span>
                     </button>
                   );
                 })}
@@ -111,15 +120,15 @@ export default function Home() {
                 type="button"
                 onClick={handleGetStarted}
                 disabled={!selected}
-                className="mt-4 w-full rounded-xl bg-brand-600 hover:bg-brand-700 px-6 py-3.5 font-semibold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-4 w-full rounded-lg bg-brand-600 hover:bg-brand-700 active:bg-brand-800 px-6 py-3 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Get Started →
               </button>
             </div>
           </div>
 
-          <p className="mt-8 text-sm italic text-warm-500">
-            &quot;I had no idea we qualified for that much. GrantReady walked me through every step.&quot; — Sandra T., Center Director, San Antonio
+          <p className="mt-6 text-xs italic text-warm-400 max-w-xs mx-auto">
+            &quot;I had no idea we qualified for that much.&quot; — Sandra T., San Antonio
           </p>
 
           <p className="mt-6 text-sm text-warm-400">
