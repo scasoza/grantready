@@ -142,38 +142,39 @@ export default function VoiceMemoRecorder({
   }, [audioUrl]);
 
   return (
-    <div className="rounded-2xl border border-warm-200 bg-warm-50 p-5 sm:p-6">
-      <div className="flex items-center gap-4">
+    <div>
+      <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={isRecording ? stopRecording : startRecording}
           disabled={disabled}
           aria-label={isRecording ? 'Stop recording' : 'Start recording'}
-          className={`h-14 w-14 rounded-full bg-red-500 transition focus:outline-none focus:ring-2 focus:ring-red-400/60 disabled:cursor-not-allowed disabled:opacity-50 ${
+          className={`h-10 w-10 shrink-0 rounded-full bg-red-500 transition focus:outline-none focus:ring-2 focus:ring-red-400/60 disabled:cursor-not-allowed disabled:opacity-50 ${
             isRecording ? 'animate-pulse' : 'hover:bg-red-600'
           }`}
         />
-
-        <div>
-          <p className="text-sm font-semibold text-warm-800">
-            {isRecording ? 'Recording...' : 'Voice memo'}
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-warm-700">
+            {isRecording ? 'Recording...' : 'Tap to record'}{' '}
+            {(isRecording || duration > 0) && (
+              <span className="text-warm-400 font-normal">{formatDuration(duration)}</span>
+            )}
           </p>
-          <p className="text-sm text-warm-500">{formatDuration(duration)}</p>
         </div>
       </div>
 
       {permissionError && (
-        <p className="mt-4 text-sm text-red-600">{permissionError}</p>
+        <p className="mt-2 text-xs text-red-600">{permissionError}</p>
       )}
 
       {recordedBlob && audioUrl && !isRecording && (
-        <div className="mt-4 space-y-3">
-          <audio controls src={audioUrl} className="w-full" />
+        <div className="mt-2 space-y-2">
+          <audio controls src={audioUrl} className="w-full h-8" />
           <button
             type="button"
             onClick={startRecording}
             disabled={disabled}
-            className="text-sm font-medium text-warm-800 underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-50"
+            className="text-xs font-medium text-warm-700 underline underline-offset-4 py-1 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Re-record
           </button>

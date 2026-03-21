@@ -450,7 +450,6 @@ export default function TrsDocPage() {
           </Link>
           <div className="flex-1 min-w-0">
             <h1 className="text-sm font-bold text-warm-900 truncate">{template.title}</h1>
-            <p className="text-xs text-warm-400">TRS Document</p>
           </div>
         </div>
       </nav>
@@ -502,20 +501,16 @@ export default function TrsDocPage() {
                 )}
               </div>
 
-              {/* Voice recorder - below the textarea */}
-              <div className="mt-3 flex items-center gap-3">
+              {/* Voice recorder */}
+              <div className="mt-3 flex items-center justify-between gap-3">
                 <VoiceMemoRecorder
                   disabled={isGenerating || isTranscribing}
                   onRecordingComplete={handleRecordingComplete}
                 />
-                <p className="text-xs text-warm-400 flex-1">
-                  Record a voice memo - it will be transcribed and added to the text above for editing.
+                <p className="text-xs text-warm-400 text-right">
+                  or record a voice memo
                 </p>
               </div>
-
-              <p className="text-xs text-warm-400 mt-3">
-                Tip: &quot;34 kids on our waitlist&quot; beats &quot;many families need care.&quot;
-              </p>
             </div>
 
             {error && (
