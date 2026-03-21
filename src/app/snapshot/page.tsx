@@ -114,32 +114,38 @@ export default function FundingSnapshotPage() {
       <div className="mx-auto max-w-5xl space-y-8">
         <header className="flex items-start justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-700 rounded-xl flex items-center justify-center shadow-md shadow-brand-600/25">
+            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-extrabold text-sm">G</span>
             </div>
-            <span className="text-lg font-bold text-warm-900 tracking-tight">GrantReady</span>
+            <span className="text-sm font-bold text-warm-900 tracking-tight">GrantReady</span>
           </Link>
         </header>
 
-        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Funding Snapshot</p>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-emerald-900 sm:text-4xl">
+        <section className="rounded-xl bg-brand-800 p-6 sm:p-8 text-white shadow-lg">
+          <p className="text-xs font-semibold uppercase tracking-wider text-brand-300">Your funding snapshot</p>
+          {!isThinkingAboutOpening && quizData.ccsCount > 0 && (
+            <p className="mt-3 text-4xl sm:text-5xl font-extrabold tracking-tight">
+              {currency.format(revenue.annualIncrease)}
+              <span className="text-lg font-normal text-brand-300">/yr</span>
+            </p>
+          )}
+          <h1 className="mt-2 text-base text-brand-200 leading-relaxed">
             {isThinkingAboutOpening
               ? "Here is what you could earn once you open"
               : quizData.ccsCount > 0
-                ? `You could be earning an additional ${currency.format(revenue.annualIncrease)} per year`
+                ? "in additional funding you could be earning"
                 : "TRS certification unlocks higher reimbursement rates"}
           </h1>
           {isThinkingAboutOpening ? (
-            <p className="mt-3 text-base text-emerald-800">
+            <p className="mt-3 text-base text-brand-200">
               $0 estimated right now. Complete TRS certification after opening to unlock higher reimbursement rates.
             </p>
           ) : quizData.ccsCount > 0 ? (
-            <p className="mt-3 text-base text-emerald-800">
+            <p className="mt-3 text-base text-brand-200">
               That is {currency.format(revenue.monthlyIncrease)} more per month from higher CCS reimbursement rates.
             </p>
           ) : (
-            <p className="mt-3 text-base text-emerald-800">
+            <p className="mt-3 text-base text-brand-200">
               You don&apos;t currently accept CCS children, but TRS certification positions you for higher reimbursements if you do — and signals quality to all parents.
             </p>
           )}
