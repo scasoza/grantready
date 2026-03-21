@@ -354,16 +354,27 @@ export default function DashboardPage() {
         {/* Zone 1: Needs your attention */}
         {attentionItems.length > 0 && (
           <section>
-            <h2 className="text-lg font-bold text-warm-900">Needs your attention</h2>
-            <div className="mt-3 space-y-3">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">{attentionItems.length}</span>
+              <h2 className="text-base font-bold text-warm-900">Needs your attention</h2>
+            </div>
+            <div className="space-y-2">
               {attentionItems.map((item) => (
                 <Link
                   key={item.id}
                   href={item.actionHref}
-                  className="block rounded-2xl border border-amber-200 bg-amber-50 p-4 transition hover:border-amber-300"
+                  className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 transition hover:border-amber-300"
                 >
-                  <p className="font-semibold text-amber-900">{item.title}</p>
-                  <p className="mt-1 text-sm text-amber-700">{item.message}</p>
+                  <svg className="h-5 w-5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm text-amber-900">{item.title}</p>
+                    <p className="text-xs text-amber-700">{item.message}</p>
+                  </div>
+                  <svg className="h-4 w-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
               ))}
             </div>
@@ -373,18 +384,32 @@ export default function DashboardPage() {
         {/* Zone 2: Your paperwork */}
         {pendingPaperwork.length > 0 && (
           <section>
-            <h2 className="text-lg font-bold text-warm-900">Your paperwork</h2>
-            <div className="mt-3 space-y-3">
+            <div className="flex items-center gap-2 mb-3">
+              <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <h2 className="text-base font-bold text-warm-900">Your paperwork</h2>
+              <span className="text-xs text-warm-400">{pendingPaperwork.length} remaining</span>
+            </div>
+            <div className="space-y-2">
               {pendingPaperwork.map((task) => {
                 const href = actionHref(task);
                 const card = (
-                  <div className="rounded-2xl border border-warm-200 bg-white p-4 transition hover:border-warm-300">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-warm-900">{task.title}</h3>
-                        <p className="mt-1 text-sm text-warm-500">{task.context}</p>
-                      </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-warm-200 bg-white px-4 py-3 transition hover:border-brand-300 hover:shadow-sm">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-500">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-semibold text-warm-900">{task.title}</h3>
+                      <p className="text-xs text-warm-500 line-clamp-1">{task.context}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
                       {docStatusBadge(task)}
+                      <svg className="h-4 w-4 text-warm-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
                     </div>
                   </div>
                 );
@@ -403,7 +428,13 @@ export default function DashboardPage() {
         {/* Zone 3: Your center prep */}
         {pendingPrep.length > 0 && (
           <section>
-            <h2 className="text-lg font-bold text-warm-900">Your center prep</h2>
+            <div className="flex items-center gap-2 mb-3">
+              <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <h2 className="text-base font-bold text-warm-900">Your center prep</h2>
+              <span className="text-xs text-warm-400">{pendingPrep.length} remaining</span>
+            </div>
             <div className="mt-3 space-y-5">
               {prepGroups.map((group) => (
                 <div key={group.label}>
