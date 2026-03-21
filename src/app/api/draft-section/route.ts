@@ -77,6 +77,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Generation metering for free-tier users
+    const { data: centerRow } = await supabase
+      .from("centers")
+      .select("id, subscription_status, ai_generations_this_month, generation_month")
+      .eq("user_id", user.id)
+      .limit(1)
+      .single();
+
+    if (centerRow && centerRow.subscription_status !== "active") {
+      const currentMonth = Number(
+        new Date().toISOString().slice(0, 7).replace("-", "")
+      );
+      let count = (centerRow.ai_generations_this_month as number) ?? 0;
+      if (((centerRow.generation_month as number) ?? 0) !== currentMonth) {
+        count = 0;
+      }
+      if (count >= 3) {
+        return NextResponse.json(
+          { error: "Free tier limit reached (3/month). Upgrade to Pro for unlimited generations.", upgrade: true },
+          { status: 403 }
+        );
+      }
+      await supabase
+        .from("centers")
+        .update({
+          ai_generations_this_month: count + 1,
+          generation_month: currentMonth,
+        })
+        .eq("id", centerRow.id);
+    }
+
     const {
       sectionType,
       sectionTitle,
