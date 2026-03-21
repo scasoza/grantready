@@ -37,6 +37,7 @@ export default function ReadinessPage() {
   const [result, setResult] = useState<ReadinessResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [centerId, setCenterId] = useState<string | null>(null);
+  const [centerName, setCenterName] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -50,7 +51,7 @@ export default function ReadinessPage() {
 
       const { data: centerRows } = await supabase
         .from("centers")
-        .select("id")
+        .select("id, center_name")
         .eq("user_id", user.id)
         .limit(1);
 
@@ -59,8 +60,10 @@ export default function ReadinessPage() {
         return;
       }
 
-      const cid = (centerRows[0] as { id: string }).id;
+      const row = centerRows[0] as { id: string; center_name: string };
+      const cid = row.id;
       setCenterId(cid);
+      setCenterName(row.center_name);
 
       try {
         const res = await fetch("/api/readiness-check", {
@@ -104,6 +107,20 @@ export default function ReadinessPage() {
         setError(insertError.message);
         setSubmitting(false);
         return;
+      }
+
+      // Send confirmation email (fire-and-forget, don't block navigation)
+      if (centerName) {
+        fetch("/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "submission_confirmed",
+            centerName,
+          }),
+        }).catch(() => {
+          // Email failure should not block the user
+        });
       }
 
       router.push("/dashboard");

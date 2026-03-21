@@ -25,6 +25,14 @@ export default function TrsDocPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const docType = params.docType as string;
+
+  // Redirect self_assessment to its dedicated checklist UI
+  useEffect(() => {
+    if (docType === "self_assessment") {
+      router.replace("/trs/self-assessment");
+    }
+  }, [docType, router]);
+
   const template = getTrsDocTemplate(docType);
 
   // State
@@ -39,6 +47,8 @@ export default function TrsDocPage() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
+  const [uploadedImages, setUploadedImages] = useState<{ file: File; preview: string }[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load existing section data + ensure records exist
   useEffect(() => {
@@ -265,10 +275,56 @@ export default function TrsDocPage() {
     }
   };
 
+  // Image handling
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const newImages = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setUploadedImages((prev) => [...prev, ...newImages]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages((prev) => {
+      const updated = [...prev];
+      URL.revokeObjectURL(updated[index].preview);
+      updated.splice(index, 1);
+      return updated;
+    });
+  };
+
+  const compressAndEncodeImage = (file: File): Promise<{ mimeType: string; data: string }> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxWidth = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("Canvas not supported"));
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+        const base64 = dataUrl.split(",")[1];
+        resolve({ mimeType: "image/jpeg", data: base64 });
+      };
+      img.onerror = () => reject(new Error("Failed to load image"));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   // Generate draft
   const generateDraft = async () => {
-    if (!textInput.trim()) {
-      setError("Please provide your input first - voice or text.");
+    if (!textInput.trim() && uploadedImages.length === 0) {
+      setError("Please provide your input first - text, voice, or upload a document photo.");
       return;
     }
 
@@ -298,6 +354,14 @@ export default function TrsDocPage() {
         if (center.county) centerData.county = center.county;
       }
 
+      // Compress and encode uploaded images
+      let encodedImages: { mimeType: string; data: string }[] = [];
+      if (uploadedImages.length > 0) {
+        encodedImages = await Promise.all(
+          uploadedImages.map((img) => compressAndEncodeImage(img.file))
+        );
+      }
+
       const response = await fetch("/api/draft-section", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -306,8 +370,9 @@ export default function TrsDocPage() {
           sectionTitle: template?.title || docType,
           prompt: template?.prompt || "",
           subPrompts: template?.subPrompts || [],
-          userInput: textInput,
+          userInput: textInput || "(See uploaded document photos)",
           centerData,
+          ...(encodedImages.length > 0 ? { images: encodedImages } : {}),
         }),
       });
 
@@ -539,6 +604,54 @@ export default function TrsDocPage() {
                   or record a voice memo
                 </p>
               </div>
+
+              {/* Document photo upload */}
+              <div className="mt-3 border-t border-warm-100 pt-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  multiple
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isGenerating}
+                  className="flex items-center gap-2 text-sm text-brand-600 hover:text-brand-700 font-medium transition disabled:opacity-50"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                  </svg>
+                  Upload or take a document photo
+                </button>
+                {uploadedImages.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {uploadedImages.map((img, i) => (
+                      <div key={i} className="relative group">
+                        <img
+                          src={img.preview}
+                          alt={`Uploaded document ${i + 1}`}
+                          className="h-20 w-20 object-cover rounded-lg border border-warm-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(i)}
+                          className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ))}
+                    <p className="w-full text-xs text-warm-400 mt-1">
+                      {uploadedImages.length} photo{uploadedImages.length !== 1 ? "s" : ""} attached — AI will extract content from {uploadedImages.length !== 1 ? "these" : "this"}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {error && (
@@ -549,7 +662,7 @@ export default function TrsDocPage() {
 
             <button
               onClick={generateDraft}
-              disabled={isGenerating || !textInput.trim()}
+              disabled={isGenerating || (!textInput.trim() && uploadedImages.length === 0)}
               className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white py-3.5 rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGenerating ? "Generating..." : "Generate professional draft"}

@@ -9,6 +9,7 @@ type DraftSectionRequest = {
   subPrompts: string[];
   userInput: string;
   centerData: Record<string, string>;
+  images?: { mimeType: string; data: string }[];
 };
 
 type Claim = {
@@ -115,15 +116,29 @@ export async function POST(request: Request) {
       subPrompts,
       userInput,
       centerData,
+      images,
     } = (await request.json()) as DraftSectionRequest;
 
     const ai = getAI();
 
+    // Build image parts for Gemini vision calls
+    const hasImages = images && images.length > 0;
+    const imageParts = hasImages
+      ? images.map((img) => ({ inlineData: { mimeType: img.mimeType, data: img.data } }))
+      : [];
+    const imageContext = hasImages
+      ? "\n\n[The user has also uploaded photos of existing documents. The image content should be considered as additional input.]"
+      : "";
+
     // Step 1: Sufficiency check
+    const sufficiencyText = `Section: ${sectionTitle}\nExpected content: ${prompt}\nSub-prompts the director should address:\n${(subPrompts ?? []).map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\nDirector's input:\n"${userInput}"${imageContext}`;
+    const sufficiencyContents = hasImages
+      ? [{ role: "user" as const, parts: [{ text: sufficiencyText }, ...imageParts] }]
+      : sufficiencyText;
     const sufficiencyResponse = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       config: { systemInstruction: SUFFICIENCY_SYSTEM, maxOutputTokens: 300 },
-      contents: `Section: ${sectionTitle}\nExpected content: ${prompt}\nSub-prompts the director should address:\n${(subPrompts ?? []).map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\nDirector's input:\n"${userInput}"`,
+      contents: sufficiencyContents,
     });
 
     try {
@@ -149,7 +164,7 @@ export async function POST(request: Request) {
       .map(([key, value]) => `- ${key}: ${value}`)
       .join("\n");
 
-    const narrativePrompt = [
+    const narrativeLines = [
       `Section: ${sectionTitle}`,
       `Grant section prompt: ${prompt}`,
       "",
@@ -161,12 +176,24 @@ export async function POST(request: Request) {
       "",
       "Center data on file:",
       centerDataText || "(none)",
-    ].join("\n");
+    ];
+    if (hasImages) {
+      narrativeLines.push("", "The user has uploaded photos of existing documents. Extract the relevant information from the images and use it as the basis for generating the requested document.");
+    }
+    const narrativePrompt = narrativeLines.join("\n");
+
+    const writerSystem = hasImages
+      ? WRITER_SYSTEM + "\n\nIMPORTANT: The user has uploaded photos of existing documents. Extract all relevant information from the images and incorporate it into the grant narrative."
+      : WRITER_SYSTEM;
+
+    const draftContents = hasImages
+      ? [{ role: "user" as const, parts: [{ text: narrativePrompt }, ...imageParts] }]
+      : narrativePrompt;
 
     const draftResponse = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      config: { systemInstruction: WRITER_SYSTEM },
-      contents: narrativePrompt,
+      config: { systemInstruction: writerSystem },
+      contents: draftContents,
     });
 
     const draft = draftResponse.text?.trim() || "";

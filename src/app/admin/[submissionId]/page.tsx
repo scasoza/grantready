@@ -154,21 +154,28 @@ export default function AdminSubmissionPage() {
     setMarking(true);
     setError(null);
 
-    const { error: updateErr } = await supabase
-      .from("submissions")
-      .update({ status: "completed", completed_at: new Date().toISOString() })
-      .eq("id", submission.id);
+    try {
+      const res = await fetch("/api/admin/complete-submission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ submissionId: submission.id }),
+      });
 
-    if (updateErr) {
-      setError(updateErr.message);
-      setMarking(false);
-      return;
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? "Failed to mark as completed");
+        setMarking(false);
+        return;
+      }
+
+      setMarked(true);
+      setSubmission((prev) =>
+        prev ? { ...prev, status: "completed", completed_at: new Date().toISOString() } : prev
+      );
+    } catch {
+      setError("Failed to mark as completed");
     }
 
-    setMarked(true);
-    setSubmission((prev) =>
-      prev ? { ...prev, status: "completed", completed_at: new Date().toISOString() } : prev
-    );
     setMarking(false);
   };
 

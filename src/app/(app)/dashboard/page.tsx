@@ -55,6 +55,8 @@ export default function DashboardPage() {
   const [showCompleted, setShowCompleted] = useState(false);
   const [expandedZone, setExpandedZone] = useState<"attention" | "paperwork" | "prep" | null>(null);
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeCollapsed, setWelcomeCollapsed] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -142,6 +144,29 @@ export default function DashboardPage() {
 
     void load();
   }, [router, supabase]);
+
+  // Show onboarding card for first-time users (no submission, not previously dismissed)
+  useEffect(() => {
+    if (!loading && !submission) {
+      const onboarded = localStorage.getItem("careladder_onboarded");
+      if (!onboarded) {
+        setShowWelcome(true);
+      }
+    }
+  }, [loading, submission]);
+
+  const dismissWelcome = () => {
+    localStorage.setItem("careladder_onboarded", "true");
+    setShowWelcome(false);
+    setWelcomeCollapsed(true);
+  };
+
+  const toggleWelcomeExpand = () => {
+    if (welcomeCollapsed) {
+      setWelcomeCollapsed(false);
+      setShowWelcome(true);
+    }
+  };
 
   // ---- Derived data ----
 
@@ -328,6 +353,63 @@ export default function DashboardPage() {
                 : `${totalDone} of ${totalTasks} tasks done · ${totalTasks - totalDone} remaining`}
             </p>
           </div>
+        )}
+
+        {/* First-time onboarding card */}
+        {showWelcome && !submission && (
+          <div className="rounded-xl bg-brand-800 p-5 sm:p-6 space-y-3">
+            <div className="flex items-start justify-between">
+              <h2 className="text-base font-bold text-white">Welcome to CareLadder</h2>
+              <button
+                type="button"
+                onClick={dismissWelcome}
+                className="text-brand-300 hover:text-white transition p-1 -mr-1 -mt-1"
+                aria-label="Dismiss welcome card"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-sm text-brand-100 leading-relaxed">
+              <strong className="text-white">Texas Rising Star (TRS) certification</strong> gets you higher
+              childcare subsidy rates — typically <strong className="text-white">$800–1,400+ more per month</strong>.
+            </p>
+            <p className="text-sm text-brand-100 leading-relaxed">
+              We&apos;ll walk you through every step: generate your documents, prep your center, and submit for you.
+              No guesswork, no confusing paperwork.
+            </p>
+            <p className="text-sm text-brand-200 leading-relaxed">
+              Most directors finish in <strong className="text-white">4–8 weeks</strong>, about 20 minutes a week.
+            </p>
+            <button
+              type="button"
+              onClick={dismissWelcome}
+              className="mt-1 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-brand-800 hover:bg-brand-50 active:scale-[0.98] transition-all"
+            >
+              Let&apos;s get started
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* Collapsed onboarding mini-bar */}
+        {welcomeCollapsed && !showWelcome && !submission && (
+          <button
+            type="button"
+            onClick={toggleWelcomeExpand}
+            className="flex items-center gap-2 w-full rounded-lg bg-brand-50 border border-brand-200 px-4 py-2.5 text-left hover:bg-brand-100 transition"
+          >
+            <svg className="h-4 w-4 text-brand-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-xs font-medium text-brand-700 flex-1">About TRS certification</span>
+            <svg className="h-3.5 w-3.5 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
         )}
 
         {/* Submission Banner */}
