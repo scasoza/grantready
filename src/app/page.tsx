@@ -49,7 +49,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-warm-50 text-warm-900 flex flex-col">
+    <div className="min-h-screen hero-gradient text-warm-900 flex flex-col">
       <header className="w-full px-4 sm:px-6 py-5">
         <div className="max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2.5">
@@ -63,11 +63,11 @@ export default function Home() {
 
       <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-10">
         <div className="w-full max-w-2xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-warm-900">
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-warm-900">
             Stop leaving money on the table.
           </h1>
-          <p className="mt-5 mx-auto text-lg text-warm-500 max-w-lg leading-relaxed">
-            Texas childcare providers miss an average of $14,000/yr in funding they already qualify for. See what you are missing — free, 5 minutes, no account required.
+          <p className="mt-4 mx-auto text-base sm:text-lg text-warm-500 max-w-lg leading-relaxed">
+            Texas childcare providers miss an average of <span className="font-semibold text-brand-700">$14,000/yr</span> in funding they already qualify for. See what you&apos;re missing — free, 5 minutes, no account needed.
           </p>
 
           <div className="mt-8 flex justify-center">
