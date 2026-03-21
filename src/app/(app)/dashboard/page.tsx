@@ -354,7 +354,7 @@ export default function DashboardPage() {
             <div className="mt-4">
               <Link
                 href="/trs/readiness"
-                className="inline-flex rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:from-brand-600 hover:to-brand-700"
+                className="inline-flex rounded-xl bg-brand-600 hover:bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow"
               >
                 Ready to submit
               </Link>

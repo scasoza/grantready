@@ -458,7 +458,7 @@ export default function StaffTrackerPage() {
                 setShowAddForm((prev) => !prev);
                 setErrorMessage(null);
               }}
-              className="rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-brand-600/20 hover:from-brand-600 hover:to-brand-700"
+              className="rounded-xl bg-brand-600 hover:bg-brand-700 px-4 py-2 text-sm font-semibold text-white"
             >
               + Add staff member
             </button>

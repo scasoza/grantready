@@ -5,7 +5,7 @@ export default function NotFound() {
     <main className="min-h-screen bg-warm-50 text-warm-900 flex items-center justify-center px-6">
       <div className="w-full max-w-md text-center space-y-6">
         <div className="flex items-center justify-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-gradient-to-b from-brand-500 to-brand-600 flex items-center justify-center text-white font-bold">
+          <div className="h-10 w-10 rounded-lg bg-brand-600 hover:bg-brand-700 flex items-center justify-center text-white font-bold">
             G
           </div>
           <span className="text-xl font-semibold text-warm-900">GrantReady</span>
@@ -20,7 +20,7 @@ export default function NotFound() {
         <div>
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-2.5 text-sm font-semibold text-white"
+            className="inline-flex items-center justify-center rounded-2xl bg-brand-600 hover:bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white"
           >
             Go home
           </Link>

@@ -197,7 +197,7 @@ export default function ApplicationBuilderPage() {
           ← Back to dashboard
         </Link>
 
-        <header className="rounded-2xl bg-gradient-to-b from-brand-500 to-brand-600 p-6 text-white shadow-lg shadow-brand-700/20">
+        <header className="rounded-2xl bg-brand-600 hover:bg-brand-700 p-6 text-white shadow-lg shadow-brand-700/20">
           <p className="text-xs font-semibold uppercase tracking-wide text-brand-100">Application Builder</p>
           <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">{grant.name}</h1>
           <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">

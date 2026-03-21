@@ -196,7 +196,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loadingGoogle || loadingEmail}
-              className="w-full bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white py-3 rounded-xl font-semibold transition shadow-md shadow-brand-600/20 disabled:opacity-60"
+              className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white py-3 rounded-xl font-semibold transition disabled:opacity-60"
             >
               {loadingEmail
                 ? (isSignUp ? "Creating account..." : "Signing in...")

@@ -261,7 +261,7 @@ export default function AdminSubmissionPage() {
                 <button
                   onClick={() => void handleMarkCompleted()}
                   disabled={marking}
-                  className="rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:from-brand-600 hover:to-brand-700 disabled:opacity-50"
+                  className="rounded-xl bg-brand-600 hover:bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow disabled:opacity-50"
                 >
                   {marking ? "Marking..." : "Mark as completed"}
                 </button>

@@ -164,7 +164,7 @@ export default function OnboardingPage() {
       <nav className="sticky top-0 z-40 border-b border-warm-200/40 bg-white/90 backdrop-blur-sm shadow-sm">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-b from-brand-500 to-brand-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-extrabold text-sm">G</span>
             </div>
             <span className="text-sm font-bold text-warm-900">GrantReady</span>
@@ -286,7 +286,7 @@ export default function OnboardingPage() {
 
               <button
                 type="submit"
-                className="w-full sm:w-auto bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-7 py-3 rounded-xl transition font-semibold shadow-md shadow-brand-600/20"
+                className="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white px-7 py-3 rounded-xl transition font-semibold"
               >
                 Continue
               </button>
@@ -349,7 +349,7 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={submitCenter}
                   disabled={submitting}
-                  className="bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-6 py-3 rounded-xl transition font-semibold shadow-md shadow-brand-600/20 disabled:opacity-60"
+                  className="bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white px-6 py-3 rounded-xl transition font-semibold disabled:opacity-60"
                 >
                   {submitting ? "Saving..." : "Save and continue"}
                 </button>

@@ -157,7 +157,7 @@ export default function FundingSnapshotPage() {
               )}
               <Link
                 href="/dashboard"
-                className="mt-1 flex w-full items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-brand-600/20 hover:from-brand-600 hover:to-brand-700 sm:w-auto sm:inline-flex"
+                className="mt-1 flex w-full items-center justify-center rounded-xl bg-brand-600 hover:bg-brand-700 px-5 py-3 text-sm font-semibold text-white sm:w-auto sm:inline-flex"
               >
                 See your roadmap &rarr;
               </Link>
@@ -212,7 +212,7 @@ export default function FundingSnapshotPage() {
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-brand-400/30 bg-white/95 backdrop-blur-sm p-3 sm:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
         <Link
           href="/login?mode=signup"
-          className="flex w-full items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-md"
+          className="flex w-full items-center justify-center rounded-xl bg-brand-600 hover:bg-brand-700 px-6 py-3 text-sm font-semibold text-white shadow-md"
         >
           Create Free Account — It&apos;s Free
         </Link>

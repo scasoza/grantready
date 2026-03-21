@@ -448,7 +448,7 @@ export default function SectionDetailPage() {
             <button
               onClick={generateDraft}
               disabled={isGenerating || !textInput.trim()}
-              className="w-full bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white py-3.5 rounded-xl font-semibold transition shadow-md shadow-brand-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white py-3.5 rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGenerating ? "Writing your draft..." : "Generate professional draft"}
             </button>
@@ -518,7 +518,7 @@ export default function SectionDetailPage() {
                 <button
                   onClick={verifySection}
                   disabled={!allClaimsVerified}
-                  className="flex-1 bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white py-3 rounded-xl font-semibold text-sm transition shadow-md shadow-brand-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white py-3 rounded-xl font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {allClaimsVerified ? "Looks good — approve" : "Verify all claims first"}
                 </button>

@@ -53,7 +53,7 @@ export default function Home() {
       <header className="w-full px-4 sm:px-6 py-5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="inline-flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-gradient-to-b from-brand-500 to-brand-600 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center shadow-md">
               <span className="text-white font-extrabold text-sm">G</span>
             </div>
             <span className="text-base font-extrabold tracking-tight">GrantReady</span>
@@ -111,7 +111,7 @@ export default function Home() {
                 type="button"
                 onClick={handleGetStarted}
                 disabled={!selected}
-                className="mt-4 w-full rounded-2xl bg-gradient-to-b from-brand-500 to-brand-600 px-6 py-3.5 font-semibold text-white shadow-md transition hover:from-brand-600 hover:to-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-4 w-full rounded-2xl bg-brand-600 hover:bg-brand-700 px-6 py-3.5 font-semibold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Get Started →
               </button>

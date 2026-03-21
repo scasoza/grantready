@@ -248,7 +248,7 @@ export default function ReviewApplicationPage() {
                 <button
                   type="button"
                   onClick={() => console.log("Download application placeholder")}
-                  className="rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:from-brand-600 hover:to-brand-700"
+                  className="rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition"
                 >
                   Download Application
                 </button>
@@ -276,7 +276,7 @@ export default function ReviewApplicationPage() {
           ← Back
         </Link>
 
-        <header className="rounded-2xl bg-gradient-to-b from-brand-500 to-brand-600 p-6 text-white shadow-lg shadow-brand-700/20">
+        <header className="rounded-2xl bg-brand-600 p-6 text-white shadow-lg shadow-brand-700/20">
           <p className="text-xs font-semibold uppercase tracking-wide text-brand-100">Application Review</p>
           <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">{grant.name}</h1>
         </header>

@@ -206,7 +206,7 @@ export default function ReadinessPage() {
                 <button
                   onClick={() => void handleSubmit()}
                   disabled={submitting}
-                  className="w-full rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-6 py-3 text-sm font-semibold text-white shadow hover:from-brand-600 hover:to-brand-700 disabled:opacity-50"
+                  className="w-full rounded-xl bg-brand-600 hover:bg-brand-700 px-6 py-3 text-sm font-semibold text-white shadow disabled:opacity-50"
                 >
                   {submitting ? "Submitting..." : "Submit my application"}
                 </button>

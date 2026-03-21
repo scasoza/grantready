@@ -223,7 +223,7 @@ export default function GrantExplorer() {
             <div className="mt-6 flex flex-wrap items-center gap-3 pt-5 border-t border-warm-100">
               <button
                 onClick={() => setFiltering(true)}
-                className="bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white text-sm px-6 py-2.5 rounded-xl font-semibold transition shadow-md shadow-brand-600/20"
+                className="bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-sm px-6 py-2.5 rounded-xl font-semibold transition"
               >
                 Show my grants
               </button>
@@ -325,7 +325,7 @@ export default function GrantExplorer() {
       <div className="text-center sm:text-left mt-6">
         <Link
           href="/login"
-          className="inline-block bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-8 py-4 rounded-2xl font-semibold transition shadow-lg shadow-brand-600/20 text-sm"
+          className="inline-block bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white px-8 py-4 rounded-2xl font-semibold transition shadow-lg shadow-brand-600/20 text-sm"
         >
           See full details and eligibility
         </Link>

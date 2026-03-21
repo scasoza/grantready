@@ -86,7 +86,7 @@ export default function PricingPage() {
             <ul className="mt-6 space-y-3 text-sm text-warm-700">
               {freeFeatures.map((feature) => (
                 <li key={feature} className="flex items-start gap-2.5">
-                  <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-gradient-to-b from-brand-500 to-brand-600" />
+                  <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-brand-600" />
                   <span>{feature}</span>
                 </li>
               ))}
@@ -108,7 +108,7 @@ export default function PricingPage() {
             <ul className="mt-6 space-y-3 text-sm text-warm-700">
               {proFeatures.map((feature) => (
                 <li key={feature} className="flex items-start gap-2.5">
-                  <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-gradient-to-b from-brand-500 to-brand-600" />
+                  <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-brand-600" />
                   <span>{feature}</span>
                 </li>
               ))}
@@ -124,7 +124,7 @@ export default function PricingPage() {
               type="button"
               onClick={handleStartTrial}
               disabled={isLoading}
-              className="mt-8 inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:from-brand-600 hover:to-brand-700 disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-8 inline-flex w-full items-center justify-center rounded-2xl bg-brand-600 hover:bg-brand-700 px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isLoading ? "Redirecting..." : "Start 14-Day Free Trial"}
             </button>

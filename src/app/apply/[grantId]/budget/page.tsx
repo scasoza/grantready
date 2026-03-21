@@ -260,7 +260,7 @@ export default function BudgetPage() {
         <button
           onClick={saveBudget}
           disabled={saving || items.length === 0}
-          className="w-full bg-gradient-to-b from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white py-3.5 rounded-xl font-semibold transition shadow-md shadow-brand-600/20 disabled:opacity-50"
+          className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white py-3.5 rounded-xl font-semibold transition disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save budget"}
         </button>
