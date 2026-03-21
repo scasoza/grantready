@@ -51,13 +51,16 @@ export default function Home() {
   return (
     <div className="min-h-screen hero-gradient text-warm-900 flex flex-col">
       <header className="w-full px-4 sm:px-6 py-5">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="inline-flex items-center gap-2.5">
             <div className="w-8 h-8 bg-gradient-to-b from-brand-500 to-brand-600 rounded-lg flex items-center justify-center shadow-md">
               <span className="text-white font-extrabold text-sm">G</span>
             </div>
             <span className="text-base font-extrabold tracking-tight">GrantReady</span>
           </div>
+          <Link href="/login" className="rounded-xl border border-warm-200 bg-white/80 px-4 py-2 text-sm font-semibold text-warm-700 hover:bg-white transition">
+            Log in
+          </Link>
         </div>
       </header>
 
