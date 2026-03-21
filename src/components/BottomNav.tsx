@@ -25,7 +25,7 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-warm-200 bg-white/95 backdrop-blur-sm sm:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-warm-200 bg-white/95 backdrop-blur-sm sm:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
       <div className="flex justify-around py-2">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href || pathname.startsWith(tab.href + "/");

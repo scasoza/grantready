@@ -37,8 +37,11 @@ html {
   scroll-padding-top: 4rem;
 }
 
+/* Touch target minimum for primary interactive elements */
 @media (max-width: 768px) {
-  button, a {
+  button[type="submit"],
+  button[type="button"],
+  a[role="button"] {
     min-height: 44px;
   }
 }
