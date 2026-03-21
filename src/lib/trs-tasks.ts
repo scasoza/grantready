@@ -14,6 +14,7 @@ export interface TrsTask {
     href?: string;
     docType?: string;
   };
+  zone?: "paperwork" | "prep";
 }
 
 export const trsTasks: TrsTask[] = [
