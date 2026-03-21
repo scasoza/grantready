@@ -334,7 +334,7 @@ export default function DashboardPage() {
         )}
 
         {/* Progress */}
-        <section className="animate-fade-up animate-delay-200 rounded-2xl border border-warm-200 bg-white p-5 sm:p-6">
+        <section className="animate-fade-up animate-delay-200 rounded-xl border border-warm-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-4">
             <div>
               <h1 className="text-xl font-semibold text-warm-900">TRS Certification</h1>
@@ -374,7 +374,7 @@ export default function DashboardPage() {
                 <Link
                   key={item.id}
                   href={item.actionHref}
-                  className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 transition hover:border-amber-300"
+                  className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 transition hover:border-amber-300"
                 >
                   <svg className="h-5 w-5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -406,7 +406,7 @@ export default function DashboardPage() {
               {pendingPaperwork.map((task) => {
                 const href = actionHref(task);
                 const card = (
-                  <div className="flex items-center gap-3 rounded-xl border border-warm-200 bg-white px-4 py-3 transition hover:border-brand-300 hover:shadow-sm">
+                  <div className="flex items-center gap-3 rounded-lg border border-warm-100 bg-white px-4 py-3 transition hover:border-warm-300 hover:bg-warm-50/50">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-500">
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -459,7 +459,7 @@ export default function DashboardPage() {
                       return (
                         <div
                           key={task.id}
-                          className="rounded-xl border border-warm-200 bg-white px-4 py-3"
+                          className="rounded-lg border border-warm-100 bg-white px-4 py-3"
                         >
                           <div className="flex items-start gap-3">
                             <input
@@ -511,7 +511,7 @@ export default function DashboardPage() {
                 {completedPaperwork.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-3 rounded-xl border border-warm-100 bg-warm-50/50 px-4 py-2.5"
+                    className="flex items-center gap-3 rounded-lg bg-warm-50/50 px-4 py-2"
                   >
                     <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -528,7 +528,7 @@ export default function DashboardPage() {
                 {completedPrep.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-3 rounded-xl border border-warm-100 bg-warm-50/50 px-4 py-2.5"
+                    className="flex items-center gap-3 rounded-lg bg-warm-50/50 px-4 py-2"
                   >
                     <input
                       type="checkbox"

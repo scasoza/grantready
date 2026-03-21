@@ -468,7 +468,7 @@ export default function StaffTrackerPage() {
           </div>
 
           {showAddForm && (
-            <form onSubmit={handleAddStaff} className="mt-4 rounded-2xl border border-warm-200 bg-warm-50 p-4">
+            <form onSubmit={handleAddStaff} className="mt-4 rounded-lg border border-warm-100 bg-warm-50/80 p-4">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <label className="block text-xs text-warm-500 mb-1 font-semibold">Name</label>
@@ -564,7 +564,7 @@ export default function StaffTrackerPage() {
                 const trainingLow = member.trainingHours < 24;
 
                 return (
-                  <article key={member.id} className="rounded-2xl border border-warm-200 bg-warm-50 p-4">
+                  <article key={member.id} className="rounded-lg border border-warm-100 bg-warm-50/80 p-4">
                     {isEditing && editDraft ? (
                       <div className="space-y-3">
                         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -222,7 +222,7 @@ export default function DocumentsPage() {
               const previewText = document.aiDraft.slice(0, 150);
 
               return (
-                <article key={document.id} className="rounded-2xl border border-warm-200 bg-white p-5">
+                <article key={document.id} className="rounded-xl border border-warm-200 bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <h2 className="text-lg font-semibold text-warm-900">
