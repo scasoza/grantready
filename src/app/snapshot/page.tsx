@@ -90,8 +90,11 @@ export default function FundingSnapshotPage() {
 
   if (!mounted || !quizData || !revenue) {
     return (
-      <div className="min-h-screen bg-warm-50 px-4 py-10 sm:px-6">
-        <div className="mx-auto max-w-5xl rounded-2xl border border-warm-200 bg-white p-6 text-sm text-warm-500">Loading funding snapshot...</div>
+      <div className="min-h-screen bg-warm-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-warm-200 border-t-brand-500" />
+          <p className="mt-3 text-sm text-warm-400">Calculating your funding...</p>
+        </div>
       </div>
     );
   }

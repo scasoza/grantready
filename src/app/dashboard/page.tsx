@@ -8,6 +8,7 @@ import { trsTasks, categoryLabels, categoryColors, type TrsTask } from "@/lib/tr
 import { getTaskZone, getAttentionItems, type AttentionItem } from "@/lib/trs-zones";
 import { parseStaffMembers, getStaffAlerts } from "@/lib/staff-utils";
 import { trsDocTemplates } from "@/lib/trs-documents";
+import LoadingScreen from "@/components/LoadingScreen";
 
 type Center = {
   id: string;
@@ -249,11 +250,7 @@ export default function DashboardPage() {
   // ---- Render ----
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-warm-50 text-warm-900">
-        <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">Loading dashboard...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

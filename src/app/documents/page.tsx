@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { grants } from "@/lib/grants";
 import { createClient } from "@/lib/supabase/client";
+import LoadingScreen from "@/components/LoadingScreen";
 
 type SectionStatus = "pending" | "input_given" | "draft_generated" | "verified";
 
@@ -171,13 +172,7 @@ export default function DocumentsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-warm-50 px-4 py-8 text-warm-900 sm:px-6">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-warm-200 bg-white p-6">
-          Loading documents...
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

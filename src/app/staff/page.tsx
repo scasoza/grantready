@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import LoadingScreen from "@/components/LoadingScreen";
 
 type CredentialType = "none" | "cda" | "associates" | "bachelors" | "masters";
 
@@ -403,13 +404,7 @@ export default function StaffTrackerPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-warm-50 px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-5xl rounded-2xl border border-warm-200 bg-white p-6 text-warm-700">
-          Loading staff tracker...
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

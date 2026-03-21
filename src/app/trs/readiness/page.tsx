@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import LoadingScreen from "@/components/LoadingScreen";
 
 interface Check {
   category: "documents" | "staff" | "consistency";
@@ -125,13 +126,7 @@ export default function ReadinessPage() {
   }, [result]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-warm-50 text-warm-900">
-        <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-          <p className="text-warm-500">Running readiness checks...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen label="Running readiness checks..." />;
   }
 
   if (error && !result) {
