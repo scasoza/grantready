@@ -209,7 +209,7 @@ export default function FundingSnapshotPage() {
           </section>
         )}
 
-        <section className="rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-center sm:p-8 shadow-lg">
+        <section className="rounded-xl bg-brand-800 p-6 text-center sm:p-8 shadow-lg">
           <h2 className="text-xl font-extrabold tracking-tight text-white">Start your roadmap — it&apos;s free</h2>
           <p className="mt-2 text-sm text-brand-100">No credit card. Takes 30 seconds.</p>
           <Link

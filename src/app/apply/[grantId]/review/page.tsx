@@ -248,7 +248,7 @@ export default function ReviewApplicationPage() {
                 <button
                   type="button"
                   onClick={() => console.log("Download application placeholder")}
-                  className="rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition"
+                  className="rounded-xl bg-brand-600 hover:bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition"
                 >
                   Download Application
                 </button>
@@ -336,7 +336,7 @@ export default function ReviewApplicationPage() {
             type="button"
             onClick={handleSubmit}
             disabled={!allSectionsVerified || submitting}
-            className="w-full rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-4 py-3 text-sm font-semibold text-white transition enabled:hover:from-brand-600 enabled:hover:to-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-xl bg-brand-600 hover:bg-brand-700 px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? "Submitting..." : "Submit Application"}
           </button>

@@ -159,7 +159,7 @@ export default function QuizPage() {
       <div className="mx-auto w-full max-w-3xl">
         <header className="mb-4 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-sm shadow-brand-600/20">
+            <div className="h-8 w-8 rounded-xl bg-brand-600 flex items-center justify-center">
               <span className="text-white text-xs font-extrabold">G</span>
             </div>
             <span className="text-sm font-bold tracking-tight">GrantReady</span>
