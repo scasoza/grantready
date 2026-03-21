@@ -413,40 +413,46 @@ export default function StaffTrackerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-warm-50 px-4 py-8 sm:px-6">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <header className="space-y-3">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center text-sm font-semibold text-warm-600 hover:text-warm-900"
-          >
-            ← Dashboard
+    <div className="min-h-screen bg-warm-50">
+      {/* Sticky nav matching dashboard */}
+      <nav className="sticky top-0 z-40 border-b border-warm-200/40 bg-white/90 backdrop-blur-sm shadow-sm">
+        <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3 sm:px-6">
+          <Link href="/dashboard" className="text-warm-400 hover:text-warm-600 transition p-2 -m-2" aria-label="Back to dashboard">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
           </Link>
-
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-warm-900 sm:text-3xl">Staff Tracker</h1>
-            <p className="mt-1 text-sm text-warm-600">{subtitle}</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-sm font-bold text-warm-900">Staff Tracker</h1>
+            {staffMembers.length > 0 && (
+              <p className="text-xs text-warm-400">{staffMembers.length} staff member{staffMembers.length !== 1 ? "s" : ""}</p>
+            )}
           </div>
-        </header>
+        </div>
+      </nav>
 
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-warm-500">Alerts</h2>
-          {alerts.length === 0 ? (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-              No active compliance alerts right now.
-            </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {alerts.map((alert) => (
-                <article key={alert.id} className={`rounded-2xl border p-4 ${alert.tone}`}>
-                  <p className="text-xs font-semibold uppercase tracking-wide">{alert.name}</p>
-                  <p className="mt-1 text-sm font-semibold">{alert.needed}</p>
-                  <p className="mt-1 text-xs">Suggested action: {alert.action}</p>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 space-y-5">
+        {/* Alerts */}
+        {alerts.length > 0 && (
+          <section className="space-y-2">
+            {alerts.map((alert) => (
+              <article key={alert.id} className={`flex items-start gap-3 rounded-xl border px-4 py-3 ${alert.tone}`}>
+                <svg className="h-5 w-5 shrink-0 mt-0.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold">{alert.name}</p>
+                  <p className="text-xs">{alert.needed}</p>
+                </div>
+              </article>
+            ))}
+          </section>
+        )}
+        {alerts.length === 0 && staffMembers.length > 0 && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            All staff are in compliance.
+          </div>
+        )}
 
         <section className="rounded-2xl border border-warm-200 bg-white p-4 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
