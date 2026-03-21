@@ -339,7 +339,7 @@ export default function DashboardPage() {
                       </svg>
                     ) : i + 1}
                   </div>
-                  <span className={`text-[10px] font-medium ${s.active ? "text-brand-700" : "text-warm-400"}`}>{s.label}</span>
+                  <span className={`text-xs font-medium ${s.active ? "text-brand-700" : "text-warm-400"}`}>{s.label}</span>
                 </div>
               </div>
             ))}
