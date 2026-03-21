@@ -156,20 +156,18 @@ export default function QuizPage() {
 
   return (
     <div className="min-h-screen bg-warm-50 text-warm-900 px-4 py-6 sm:px-6">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-3xl flex-col">
-        <header className="mb-6 flex items-start justify-between">
+      <div className="mx-auto w-full max-w-3xl">
+        <header className="mb-4 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-sm shadow-brand-600/20">
               <span className="text-white text-xs font-extrabold">G</span>
             </div>
             <span className="text-sm font-bold tracking-tight">GrantReady</span>
           </Link>
+          <span className="text-xs font-semibold text-warm-400">{step + 1} / {totalSteps}</span>
         </header>
 
-        <div className="mb-8">
-          <div className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-warm-500">
-            <span>Step {step + 1} of {totalSteps}</span>
-          </div>
+        <div className="mb-6">
           <div className="h-2 w-full overflow-hidden rounded-full bg-warm-200">
             <div
               className="h-full rounded-full bg-brand-500 transition-all duration-300"
@@ -178,10 +176,10 @@ export default function QuizPage() {
           </div>
         </div>
 
-        <form onSubmit={onSubmit} className="flex flex-1 flex-col rounded-2xl border border-warm-200 bg-white p-5 sm:p-8 shadow-sm">
-          <div className="flex-1">{renderQuestion(currentQuestionIndex, answers, updateAnswer)}</div>
+        <form onSubmit={onSubmit} className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-8 shadow-sm">
+          <div>{renderQuestion(currentQuestionIndex, answers, updateAnswer)}</div>
 
-          <div className="mt-8 flex items-center justify-between gap-3">
+          <div className="mt-6 flex items-center justify-between gap-3">
             {step === 0 ? (
               <Link href="/" className="rounded-xl border border-warm-200 px-5 py-3 text-base font-semibold text-warm-700 hover:bg-warm-50 transition">
                 Back
@@ -205,6 +203,10 @@ export default function QuizPage() {
             </button>
           </div>
         </form>
+
+        <p className="mt-4 text-center text-xs text-warm-400">
+          Your answers stay on your device until you create an account.
+        </p>
       </div>
     </div>
   );
@@ -219,7 +221,7 @@ function renderQuestion(
     case 0:
       return (
         <div className="space-y-5">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">What type of childcare do you run?</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">What type of childcare do you run?</h1>
           <fieldset className="space-y-3">
             {[
               "Licensed center",
@@ -247,7 +249,7 @@ function renderQuestion(
     case 1:
       return (
         <div className="space-y-5">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">What county is your center in?</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">What county is your center in?</h1>
           <input
             type="text"
             value={answers.county}
@@ -260,7 +262,7 @@ function renderQuestion(
     case 2:
       return (
         <div className="space-y-5">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">How many children are you licensed for?</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">How many children are you licensed for?</h1>
           <input
             key={`number-${questionIndex}`}
             type="number"
@@ -275,7 +277,7 @@ function renderQuestion(
     case 3:
       return (
         <div className="space-y-5">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Current enrollment?</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Current enrollment?</h1>
           <input
             key={`number-${questionIndex}`}
             type="number"
@@ -290,7 +292,7 @@ function renderQuestion(
     case 4:
       return (
         <div className="space-y-5">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Do you accept CCS (subsidized) children?</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Do you accept CCS (subsidized) children?</h1>
           <div key={`choices-${questionIndex}`} className="flex gap-3">
             <button
               type="button"
@@ -340,7 +342,7 @@ function renderQuestion(
     case 5:
       return (
         <div className="space-y-5">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">How many staff, including yourself?</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">How many staff, including yourself?</h1>
           <input
             key={`number-${questionIndex}`}
             type="number"
@@ -355,7 +357,7 @@ function renderQuestion(
     case 6:
       return (
         <div className="space-y-5">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Do you have a written curriculum?</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Do you have a written curriculum?</h1>
           <div key={`choices-${questionIndex}`} className="flex flex-wrap gap-3">
             {["Yes", "Sort of", "No"].map((option) => (
               <button
@@ -377,7 +379,7 @@ function renderQuestion(
     case 7:
       return (
         <div className="space-y-5">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Do all lead teachers hold a CDA or higher?</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Do all lead teachers hold a CDA or higher?</h1>
           <div key={`choices-${questionIndex}`} className="flex flex-wrap gap-3">
             {["Yes", "Not sure", "No"].map((option) => (
               <button
@@ -399,7 +401,7 @@ function renderQuestion(
     case 8:
       return (
         <div className="space-y-5">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Have you looked into Texas Rising Star before?</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Have you looked into Texas Rising Star before?</h1>
           <div key={`choices-${questionIndex}`} className="flex flex-wrap gap-3">
             {["Yes, applied", "Yes, looked", "No"].map((option) => (
               <button
