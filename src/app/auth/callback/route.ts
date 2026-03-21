@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = requestUrl.searchParams.get("next") ?? "/onboarding";
+  const next = requestUrl.searchParams.get("next") ?? "/dashboard";
 
   if (code) {
     const supabase = await createClient();
@@ -15,6 +15,6 @@ export async function GET(request: Request) {
   }
 
   // Prevent open redirect: must start with "/" but not "//" (protocol-relative URL)
-  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/onboarding";
+  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
   return NextResponse.redirect(new URL(safeNext, requestUrl.origin));
 }

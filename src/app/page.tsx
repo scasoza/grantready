@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 const options = [
   "I run a licensed center",
@@ -17,7 +18,15 @@ const centerTypeByOption: Record<(typeof options)[number], string> = {
 
 export default function Home() {
   const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
   const [selected, setSelected] = useState<(typeof options)[number] | "">("");
+
+  // If already logged in, go straight to dashboard
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) router.replace("/dashboard");
+    });
+  }, [supabase, router]);
 
   const handleGetStarted = () => {
     if (!selected) return;

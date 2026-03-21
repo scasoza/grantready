@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   const getNextUrl = () => {
     const params = new URLSearchParams(window.location.search);
-    return params.get("next") || "/onboarding";
+    return params.get("next") || "/dashboard";
   };
 
   const signInWithGoogle = async () => {
