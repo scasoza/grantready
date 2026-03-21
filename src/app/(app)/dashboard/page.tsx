@@ -554,8 +554,11 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setShowCompleted(!showCompleted)}
-              className="text-sm font-medium text-warm-500 hover:text-warm-700 py-2 px-1"
+              className="flex items-center gap-2 w-full text-left py-2 px-3 rounded-lg hover:bg-warm-100 transition"
             >
+              <svg className={`h-4 w-4 text-warm-400 transition-transform ${showCompleted ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
               {showCompleted ? "Hide" : "Show"} {totalDone} completed task
               {totalDone !== 1 ? "s" : ""}
             </button>
