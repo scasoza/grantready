@@ -674,64 +674,39 @@ export default function StaffTrackerPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="space-y-3">
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div>
-                            <h3 className="text-lg font-bold text-warm-900">{member.name || "Unnamed staff"}</h3>
+                      <div>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <h3 className="text-base font-bold text-warm-900">{member.name || "Unnamed staff"}</h3>
                             <p className="text-sm text-warm-600">{member.role || "Role not set"}</p>
-                            <p className="text-xs text-warm-500">{member.email || "No email"}</p>
                           </div>
-
-                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${credentialBadgeStyles[member.credentialType]}`}>
+                          <span className={`shrink-0 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${credentialBadgeStyles[member.credentialType]}`}>
                             {credentialLabels[member.credentialType]}
                           </span>
                         </div>
 
-                        <div className="grid gap-2 text-sm sm:grid-cols-2">
-                          <div className="rounded-xl border border-warm-200 bg-white p-3">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-warm-500">Hire date</p>
-                            <p className="mt-1 font-semibold text-warm-800">{formatDate(member.hireDate)}</p>
-                          </div>
-
-                          <div className="rounded-xl border border-warm-200 bg-white p-3">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-warm-500">CPR / First Aid</p>
-                            <p className={`mt-1 font-semibold ${cprStatus.tone}`}>{formatDate(member.cprExpiry)}</p>
-                            <span className={`mt-2 inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${cprStatus.badge}`}>
-                              {cprStatus.label}
-                            </span>
-                          </div>
-
-                          <div className="rounded-xl border border-warm-200 bg-white p-3 sm:col-span-2">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-warm-500">Training hours this year</p>
-                            <div className="mt-1 flex items-center gap-2">
-                              <p className={`font-semibold ${trainingLow ? "text-amber-700" : "text-emerald-700"}`}>
-                                {member.trainingHours} hours
-                              </p>
-                              <span
-                                className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                  trainingLow
-                                    ? "border border-amber-200 bg-amber-100 text-amber-700"
-                                    : "border border-emerald-200 bg-emerald-100 text-emerald-700"
-                                }`}
-                              >
-                                {trainingLow ? "Below 24" : "Meets 24+"}
-                              </span>
-                            </div>
-                          </div>
+                        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-warm-500">
+                          <span>Hired {formatDate(member.hireDate)}</span>
+                          <span className={cprStatus.tone}>
+                            CPR: {cprStatus.label}
+                          </span>
+                          <span className={trainingLow ? "text-amber-700" : "text-emerald-700"}>
+                            Training: {member.trainingHours}/24 hrs
+                          </span>
                         </div>
 
-                        <div className="flex flex-wrap gap-2">
+                        <div className="mt-3 flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => startEdit(member)}
-                            className="rounded-xl border border-warm-200 bg-white px-4 py-2 text-sm font-semibold text-warm-700 hover:bg-warm-100"
+                            className="rounded-lg border border-warm-200 bg-white px-3 py-1.5 text-xs font-semibold text-warm-700 hover:bg-warm-100"
                           >
                             Edit
                           </button>
                           <button
                             type="button"
                             onClick={() => void handleDelete(member)}
-                            className="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
+                            className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
                           >
                             Delete
                           </button>
