@@ -140,8 +140,9 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="px-4 sm:px-6 py-6 text-center text-xs text-warm-400">
-        © 2026 GrantReady
+      <footer className="px-4 sm:px-6 py-6 text-center space-y-2">
+        <p className="text-[11px] text-warm-400">Built for Texas childcare providers</p>
+        <p className="text-[10px] text-warm-300">© 2026 GrantReady · <Link href="/pricing" className="hover:text-warm-500 transition">Pricing</Link></p>
       </footer>
     </div>
   );
