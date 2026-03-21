@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { trsTasks, categoryLabels, categoryColors, type TrsTask } from "@/lib/trs-tasks";
+import { trsTasks, type TrsTask } from "@/lib/trs-tasks";
 import { getTaskZone, getAttentionItems, type AttentionItem } from "@/lib/trs-zones";
 import { parseStaffMembers, getStaffAlerts } from "@/lib/staff-utils";
 import { trsDocTemplates } from "@/lib/trs-documents";
@@ -44,6 +44,9 @@ export default function DashboardPage() {
   const [attentionItems, setAttentionItems] = useState<AttentionItem[]>([]);
   const [submission, setSubmission] = useState<SubmissionRow | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [showAttention, setShowAttention] = useState(true);
+  const [expandedPrepGroup, setExpandedPrepGroup] = useState<string | null>(null);
+  const [showAllPaperwork, setShowAllPaperwork] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -173,6 +176,17 @@ export default function DashboardPage() {
   const progressPct = totalTasks ? Math.round((totalDone / totalTasks) * 100) : 0;
   const allComplete = totalDone === totalTasks && totalTasks > 0;
 
+  // Estimate time remaining from pending task effort strings
+  const estimatedMinutes = useMemo(() => {
+    const pending = [...pendingPaperwork, ...pendingPrep];
+    let mins = 0;
+    for (const t of pending) {
+      const m = t.effort.match(/(\d+)/);
+      if (m) mins += parseInt(m[1], 10);
+    }
+    return mins;
+  }, [pendingPaperwork, pendingPrep]);
+
   // Group prep tasks
   const prepGroups = useMemo(() => {
     const groups: { label: string; tasks: TrsTask[] }[] = [
@@ -269,26 +283,34 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-warm-50 text-warm-900">
-      {/* Nav */}
-      <nav className="border-b border-warm-200/60 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
-          <Link href="/" className="flex items-center gap-2">
+      {/* Nav — compact app-style header */}
+      <nav className="sticky top-0 z-40 border-b border-warm-200/60 bg-white/95 backdrop-blur-lg">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-2.5 sm:px-6">
+          <div className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-sm font-extrabold text-white">
               G
             </span>
-            <span className="text-sm font-bold text-warm-900">GrantReady</span>
-          </Link>
+            <div className="hidden sm:block">
+              <span className="text-sm font-bold text-warm-900">GrantReady</span>
+            </div>
+            <div className="sm:hidden">
+              <p className="text-sm font-bold text-warm-900">My Dashboard</p>
+            </div>
+          </div>
           <button
             onClick={() => void handleSignOut()}
-            className="text-xs text-warm-400 hover:text-warm-600 transition py-2"
+            className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs text-warm-400 hover:text-warm-600 hover:bg-warm-100 transition active:bg-warm-200"
           >
-            Sign out
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+            </svg>
+            <span className="hidden sm:inline">Sign out</span>
           </button>
         </div>
       </nav>
 
 
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 pb-24 sm:pb-8 space-y-6">
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 pb-28 sm:pb-8 space-y-5">
         {/* Submission Banner */}
         {submission?.status === "pending" && (
           <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
@@ -301,133 +323,224 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* First-visit welcome */}
-        {totalDone === 0 && !submission && (
-          <section className="animate-fade-up rounded-xl bg-brand-800 p-5 text-white shadow-lg">
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-600">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-base font-bold">Your TRS certification starts here</h2>
-                <p className="mt-1 text-sm text-brand-200 leading-relaxed">
-                  We generate your documents, track credentials, and submit when ready. Tap below to begin.
+        {/* Hero: Current Step — wizard-style focus card */}
+        {!submission && (
+          <section className="animate-fade-up">
+            {/* Step indicator — connected dots on mobile, pills on desktop */}
+            <div className="flex items-center mb-4 px-1">
+              {["Paperwork", "Center Prep", "Submit"].map((label, i) => {
+                const stepDone = i === 0 ? pendingPaperwork.length === 0 : i === 1 ? pendingPrep.length === 0 : !!submission;
+                const stepActive = i === 0 ? pendingPaperwork.length > 0 : i === 1 ? pendingPaperwork.length === 0 && pendingPrep.length > 0 : allComplete;
+                return (
+                  <div key={label} className="flex items-center flex-1 last:flex-none">
+                    <div className="flex flex-col items-center gap-1">
+                      <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all ${
+                        stepDone ? "bg-brand-500 text-white" : stepActive ? "bg-brand-600 text-white ring-2 ring-brand-200 ring-offset-1" : "bg-warm-200 text-warm-500"
+                      }`}>
+                        {stepDone ? (
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <span>{i + 1}</span>
+                        )}
+                      </div>
+                      <span className={`text-[10px] font-medium leading-tight ${
+                        stepDone ? "text-brand-600" : stepActive ? "text-brand-700 font-semibold" : "text-warm-400"
+                      }`}>{label}</span>
+                    </div>
+                    {i < 2 && (
+                      <div className={`h-0.5 flex-1 mx-2 mb-4 rounded ${stepDone ? "bg-brand-400" : "bg-warm-200"}`} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Primary action card */}
+            {totalDone === 0 ? (
+              /* First visit — welcome + start */
+              <Link
+                href={pendingPaperwork.length > 0 ? `/trs/${pendingPaperwork[0].action?.docType ?? pendingPaperwork[0].id}` : "/staff"}
+                className="block rounded-2xl bg-gradient-to-br from-brand-700 to-brand-900 p-5 text-white shadow-lg active:scale-[0.98] transition-transform"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand-300">Step 1 of {totalTasks}</p>
+                <h2 className="mt-1 text-lg font-bold leading-snug">
+                  {pendingPaperwork.length > 0 ? pendingPaperwork[0].title : "Get started"}
+                </h2>
+                <p className="mt-1.5 text-sm text-brand-200 leading-relaxed">
+                  {pendingPaperwork.length > 0 ? pendingPaperwork[0].context : "Set up your center for TRS certification."}
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white/20 px-4 py-2.5 text-sm font-semibold backdrop-blur-sm">
+                  Start here
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
+              </Link>
+            ) : pendingPaperwork.length > 0 ? (
+              /* In progress — next step */
+              <Link
+                href={`/trs/${pendingPaperwork[0].action?.docType ?? pendingPaperwork[0].id}`}
+                className="block rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 p-5 text-white shadow-lg active:scale-[0.98] transition-transform"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand-200">Up next</p>
+                <h2 className="mt-1 text-lg font-bold leading-snug">{pendingPaperwork[0].title}</h2>
+                <p className="mt-1 text-sm text-brand-200">{pendingPaperwork[0].context}</p>
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-white/20 px-4 py-2.5 text-sm font-semibold backdrop-blur-sm">
+                    Continue
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </span>
+                  <span className="text-xs text-brand-300">{pendingPaperwork[0].effort}</span>
+                </div>
+              </Link>
+            ) : pendingPrep.length > 0 ? (
+              /* Paperwork done, prep remaining */
+              <div className="rounded-2xl bg-gradient-to-br from-warm-700 to-warm-900 p-5 text-white shadow-lg">
+                <p className="text-xs font-semibold uppercase tracking-wider text-warm-300">Paperwork complete — now prep your center</p>
+                <h2 className="mt-1 text-lg font-bold leading-snug">
+                  {prepGroups.length > 0 ? prepGroups[0].tasks[0]?.title : "Center prep tasks"}
+                </h2>
+                <p className="mt-1 text-sm text-warm-300">{pendingPrep.length} tasks remaining</p>
+                <div className="mt-3 text-xs text-warm-400">Scroll down to check off tasks as you go</div>
               </div>
-            </div>
-          </section>
-        )}
-
-        {/* Next step suggestion */}
-        {pendingPaperwork.length > 0 && !submission && (
-          <Link
-            href={`/trs/${pendingPaperwork[0].action?.docType ?? pendingPaperwork[0].id}`}
-            className="animate-fade-up animate-delay-100 flex items-center gap-3 rounded-xl bg-brand-600 p-4 shadow-md hover:bg-brand-700 transition"
-          >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/20 text-white">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-200">Next step</p>
-              <p className="mt-0.5 text-sm font-semibold text-white line-clamp-1">{pendingPaperwork[0].title}</p>
-            </div>
-            <svg className="h-5 w-5 shrink-0 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        )}
-
-        {/* Progress */}
-        <section className="animate-fade-up animate-delay-200 rounded-xl bg-white p-5 border border-warm-200">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-warm-400">Progress</p>
-              <p className="mt-0.5 text-sm text-warm-700">
-                <span className="text-2xl font-bold text-warm-900">{totalDone}</span>
-                <span className="text-warm-400"> / {totalTasks} tasks</span>
-              </p>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50">
-              <span className="text-sm font-bold text-brand-700">{progressPct}%</span>
-            </div>
-          </div>
-          <div className="mt-4 h-3 w-full rounded-full bg-warm-100">
-            <div
-              className="h-3 rounded-full bg-brand-500 transition-all"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-          {allComplete && !submission && (
-            <div className="mt-4">
+            ) : allComplete ? (
+              /* All done — submit */
               <Link
                 href="/trs/readiness"
-                className="inline-flex rounded-xl bg-brand-600 hover:bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow"
+                className="block rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-800 p-5 text-white shadow-lg active:scale-[0.98] transition-transform animate-pulse-ring"
               >
-                Ready to submit
+                <div className="flex items-center gap-2 mb-2">
+                  <svg className="h-5 w-5 text-emerald-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-emerald-200">All tasks complete</p>
+                </div>
+                <h2 className="text-lg font-bold">Ready to submit your application</h2>
+                <p className="mt-1 text-sm text-emerald-200">Everything looks good. Review and submit to your Workforce Board.</p>
+                <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white/25 px-4 py-2.5 text-sm font-semibold backdrop-blur-sm">
+                  Review &amp; submit
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
               </Link>
-            </div>
-          )}
-        </section>
-
-        {/* Zone 1: Needs your attention */}
-        {attentionItems.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">{attentionItems.length}</span>
-              <h2 className="text-base font-bold text-warm-900">Needs your attention</h2>
-            </div>
-            <div className="space-y-2">
-              {attentionItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.actionHref}
-                  className="flex items-center gap-3 rounded-lg border-l-3 border-l-amber-400 bg-amber-50/80 px-4 py-3 transition hover:bg-amber-50"
-                >
-                  <svg className="h-5 w-5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-sm text-amber-900">{item.title}</p>
-                    <p className="text-xs text-amber-700">{item.message}</p>
-                  </div>
-                  <svg className="h-4 w-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              ))}
-            </div>
+            ) : null}
           </section>
         )}
 
-        {/* Zone 2: Your paperwork */}
+        {/* Progress ring + breakdown */}
+        <section className="animate-fade-up animate-delay-100 rounded-2xl bg-white p-4 border border-warm-200/80 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="relative h-14 w-14 shrink-0">
+              <svg className="h-14 w-14 -rotate-90" viewBox="0 0 56 56">
+                <circle cx="28" cy="28" r="24" fill="none" stroke="#e2e8f0" strokeWidth="4.5" />
+                <circle cx="28" cy="28" r="24" fill="none" stroke="#0d9488" strokeWidth="4.5"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 24}`}
+                  strokeDashoffset={`${2 * Math.PI * 24 * (1 - progressPct / 100)}`}
+                  className="transition-all duration-700"
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-brand-700">{progressPct}%</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-warm-900">{totalDone} of {totalTasks} tasks</p>
+              <div className="flex gap-3 mt-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-blue-400" />
+                  <span className="text-[11px] text-warm-500">{completedPaperwork.length}/{paperworkTasks.length} docs</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-warm-400" />
+                  <span className="text-[11px] text-warm-500">{completedPrep.length}/{prepTasks.length} prep</span>
+                </div>
+              </div>
+              {estimatedMinutes > 0 && !allComplete && (
+                <p className="text-[11px] text-warm-400 mt-1">
+                  ~{estimatedMinutes >= 60 ? `${Math.round(estimatedMinutes / 60)}h ${estimatedMinutes % 60}m` : `${estimatedMinutes} min`} estimated remaining
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Zone 1: Needs your attention — prominent alert cards */}
+        {attentionItems.length > 0 && (
+          <section className="animate-fade-up animate-delay-200">
+            <button
+              type="button"
+              onClick={() => setShowAttention(!showAttention)}
+              className="flex items-center gap-2 mb-3 w-full text-left py-1"
+            >
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">{attentionItems.length}</span>
+              <h2 className="text-sm font-bold text-warm-900 flex-1">Needs your attention</h2>
+              <svg className={`h-4 w-4 text-warm-400 transition-transform ${showAttention ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showAttention && (
+              <div className="space-y-2">
+                {attentionItems.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={item.actionHref}
+                    className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5 transition active:scale-[0.98] hover:bg-amber-100/60"
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100">
+                      <svg className="h-4.5 w-4.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-sm text-amber-900">{item.title}</p>
+                      <p className="text-xs text-amber-700 mt-0.5">{item.message}</p>
+                    </div>
+                    <svg className="h-4 w-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Zone 2: Your paperwork — card-style with effort + status */}
         {pendingPaperwork.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <section className="animate-fade-up animate-delay-200">
+            <div className="flex items-center gap-2 mb-3 px-1">
+              <svg className="h-4.5 w-4.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <h2 className="text-base font-bold text-warm-900">Your paperwork</h2>
-              <span className="text-xs text-warm-400">{pendingPaperwork.length} remaining</span>
+              <h2 className="text-sm font-bold text-warm-900 flex-1">Paperwork</h2>
+              <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">{pendingPaperwork.length} left</span>
             </div>
             <div className="space-y-2">
-              {pendingPaperwork.map((task, idx) => {
+              {(showAllPaperwork ? pendingPaperwork : pendingPaperwork.slice(0, 3)).map((task, idx) => {
                 const href = actionHref(task);
+                const isNext = idx === 0;
                 const card = (
-                  <div className="flex items-center gap-3 rounded-lg border border-warm-100 bg-white px-4 py-3 transition hover:border-warm-300 hover:bg-warm-50/50">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
-                      {idx + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-semibold text-warm-900">{task.title}</h3>
-                      <p className="text-xs text-warm-500 line-clamp-1">{task.context}</p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {docStatusBadge(task)}
-                      <svg className="h-4 w-4 text-warm-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <div className={`rounded-xl border bg-white px-4 py-3.5 transition active:scale-[0.98] ${
+                    isNext ? "border-brand-200 shadow-sm" : "border-warm-100"
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                        isNext ? "bg-brand-600 text-white" : "bg-warm-100 text-warm-500"
+                      }`}>
+                        {completedPaperwork.length + idx + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm font-semibold text-warm-900">{task.title}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          {docStatusBadge(task)}
+                          <span className="text-[11px] text-warm-400">· {task.effort}</span>
+                        </div>
+                      </div>
+                      <svg className={`h-4 w-4 shrink-0 ${isNext ? "text-brand-400" : "text-warm-300"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                       </svg>
                     </div>
@@ -441,96 +554,145 @@ export default function DashboardPage() {
                   <div key={task.id}>{card}</div>
                 );
               })}
+              {pendingPaperwork.length > 3 && !showAllPaperwork && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllPaperwork(true)}
+                  className="w-full rounded-xl border border-dashed border-warm-200 py-2.5 text-xs font-medium text-warm-500 active:bg-warm-100"
+                >
+                  Show {pendingPaperwork.length - 3} more
+                </button>
+              )}
             </div>
           </section>
         )}
 
-        {/* Zone 3: Your center prep */}
+        {/* Zone 3: Center prep — accordion groups with category icons */}
         {pendingPrep.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-warm-200 text-warm-500">
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-              </span>
-              <h2 className="text-sm font-bold text-warm-700">Center prep</h2>
-              <span className="text-xs text-warm-400">· {pendingPrep.length} left</span>
+          <section className="animate-fade-up animate-delay-300">
+            <div className="flex items-center gap-2 mb-3 px-1">
+              <svg className="h-4.5 w-4.5 text-warm-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+              <h2 className="text-sm font-bold text-warm-900 flex-1">Center Prep</h2>
+              <span className="rounded-full bg-warm-100 px-2 py-0.5 text-xs font-semibold text-warm-500">{pendingPrep.length} left</span>
             </div>
-            <div className="mt-3 space-y-5">
-              {prepGroups.map((group) => (
-                <div key={group.label}>
-                  <h3 className="text-xs font-medium text-warm-400 mb-2">
-                    {group.label}
-                  </h3>
-                  <div className="space-y-3">
-                    {group.tasks.map((task) => {
-                      const href = actionHref(task);
-                      const isExternal = task.action?.type === "link";
-                      return (
-                        <div
-                          key={task.id}
-                          className="rounded-lg border border-warm-100 bg-white px-4 py-3"
-                        >
-                          <div className="flex items-start gap-3">
-                            <input
-                              type="checkbox"
-                              checked={false}
-                              onChange={() => void toggleTask(task.id)}
-                              className="mt-0.5 h-5 w-5 shrink-0 rounded border-warm-300 text-brand-500 focus:ring-brand-500 cursor-pointer"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <h3 className="text-sm font-semibold text-warm-900">{task.title}</h3>
-                              <p className="mt-0.5 text-xs text-warm-500 line-clamp-2">{task.context}</p>
-                              {href && (
-                                <div className="mt-2">
-                                  <Link
-                                    href={href}
-                                    target={isExternal ? "_blank" : undefined}
-                                    rel={isExternal ? "noreferrer" : undefined}
-                                    className="inline-flex rounded-lg border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 hover:bg-warm-100"
-                                  >
-                                    {task.action!.label}
-                                  </Link>
+            <div className="space-y-2">
+              {prepGroups.map((group, gi) => {
+                const isExpanded = expandedPrepGroup === group.label || (expandedPrepGroup === null && gi === 0);
+                const groupIcon: Record<string, string> = {
+                  "Staff & Credentials": "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+                  "Administrative": "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+                  "Classroom Setup": "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
+                  "Training": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+                };
+                return (
+                  <div key={group.label} className="rounded-xl border border-warm-100 bg-white overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setExpandedPrepGroup(isExpanded ? "__none__" : group.label)}
+                      className="flex items-center gap-3 w-full px-4 py-3.5 text-left"
+                    >
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-warm-100">
+                        <svg className="h-4 w-4 text-warm-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d={groupIcon[group.label] ?? groupIcon["Administrative"]} />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-warm-900">{group.label}</h3>
+                        <p className="text-xs text-warm-400">{group.tasks.length} task{group.tasks.length !== 1 ? "s" : ""}</p>
+                      </div>
+                      <svg className={`h-4 w-4 text-warm-400 transition-transform ${isExpanded ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {isExpanded && (
+                      <div className="border-t border-warm-100 divide-y divide-warm-50">
+                        {group.tasks.map((task) => {
+                          const href = actionHref(task);
+                          const isExternal = task.action?.type === "link";
+                          return (
+                            <div key={task.id} className="px-4 py-3.5">
+                              <div className="flex items-start gap-3">
+                                <button
+                                  type="button"
+                                  onClick={() => void toggleTask(task.id)}
+                                  className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 border-warm-300 transition hover:border-brand-400 active:border-brand-500 active:bg-brand-50"
+                                  aria-label={`Mark "${task.title}" complete`}
+                                >
+                                  <svg className="h-4 w-4 text-warm-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </button>
+                                <div className="min-w-0 flex-1">
+                                  <h4 className="text-sm font-medium text-warm-900">{task.title}</h4>
+                                  <p className="mt-0.5 text-xs text-warm-500 leading-relaxed">{task.context}</p>
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <span className="text-[11px] text-warm-400">{task.effort}</span>
+                                    {href && (
+                                      <Link
+                                        href={href}
+                                        target={isExternal ? "_blank" : undefined}
+                                        rel={isExternal ? "noreferrer" : undefined}
+                                        className="inline-flex items-center gap-1 rounded-lg bg-warm-100 px-3 py-1.5 text-xs font-medium text-warm-700 active:bg-warm-200"
+                                      >
+                                        {task.action!.label}
+                                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                      </Link>
+                                    )}
+                                  </div>
                                 </div>
-                              )}
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
 
-        {/* Completed section */}
-        {(completedPaperwork.length > 0 || completedPrep.length > 0) && (
+        {/* Completed section — collapsible with visual polish */}
+        {totalDone > 0 && (
           <section>
             <button
               type="button"
               onClick={() => setShowCompleted(!showCompleted)}
-              className="text-sm font-medium text-warm-500 hover:text-warm-700 py-2 px-1"
+              className="flex items-center gap-2 w-full text-left py-2 px-1"
             >
-              {showCompleted ? "Hide" : "Show"} {totalDone} completed task
-              {totalDone !== 1 ? "s" : ""}
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100">
+                <svg className="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="text-sm font-medium text-warm-600 flex-1">
+                {totalDone} completed
+              </span>
+              <svg className={`h-4 w-4 text-warm-400 transition-transform ${showCompleted ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
             </button>
             {showCompleted && (
-              <div className="mt-3 space-y-2">
+              <div className="mt-2 rounded-xl border border-warm-100 bg-white divide-y divide-warm-50 overflow-hidden">
                 {completedPaperwork.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-3 rounded-lg bg-warm-50/50 px-4 py-2"
+                    className="flex items-center gap-3 px-4 py-3"
                   >
-                    <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-sm text-warm-500 line-through flex-1">{task.title}</span>
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500">
+                      <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-sm text-warm-500 flex-1">{task.title}</span>
                     <Link
                       href={`/trs/${task.action?.docType ?? task.id}`}
-                      className="text-xs font-medium text-brand-600 hover:text-brand-700 py-1 px-2 shrink-0"
+                      className="text-xs font-medium text-brand-600 rounded-lg px-2.5 py-1 active:bg-brand-50"
                     >
                       View
                     </Link>
@@ -539,15 +701,19 @@ export default function DashboardPage() {
                 {completedPrep.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-3 rounded-lg bg-warm-50/50 px-4 py-2"
+                    className="flex items-center gap-3 px-4 py-3"
                   >
-                    <input
-                      type="checkbox"
-                      checked
-                      onChange={() => void toggleTask(task.id)}
-                      className="h-4 w-4 rounded border-warm-300 text-brand-500 focus:ring-brand-500"
-                    />
-                    <span className="text-sm text-warm-500 line-through">{task.title}</span>
+                    <button
+                      type="button"
+                      onClick={() => void toggleTask(task.id)}
+                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand-500 active:bg-brand-600"
+                      aria-label={`Uncheck "${task.title}"`}
+                    >
+                      <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                    <span className="text-sm text-warm-500">{task.title}</span>
                   </div>
                 ))}
               </div>
