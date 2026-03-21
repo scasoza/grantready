@@ -9,7 +9,7 @@ import { getTaskZone, getAttentionItems, type AttentionItem } from "@/lib/trs-zo
 import { parseStaffMembers, getStaffAlerts } from "@/lib/staff-utils";
 import { trsDocTemplates } from "@/lib/trs-documents";
 import LoadingScreen from "@/components/LoadingScreen";
-import BottomNav from "@/components/BottomNav";
+
 
 type Center = {
   id: string;
@@ -277,7 +277,6 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <BottomNav />
 
       <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 pb-24 sm:pb-8 space-y-6">
         {/* Submission Banner */}

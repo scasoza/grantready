@@ -5,7 +5,6 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import LoadingScreen from "@/components/LoadingScreen";
-import BottomNav from "@/components/BottomNav";
 
 type CredentialType = "none" | "cda" | "associates" | "bachelors" | "masters";
 
@@ -720,7 +719,6 @@ export default function StaffTrackerPage() {
           </div>
         </section>
       </div>
-      <BottomNav />
     </div>
   );
 }

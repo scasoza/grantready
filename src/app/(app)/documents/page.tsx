@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { grants } from "@/lib/grants";
 import { createClient } from "@/lib/supabase/client";
 import LoadingScreen from "@/components/LoadingScreen";
-import BottomNav from "@/components/BottomNav";
 
 type SectionStatus = "pending" | "input_given" | "draft_generated" | "verified";
 
@@ -275,7 +274,6 @@ export default function DocumentsPage() {
           </div>
         )}
       </main>
-      <BottomNav />
     </div>
   );
 }
