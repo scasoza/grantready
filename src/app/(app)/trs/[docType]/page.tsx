@@ -599,54 +599,74 @@ export default function TrsDocPage() {
         {/* DRAFT PHASE */}
         {aiDraft && (status === "draft_generated" || status === "verified") && (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-warm-200 bg-white shadow-sm overflow-hidden">
-              {/* Document header */}
-              <div className="bg-warm-50 border-b border-warm-200 px-5 py-4">
+            <div className="rounded-2xl border border-warm-200 bg-white shadow-lg overflow-hidden">
+              {/* Document header bar */}
+              <div className="bg-gradient-to-r from-brand-600 to-brand-700 px-5 py-3">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-6 w-6 rounded bg-brand-500 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">G</span>
-                      </div>
-                      <span className="text-xs font-semibold text-warm-600">GrantReady</span>
+                  <div className="flex items-center gap-2">
+                    <div className="h-7 w-7 rounded-lg bg-white/20 flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">G</span>
                     </div>
-                    <h3 className="mt-2 text-base font-bold text-warm-900">{template.title}</h3>
-                    <p className="text-xs text-warm-500">Generated {new Date().toLocaleDateString()}</p>
+                    <div>
+                      <p className="text-xs font-semibold text-white/80">GrantReady</p>
+                      <p className="text-[10px] text-white/60">TRS Certification Document</p>
+                    </div>
                   </div>
-                  <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                    Draft
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                    status === "verified"
+                      ? "bg-emerald-400/20 text-emerald-100"
+                      : "bg-white/20 text-white"
+                  }`}>
+                    {status === "verified" ? "Approved" : "Draft"}
                   </span>
                 </div>
               </div>
+
+              {/* Document title section */}
+              <div className="border-b border-warm-100 px-5 py-4">
+                <h3 className="text-lg font-bold text-warm-900">{template.title}</h3>
+                <p className="mt-1 text-xs text-warm-400">
+                  Generated {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                </p>
+              </div>
+
               {/* Document body */}
-              <div className="px-5 py-4">
-                <div className="prose prose-sm max-w-none text-warm-800 leading-relaxed">
-                  {aiDraft.split("\n\n").map((para, i) => (
-                    <p key={i} className="mb-3 last:mb-0">{para}</p>
-                  ))}
-                </div>
+              <div className="px-5 py-5 sm:px-6">
+                {aiDraft.split("\n\n").map((para, i) => (
+                  <p key={i} className="mb-4 text-sm leading-relaxed text-warm-700 last:mb-0 first:first-letter:text-lg first:first-letter:font-semibold first:first-letter:text-warm-900">
+                    {para}
+                  </p>
+                ))}
+              </div>
+
+              {/* Document footer */}
+              <div className="border-t border-warm-100 px-5 py-3 bg-warm-50/50">
+                <p className="text-[10px] text-warm-400 text-center">
+                  Prepared by GrantReady AI for TRS certification
+                </p>
               </div>
             </div>
 
             {/* Claim verification */}
             {claims.length > 0 && status !== "verified" && (
-              <div className="bg-white border border-warm-200/80 rounded-2xl p-5">
-                <h3 className="text-sm font-bold text-warm-900 mb-1">
-                  Quick check - are these facts right?
-                </h3>
-                <p className="text-xs text-warm-400 mb-4">Verify each claim before approving.</p>
-                <div className="space-y-3">
+              <div className="bg-white border border-warm-200/80 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-bold text-warm-900">
+                    Verify facts ({claims.filter(c => c.verified).length}/{claims.length})
+                  </h3>
+                  <span className="text-xs text-warm-400">Tap to confirm each</span>
+                </div>
+                <div className="space-y-1.5">
                   {claims.map((claim, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-3 p-3 rounded-xl bg-warm-50 border border-warm-100"
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition ${
+                        claim.verified ? "bg-emerald-50 border border-emerald-100" : "bg-warm-50 border border-warm-100"
+                      }`}
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-warm-700">
-                          {claim.claimText}:{" "}
-                          <span className="font-semibold text-warm-900">
-                            {claim.correctedValue || claim.claimValue}
-                          </span>
+                        <p className="text-xs text-warm-600 truncate">
+                          {claim.claimText}: <span className="font-semibold text-warm-800">{claim.correctedValue || claim.claimValue}</span>
                         </p>
                         {claim.correctedValue !== undefined && !claim.verified && (
                           <input
