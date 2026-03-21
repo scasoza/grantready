@@ -82,16 +82,20 @@ export default function LoginPage() {
   const [resetSent, setResetSent] = useState(false);
 
   return (
-    <div className="min-h-screen bg-warm-50 px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-md">
-        <Link href="/" className="inline-flex items-center gap-2.5 mb-8">
-          <div className="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-700 rounded-xl flex items-center justify-center shadow-md shadow-brand-600/25">
+    <div className="min-h-screen bg-warm-50">
+      {/* Branded header strip */}
+      <div className="bg-brand-700 px-4 py-8 sm:py-12 text-center">
+        <Link href="/" className="inline-flex items-center gap-2.5">
+          <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
             <span className="text-white font-extrabold text-sm">G</span>
           </div>
-          <span className="text-lg font-bold text-warm-900 tracking-tight">GrantReady</span>
+          <span className="text-lg font-bold text-white tracking-tight">GrantReady</span>
         </Link>
+        <p className="mt-2 text-sm text-brand-200">Texas childcare funding, simplified.</p>
+      </div>
 
-        <div className="bg-white border border-warm-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div className="mx-auto max-w-md px-4 -mt-6 pb-12">
+        <div className="bg-white border border-warm-200/80 rounded-2xl p-6 sm:p-8 shadow-lg">
           {confirmationSent ? (
             <div className="text-center py-4">
               <div className="w-14 h-14 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
