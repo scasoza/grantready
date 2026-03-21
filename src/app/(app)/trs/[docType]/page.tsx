@@ -8,6 +8,7 @@ import { getTrsDocTemplate } from "@/lib/trs-documents";
 import { parseStaffMembers } from "@/lib/staff-utils";
 import VoiceMemoRecorder from "@/components/VoiceMemoRecorder";
 import LoadingScreen from "@/components/LoadingScreen";
+import Logo from "@/components/Logo";
 
 interface Claim {
   id?: string;
@@ -604,9 +605,7 @@ export default function TrsDocPage() {
               <div className="bg-gradient-to-r from-brand-600 to-brand-700 px-5 py-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="h-7 w-7 rounded-lg bg-white/20 flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">C</span>
-                    </div>
+                    <Logo size={28} />
                     <div>
                       <p className="text-xs font-semibold text-white/80">CareLadder</p>
                       <p className="text-[10px] text-white/60">TRS Certification Document</p>

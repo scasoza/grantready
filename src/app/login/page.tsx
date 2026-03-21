@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Logo from "@/components/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -86,9 +87,7 @@ export default function LoginPage() {
       {/* Branded header strip */}
       <div className="bg-brand-700 px-4 py-8 sm:py-12 text-center">
         <Link href="/" className="inline-flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-            <span className="text-white font-extrabold text-sm">C</span>
-          </div>
+          <Logo size={36} />
           <span className="text-lg font-bold text-white tracking-tight">CareLadder</span>
         </Link>
         <p className="mt-2 text-sm text-brand-200">Texas childcare funding, simplified.</p>

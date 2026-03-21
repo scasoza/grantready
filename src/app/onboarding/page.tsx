@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Logo from "@/components/Logo";
 
 type OnboardingStep = 1 | 2;
 
@@ -164,9 +165,7 @@ export default function OnboardingPage() {
       <nav className="sticky top-0 z-40 bg-brand-700 shadow-md">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-extrabold text-sm">C</span>
-            </div>
+            <Logo size={32} />
             <span className="text-sm font-bold text-white">CareLadder</span>
           </div>
           <span className="text-xs text-brand-200">Step {step} of 2</span>

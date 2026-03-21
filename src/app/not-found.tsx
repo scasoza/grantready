@@ -1,13 +1,12 @@
 import Link from 'next/link';
+import Logo from '@/components/Logo';
 
 export default function NotFound() {
   return (
     <main className="min-h-screen bg-warm-50 text-warm-900 flex items-center justify-center px-6">
       <div className="w-full max-w-md text-center space-y-6">
         <div className="flex items-center justify-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-brand-600 hover:bg-brand-700 flex items-center justify-center text-white font-bold">
-            G
-          </div>
+          <Logo size={40} />
           <span className="text-xl font-semibold text-warm-900">CareLadder</span>
         </div>
 

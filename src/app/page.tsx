@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Logo from "@/components/Logo";
 
 const options = [
   "I run a licensed center",
@@ -53,9 +54,7 @@ export default function Home() {
       <header className="w-full px-4 sm:px-6 py-5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="inline-flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-white font-extrabold text-sm">C</span>
-            </div>
+            <Logo size={32} className="shadow-md rounded-lg" />
             <span className="text-base font-extrabold tracking-tight">CareLadder</span>
           </div>
           <Link href="/login" className="rounded-xl border border-warm-200 bg-white/80 px-4 py-2 text-sm font-semibold text-warm-700 hover:bg-white transition">

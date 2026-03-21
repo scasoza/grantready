@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { trsTasks, categoryLabels, categoryColors, type TrsTask } from "@/lib/trs-tasks";
+import { trsTasks, type TrsTask } from "@/lib/trs-tasks";
 import { getTaskZone, getAttentionItems, type AttentionItem } from "@/lib/trs-zones";
 import { parseStaffMembers, getStaffAlerts } from "@/lib/staff-utils";
 import { trsDocTemplates } from "@/lib/trs-documents";
 import LoadingScreen from "@/components/LoadingScreen";
+import Logo from "@/components/Logo";
 
 
 type Center = {
   id: string;
+  center_name?: string | null;
   ccs_count?: number | null;
 };
 
@@ -27,10 +29,17 @@ type SubmissionRow = {
   requested_at: string;
 };
 
-// Derive doc title from docType
 function docTitle(docType: string): string {
   return trsDocTemplates.find((t) => t.docType === docType)?.title ?? docType;
 }
+
+// Category icons for prep groups
+const groupIcons: Record<string, string> = {
+  "Staff & Credentials": "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+  "Administrative": "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
+  "Classroom Setup": "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+  "Training": "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -45,10 +54,10 @@ export default function DashboardPage() {
   const [submission, setSubmission] = useState<SubmissionRow | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const [expandedZone, setExpandedZone] = useState<"attention" | "paperwork" | "prep" | null>(null);
+  const [justCompleted, setJustCompleted] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
-      // 1. Auth
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -58,7 +67,6 @@ export default function DashboardPage() {
       }
       setUserEmail(user.email ?? "");
 
-      // 2. Center
       const { data: centerRows } = await supabase
         .from("centers")
         .select("*")
@@ -71,7 +79,6 @@ export default function DashboardPage() {
       const currentCenter = centerRows[0] as Center;
       setCenter(currentCenter);
 
-      // 3-6. Load all data in parallel
       const [completedResult, staffResult, appResult, subResult] = await Promise.all([
         supabase.from("center_data").select("data_value").eq("center_id", currentCenter.id).eq("data_key", "completed_tasks").maybeSingle(),
         supabase.from("center_data").select("data_value").eq("center_id", currentCenter.id).eq("data_key", "staff_members").maybeSingle(),
@@ -79,7 +86,6 @@ export default function DashboardPage() {
         supabase.from("submissions").select("status, requested_at").eq("center_id", currentCenter.id).order("requested_at", { ascending: false }).limit(1),
       ]);
 
-      // Completed prep tasks
       if (completedResult.data?.data_value) {
         try {
           const raw = completedResult.data.data_value;
@@ -92,16 +98,13 @@ export default function DashboardPage() {
         }
       }
 
-      // Staff members + alerts
       const staffMembers = parseStaffMembers(
         (staffResult.data as { data_value: string } | null)?.data_value ?? null
       );
       const staffAlerts = getStaffAlerts(staffMembers);
 
-      // TRS application + sections
       let sectionRows: SectionStatus[] = [];
       if (appResult.data) {
-        // Try with input_hash, fall back without if column doesn't exist
         let secData = null;
         const { data: d1, error: e1 } = await supabase
           .from("application_sections")
@@ -120,7 +123,6 @@ export default function DashboardPage() {
       }
       setSections(sectionRows);
 
-      // Stale document detection
       const centerJson = JSON.stringify({ ...currentCenter });
       const staleDocs: { docType: string; title: string }[] = [];
       for (const sec of sectionRows) {
@@ -131,7 +133,6 @@ export default function DashboardPage() {
 
       setAttentionItems(getAttentionItems(staffAlerts, staleDocs));
 
-      // Submission status
       if (subResult.data && subResult.data.length > 0) {
         setSubmission(subResult.data[0] as SubmissionRow);
       }
@@ -150,7 +151,6 @@ export default function DashboardPage() {
     return map;
   }, [sections]);
 
-  // Paperwork tasks (Zone 2)
   const paperworkTasks = trsTasks.filter((t) => getTaskZone(t) === "paperwork");
   const pendingPaperwork = paperworkTasks.filter((t) => {
     const docType = t.action?.docType;
@@ -163,25 +163,30 @@ export default function DashboardPage() {
     return sectionStatusMap.get(docType) === "verified";
   });
 
-  // Prep tasks (Zone 3)
   const prepTasks = trsTasks.filter((t) => getTaskZone(t) === "prep");
   const pendingPrep = prepTasks.filter((t) => !completedTasks.has(t.id));
   const completedPrep = prepTasks.filter((t) => completedTasks.has(t.id));
 
-  // Auto-determine which zone to focus on
   const autoFocusZone = attentionItems.length > 0 ? "attention" as const
     : pendingPaperwork.length > 0 ? "paperwork" as const
     : pendingPrep.length > 0 ? "prep" as const
     : null;
   const activeZone = expandedZone ?? autoFocusZone;
 
-  // Progress
   const totalDone = completedPaperwork.length + completedPrep.length;
   const totalTasks = paperworkTasks.length + prepTasks.length;
   const progressPct = totalTasks ? Math.round((totalDone / totalTasks) * 100) : 0;
   const allComplete = totalDone === totalTasks && totalTasks > 0;
 
-  // Group prep tasks
+  // Progress milestone message
+  const milestoneMsg = useMemo(() => {
+    if (allComplete) return null;
+    if (progressPct >= 75) return "Almost there — just a few more!";
+    if (progressPct >= 50) return "Over halfway done!";
+    if (progressPct >= 25) return "Great progress so far";
+    return null;
+  }, [progressPct, allComplete]);
+
   const prepGroups = useMemo(() => {
     const groups: { label: string; tasks: TrsTask[] }[] = [
       { label: "Staff & Credentials", tasks: [] },
@@ -199,7 +204,7 @@ export default function DashboardPage() {
 
   // ---- Task toggle ----
 
-  const saveCompletedTasks = async (nextSet: Set<string>) => {
+  const saveCompletedTasks = useCallback(async (nextSet: Set<string>) => {
     if (!center) return;
     await supabase.from("center_data").upsert(
       {
@@ -209,7 +214,7 @@ export default function DashboardPage() {
       },
       { onConflict: "center_id,data_key" }
     );
-  };
+  }, [center, supabase]);
 
   const toggleTask = async (taskId: string) => {
     const next = new Set(completedTasks);
@@ -217,12 +222,12 @@ export default function DashboardPage() {
       next.delete(taskId);
     } else {
       next.add(taskId);
+      setJustCompleted(taskId);
+      setTimeout(() => setJustCompleted(null), 600);
     }
     setCompletedTasks(next);
     await saveCompletedTasks(next);
   };
-
-  // ---- Sign out ----
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -258,8 +263,6 @@ export default function DashboardPage() {
     );
   }
 
-  // ---- Action href helper ----
-
   function actionHref(task: TrsTask): string | null {
     if (!task.action) return null;
     if (task.action.type === "staff-tracker") return "/staff";
@@ -268,6 +271,22 @@ export default function DashboardPage() {
     if (task.action.type === "link" && task.action.href) return task.action.href;
     return null;
   }
+
+  // ---- Greeting ----
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  }, []);
+
+  const firstName = useMemo(() => {
+    if (!userEmail) return "";
+    const local = userEmail.split("@")[0] ?? "";
+    // Try to extract a name from the email (e.g. "sandra.thompson" -> "Sandra")
+    const name = local.split(/[._-]/)[0] ?? "";
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  }, [userEmail]);
 
   // ---- Render ----
 
@@ -281,9 +300,7 @@ export default function DashboardPage() {
       <nav className="border-b border-warm-200/60 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-sm font-extrabold text-white">
-              C
-            </span>
+            <Logo size={32} />
             <span className="text-sm font-bold text-warm-900">CareLadder</span>
           </Link>
           <button
@@ -296,6 +313,23 @@ export default function DashboardPage() {
       </nav>
 
       <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 pb-24 sm:pb-8 space-y-4">
+        {/* Welcome banner */}
+        {!submission && (
+          <div className="rounded-xl bg-brand-800 p-4 sm:p-5">
+            <p className="text-sm font-semibold text-white">
+              {greeting}{firstName ? `, ${firstName}` : ""}
+            </p>
+            {center?.center_name && (
+              <p className="text-xs text-brand-300 mt-0.5">{center.center_name}</p>
+            )}
+            <p className="text-xs text-brand-200 mt-2">
+              {allComplete
+                ? "All tasks complete — you're ready to submit!"
+                : `${totalDone} of ${totalTasks} tasks done · ${totalTasks - totalDone} remaining`}
+            </p>
+          </div>
+        )}
+
         {/* Submission Banner */}
         {submission?.status === "pending" && (
           <div className="flex items-center gap-3 rounded-xl bg-brand-50 border border-brand-200 p-4">
@@ -345,12 +379,22 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="h-px bg-warm-100" />
+        {/* Compact progress */}
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+            <div className="h-1.5 flex-1 rounded-full bg-warm-100 overflow-hidden">
+              <div className="h-1.5 rounded-full bg-brand-500 transition-all duration-500 ease-out" style={{ width: `${progressPct}%` }} />
+            </div>
+            <span className="text-xs font-medium text-warm-400 tabular-nums">{totalDone}/{totalTasks}</span>
+          </div>
+          {milestoneMsg && (
+            <p className="text-xs text-brand-600 font-medium pl-0.5">{milestoneMsg}</p>
+          )}
+        </div>
 
         {/* Next step — the ONE thing to do right now */}
         {(() => {
           if (submission) return null;
-          // Determine next action
           const nextDoc = pendingPaperwork[0];
           const nextDocHref = nextDoc ? `/trs/${nextDoc.action?.docType ?? nextDoc.id}` : null;
 
@@ -358,11 +402,11 @@ export default function DashboardPage() {
             return (
               <Link
                 href={nextDocHref}
-                className="animate-fade-up block rounded-xl bg-brand-600 p-5 shadow-md hover:bg-brand-700 transition"
+                className="animate-fade-up block rounded-xl bg-brand-600 p-5 shadow-md hover:bg-brand-700 active:scale-[0.98] transition-all"
               >
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-white/70">Up next</p>
                 <p className="mt-1 text-lg font-bold text-white">{nextDoc.title}</p>
-                <p className="mt-1 text-xs text-brand-200">{nextDoc.context}</p>
+                <p className="mt-1 text-xs text-brand-200 leading-relaxed">{nextDoc.context}</p>
                 <div className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-white/20 px-4 py-2 text-xs font-semibold text-white">
                   Start now
                   <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -385,18 +429,11 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Compact progress */}
-        <div className="flex items-center gap-3">
-          <div className="h-1.5 flex-1 rounded-full bg-warm-100">
-            <div className="h-1.5 rounded-full bg-brand-500 transition-all" style={{ width: `${progressPct}%` }} />
-          </div>
-          <span className="text-xs font-medium text-warm-400">{totalDone}/{totalTasks}</span>
-        </div>
-
+        {/* All complete CTA */}
         {allComplete && !submission && (
           <Link
             href="/trs/readiness"
-            className="block rounded-xl bg-brand-800 p-5 text-center shadow-lg hover:bg-brand-900 transition"
+            className="block rounded-xl bg-brand-800 p-5 text-center shadow-lg hover:bg-brand-900 active:scale-[0.98] transition-all"
           >
             <svg className="mx-auto h-8 w-8 text-brand-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
@@ -412,7 +449,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setExpandedZone(activeZone === "attention" ? null : "attention")}
-              className="flex items-center gap-2 w-full text-left py-2.5 px-3 rounded-xl bg-white border border-warm-100 shadow-sm hover:shadow-md transition mb-3"
+              className="flex items-center gap-2 w-full text-left py-2.5 px-3 rounded-xl bg-white border border-warm-100 shadow-sm hover:shadow-md active:scale-[0.99] transition-all mb-3"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">{attentionItems.length}</span>
               <div className="flex-1 min-w-0">
@@ -431,7 +468,7 @@ export default function DashboardPage() {
                   <Link
                     key={item.id}
                     href={item.actionHref}
-                    className="flex items-center gap-3 rounded-lg border-l-3 border-l-amber-400 bg-amber-50/80 px-4 py-3 transition hover:bg-amber-50"
+                    className="flex items-center gap-3 rounded-lg border-l-3 border-l-amber-400 bg-amber-50/80 px-4 py-3 transition hover:bg-amber-50 active:scale-[0.99]"
                   >
                     <svg className="h-5 w-5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -456,7 +493,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setExpandedZone(activeZone === "paperwork" ? null : "paperwork")}
-              className="flex items-center gap-2 w-full text-left py-2.5 px-3 rounded-xl bg-white border border-warm-100 shadow-sm hover:shadow-md transition mb-3"
+              className="flex items-center gap-2 w-full text-left py-2.5 px-3 rounded-xl bg-white border border-warm-100 shadow-sm hover:shadow-md active:scale-[0.99] transition-all mb-3"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-100 text-brand-700 text-xs font-bold">{pendingPaperwork.length}</span>
               <div className="flex-1 min-w-0">
@@ -474,15 +511,16 @@ export default function DashboardPage() {
               {pendingPaperwork.map((task, idx) => {
                 const href = actionHref(task);
                 const card = (
-                  <div className="flex items-center gap-3 rounded-lg border border-warm-100 bg-white px-4 py-3 transition hover:border-warm-300 hover:bg-warm-50/50">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
+                  <div className="flex items-start gap-3 rounded-xl border border-warm-100 bg-white px-4 py-3.5 transition hover:border-warm-300 hover:bg-warm-50/50 active:scale-[0.99]">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 mt-0.5">
                       {idx + 1}
                     </span>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-semibold text-warm-900">{task.title}</h3>
-                      <p className="text-xs text-warm-400">{task.effort}</p>
+                      <p className="text-xs text-warm-500 mt-0.5 leading-relaxed">{task.context}</p>
+                      <p className="text-[11px] text-warm-400 mt-1">{task.effort}</p>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
                       {docStatusBadge(task)}
                     </div>
                   </div>
@@ -506,7 +544,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setExpandedZone(activeZone === "prep" ? null : "prep")}
-              className="flex items-center gap-2 w-full text-left py-2.5 px-3 rounded-xl bg-white border border-warm-100 shadow-sm hover:shadow-md transition mb-3"
+              className="flex items-center gap-2 w-full text-left py-2.5 px-3 rounded-xl bg-white border border-warm-100 shadow-sm hover:shadow-md active:scale-[0.99] transition-all mb-3"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-warm-200 text-warm-500 text-xs font-bold">{pendingPrep.length}</span>
               <div className="flex-1 min-w-0">
@@ -520,34 +558,47 @@ export default function DashboardPage() {
               </svg>
             </button>
             {activeZone === "prep" && (
-            <div className="mt-3 space-y-4">
+            <div className="mt-3 space-y-5">
               {prepGroups.map((group) => (
                 <div key={group.label}>
-                  <h3 className="text-xs font-medium text-warm-400 mb-2">
-                    {group.label}
-                  </h3>
-                  <div className="space-y-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg className="h-3.5 w-3.5 text-warm-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d={groupIcons[group.label] ?? groupIcons["Administrative"]} />
+                    </svg>
+                    <h3 className="text-xs font-semibold text-warm-500 uppercase tracking-wide">
+                      {group.label}
+                    </h3>
+                    <span className="text-[10px] text-warm-300 font-medium">{group.tasks.length}</span>
+                  </div>
+                  <div className="space-y-0.5">
                     {group.tasks.map((task) => {
                       const href = actionHref(task);
                       const isExternal = task.action?.type === "link";
+                      const isJustDone = justCompleted === task.id;
                       return (
                         <div
                           key={task.id}
-                          className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-warm-50 transition"
+                          className={`flex items-start gap-3 rounded-xl px-3 py-3 hover:bg-warm-50 active:bg-warm-100 transition-all ${
+                            isJustDone ? "animate-pulse bg-brand-50" : ""
+                          }`}
                         >
                           <input
                             type="checkbox"
                             checked={false}
                             onChange={() => void toggleTask(task.id)}
-                            className="h-4.5 w-4.5 shrink-0 rounded border-warm-300 text-brand-500 focus:ring-brand-500 cursor-pointer"
+                            className="h-5 w-5 shrink-0 rounded border-warm-300 text-brand-500 focus:ring-brand-500 cursor-pointer mt-0.5"
                           />
-                          <span className="text-sm text-warm-800 flex-1 min-w-0 truncate">{task.title}</span>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm text-warm-800 block">{task.title}</span>
+                            <span className="text-xs text-warm-400 block mt-0.5">{task.context}</span>
+                            <span className="text-[11px] text-warm-300 block mt-0.5">{task.effort}</span>
+                          </div>
                           {href && (
                             <Link
                               href={href}
                               target={isExternal ? "_blank" : undefined}
                               rel={isExternal ? "noreferrer" : undefined}
-                              className="text-xs text-brand-600 hover:text-brand-700 font-medium shrink-0 py-1"
+                              className="text-xs text-brand-600 hover:text-brand-700 font-medium shrink-0 py-1 px-1"
                             >
                               {task.action?.type === "link" ? "Open" : "Go"}
                             </Link>
@@ -569,25 +620,25 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setShowCompleted(!showCompleted)}
-              className="flex items-center gap-2 w-full text-left py-2 px-3 rounded-lg hover:bg-warm-100 transition"
+              className="flex items-center gap-2 w-full text-left py-2 px-3 rounded-lg hover:bg-warm-100 transition text-sm text-warm-400 font-medium"
             >
-              <svg className={`h-4 w-4 text-warm-400 transition-transform ${showCompleted ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className={`h-4 w-4 transition-transform ${showCompleted ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
               {showCompleted ? "Hide" : "Show"} {totalDone} completed task
               {totalDone !== 1 ? "s" : ""}
             </button>
             {showCompleted && (
-              <div className="mt-3 space-y-2">
+              <div className="mt-3 space-y-1.5">
                 {completedPaperwork.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-3 rounded-lg bg-warm-50/50 px-4 py-2"
+                    className="flex items-center gap-3 rounded-lg bg-warm-50/50 px-4 py-2.5"
                   >
-                    <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="h-4 w-4 text-brand-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-sm text-warm-500 line-through flex-1">{task.title}</span>
+                    <span className="text-sm text-warm-400 line-through flex-1">{task.title}</span>
                     <Link
                       href={`/trs/${task.action?.docType ?? task.id}`}
                       className="text-xs font-medium text-brand-600 hover:text-brand-700 py-1 px-2 shrink-0"
@@ -599,7 +650,7 @@ export default function DashboardPage() {
                 {completedPrep.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-3 rounded-lg bg-warm-50/50 px-4 py-2"
+                    className="flex items-center gap-3 rounded-lg bg-warm-50/50 px-4 py-2.5"
                   >
                     <input
                       type="checkbox"
@@ -607,7 +658,7 @@ export default function DashboardPage() {
                       onChange={() => void toggleTask(task.id)}
                       className="h-4 w-4 rounded border-warm-300 text-brand-500 focus:ring-brand-500"
                     />
-                    <span className="text-sm text-warm-500 line-through">{task.title}</span>
+                    <span className="text-sm text-warm-400 line-through">{task.title}</span>
                   </div>
                 ))}
               </div>

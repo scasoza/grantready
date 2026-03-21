@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Logo from "@/components/Logo";
 
 type SubmissionRow = {
   id: string;
@@ -155,9 +156,7 @@ export default function AdminPage() {
       <nav className="border-b border-warm-200 bg-white/90">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold text-warm-900">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-500 text-sm font-extrabold text-white">
-              G
-            </span>
+            <Logo size={32} />
             CareLadder
           </Link>
           <span className="text-sm text-warm-500">Admin</span>

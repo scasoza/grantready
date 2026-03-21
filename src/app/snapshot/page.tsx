@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { estimateRevenueIncrease } from "@/lib/trs-tasks";
+import Logo from "@/components/Logo";
 
 type QuizAnswers = {
   centerType: string;
@@ -114,9 +115,7 @@ export default function FundingSnapshotPage() {
       <div className="mx-auto max-w-5xl space-y-8">
         <header className="flex items-start justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-extrabold text-sm">C</span>
-            </div>
+            <Logo size={32} />
             <span className="text-sm font-bold text-warm-900 tracking-tight">CareLadder</span>
           </Link>
         </header>

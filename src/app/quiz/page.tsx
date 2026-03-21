@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import Logo from "@/components/Logo";
 
 type YesNo = "yes" | "no" | "";
 
@@ -159,9 +160,7 @@ export default function QuizPage() {
       <div className="mx-auto w-full max-w-3xl">
         <header className="mb-4 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-brand-600 flex items-center justify-center">
-              <span className="text-white text-xs font-extrabold">C</span>
-            </div>
+            <Logo size={32} />
             <span className="text-sm font-bold tracking-tight">CareLadder</span>
           </Link>
           <span className="text-xs font-semibold text-warm-400">{step + 1} / {totalSteps}</span>
