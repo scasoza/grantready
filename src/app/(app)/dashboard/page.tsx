@@ -268,23 +268,20 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-warm-50 text-warm-900">
       {/* Nav */}
-      <nav className="border-b border-warm-200 bg-white/90">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold text-warm-900">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-500 text-sm font-extrabold text-white">
+      <nav className="border-b border-warm-200/60 bg-white">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-sm font-extrabold text-white">
               G
             </span>
-            GrantReady
+            <span className="text-sm font-bold text-warm-900">GrantReady</span>
           </Link>
-          <div className="flex items-center gap-2 text-sm min-w-0">
-            <span className="text-warm-600 hidden sm:inline truncate max-w-[200px]">{userEmail}</span>
-            <button
-              onClick={() => void handleSignOut()}
-              className="rounded-xl bg-brand-500 px-4 py-2 text-white hover:bg-brand-600 whitespace-nowrap"
-            >
-              Sign out
-            </button>
-          </div>
+          <button
+            onClick={() => void handleSignOut()}
+            className="text-xs text-warm-400 hover:text-warm-600 transition py-2"
+          >
+            Sign out
+          </button>
         </div>
       </nav>
 
