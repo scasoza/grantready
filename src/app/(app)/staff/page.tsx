@@ -167,7 +167,7 @@ export default function StaffTrackerPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
-  const [centerId, setCenterId] = useState<number | null>(null);
+  const [centerId, setCenterId] = useState<string | null>(null);
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

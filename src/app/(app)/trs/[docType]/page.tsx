@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { getTrsDocTemplate } from "@/lib/trs-documents";
 import { parseStaffMembers } from "@/lib/staff-utils";
 import VoiceMemoRecorder from "@/components/VoiceMemoRecorder";
+import LoadingScreen from "@/components/LoadingScreen";
 
 interface Claim {
   id?: string;
@@ -36,6 +37,7 @@ export default function TrsDocPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pageLoading, setPageLoading] = useState(true);
 
   // Load existing section data + ensure records exist
   useEffect(() => {
@@ -130,6 +132,8 @@ export default function TrsDocPage() {
           autoGenerateStaffBinder(center, existingSection?.id || sectionId);
         }
       }
+
+      setPageLoading(false);
     }
 
     async function autoGenerateStaffBinder(
@@ -446,6 +450,10 @@ export default function TrsDocPage() {
   const allClaimsVerified = claims.length === 0 || claims.every((c) => c.verified);
   const showInput = template?.requiresDirectorInput !== false && (status === "pending" || status === "input_given");
 
+  if (pageLoading) {
+    return <LoadingScreen />;
+  }
+
   if (!template) {
     return (
       <div className="min-h-screen bg-warm-50 flex items-center justify-center">
@@ -511,8 +519,11 @@ export default function TrsDocPage() {
                   className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 pr-14 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm resize-none"
                 />
                 {isTranscribing && (
-                  <div className="absolute top-3 right-3 text-xs text-warm-400 animate-pulse">
-                    Transcribing...
+                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" />
+                      <span className="text-sm font-medium text-brand-700">Transcribing your recording...</span>
+                    </div>
                   </div>
                 )}
               </div>

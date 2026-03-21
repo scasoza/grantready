@@ -100,10 +100,21 @@ export default function DashboardPage() {
       // TRS application + sections
       let sectionRows: SectionStatus[] = [];
       if (appResult.data) {
-        const { data: secData } = await supabase
+        // Try with input_hash, fall back without if column doesn't exist
+        let secData = null;
+        const { data: d1, error: e1 } = await supabase
           .from("application_sections")
           .select("section_type, status, input_hash")
           .eq("application_id", appResult.data.id);
+        if (e1?.message?.includes("input_hash")) {
+          const { data: d2 } = await supabase
+            .from("application_sections")
+            .select("section_type, status")
+            .eq("application_id", appResult.data.id);
+          secData = d2;
+        } else {
+          secData = d1;
+        }
         sectionRows = (secData as SectionStatus[] | null) ?? [];
       }
       setSections(sectionRows);
