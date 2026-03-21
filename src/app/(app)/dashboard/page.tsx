@@ -296,7 +296,7 @@ export default function DashboardPage() {
       </nav>
 
 
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 pb-24 sm:pb-8 space-y-5">
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 pb-24 sm:pb-8 space-y-4">
         {/* Submission Banner */}
         {submission?.status === "pending" && (
           <div className="flex items-center gap-3 rounded-xl bg-brand-50 border border-brand-200 p-4">
@@ -522,7 +522,7 @@ export default function DashboardPage() {
               </svg>
             </button>
             {activeZone === "prep" && (
-            <div className="mt-3 space-y-5">
+            <div className="mt-3 space-y-4">
               {prepGroups.map((group) => (
                 <div key={group.label}>
                   <h3 className="text-xs font-medium text-warm-400 mb-2">
