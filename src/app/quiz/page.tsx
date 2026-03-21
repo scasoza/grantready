@@ -167,16 +167,11 @@ export default function QuizPage() {
           <span className="text-xs font-semibold text-warm-400">{step + 1} / {totalSteps}</span>
         </header>
 
-        <div className="mb-6">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-warm-200">
-            <div
-              className="h-full rounded-full bg-brand-500 transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-        </div>
+        <div className="mb-4" />
 
-        <form onSubmit={onSubmit} className="rounded-xl border border-warm-200 bg-white p-5 sm:p-8 shadow-sm">
+        <form onSubmit={onSubmit} className="rounded-xl border border-warm-200 bg-white shadow-lg overflow-hidden">
+          <div className="h-1 bg-brand-500" style={{ width: `${progressPercent}%`, transition: "width 0.3s" }} />
+          <div className="p-5 sm:p-8">
           <div>{renderQuestion(currentQuestionIndex, answers, updateAnswer)}</div>
 
           <div className="mt-6 flex items-center justify-between gap-3">
@@ -201,6 +196,7 @@ export default function QuizPage() {
             >
               {step === totalSteps - 1 ? "Finish" : "Next"}
             </button>
+          </div>
           </div>
         </form>
 
