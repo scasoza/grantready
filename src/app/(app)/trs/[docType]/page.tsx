@@ -510,7 +510,6 @@ export default function TrsDocPage() {
       return;
     }
     setStatus("verified");
-    router.replace("/dashboard");
   };
 
   const allClaimsVerified = claims.length === 0 || claims.every((c) => c.verified);
@@ -545,6 +544,34 @@ export default function TrsDocPage() {
       </nav>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* Step progress */}
+        {template.requiresDirectorInput && (
+          <div className="flex items-center gap-1 px-2">
+            {[
+              { label: "Your input", active: showInput, done: status === "draft_generated" || status === "verified" },
+              { label: "AI draft", active: status === "draft_generated" && !allClaimsVerified, done: status === "draft_generated" && allClaimsVerified || status === "verified" },
+              { label: "Verify facts", active: status === "draft_generated" && !allClaimsVerified, done: allClaimsVerified && status !== "pending" && status !== "input_given" },
+              { label: "Approved", active: false, done: status === "verified" },
+            ].map((s, i) => (
+              <div key={s.label} className="flex items-center flex-1">
+                {i > 0 && <div className={`h-px flex-1 mx-1 ${s.done ? "bg-brand-400" : "bg-warm-200"}`} />}
+                <div className="flex flex-col items-center gap-0.5">
+                  <div className={`flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-bold ${
+                    s.done ? "bg-brand-500 text-white" : s.active ? "bg-brand-100 text-brand-700 ring-1.5 ring-brand-400" : "bg-warm-100 text-warm-400"
+                  }`}>
+                    {s.done ? (
+                      <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : i + 1}
+                  </div>
+                  <span className={`text-[10px] font-medium ${s.done ? "text-brand-600" : s.active ? "text-brand-700" : "text-warm-400"}`}>{s.label}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* INPUT PHASE */}
         {showInput && (
           <div className="space-y-4">
@@ -552,16 +579,24 @@ export default function TrsDocPage() {
             <div className="bg-white border border-warm-200/80 rounded-2xl p-5">
               <p className="text-warm-800 font-semibold text-base mb-3">{template.prompt}</p>
               {template.subPrompts.length > 0 && (
-                <div className="space-y-1.5 mb-4">
-                  <p className="text-xs font-semibold text-warm-400 uppercase tracking-wide">
-                    Try to cover:
+                <div className="mb-4 bg-brand-50/50 border border-brand-100 rounded-xl p-3">
+                  <p className="text-[11px] font-semibold text-brand-700 uppercase tracking-wide mb-2">
+                    Try to mention:
                   </p>
-                  {template.subPrompts.map((sp, i) => (
-                    <div key={i} className="flex gap-2 text-sm text-warm-600">
-                      <span className="text-brand-500 font-bold">{i + 1}.</span>
-                      <span>{sp}</span>
-                    </div>
-                  ))}
+                  <div className="grid gap-1.5">
+                    {template.subPrompts.map((sp, i) => (
+                      <div key={i} className="flex items-start gap-2 text-sm text-warm-600">
+                        <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border border-brand-200 bg-white text-[10px] text-brand-400">
+                          {textInput.toLowerCase().includes(sp.split(" ")[0].toLowerCase()) ? (
+                            <svg className="h-2.5 w-2.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : null}
+                        </span>
+                        <span className="leading-tight">{sp}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -578,11 +613,17 @@ export default function TrsDocPage() {
                 <textarea
                   ref={textareaRef}
                   value={textInput}
-                  onChange={(e) => setTextInput(e.target.value)}
+                  onChange={(e) => {
+                    setTextInput(e.target.value);
+                    // Auto-resize
+                    const el = e.target;
+                    el.style.height = "auto";
+                    el.style.height = Math.max(144, el.scrollHeight) + "px";
+                  }}
                   onBlur={() => saveInput(textInput)}
-                  placeholder="Talk naturally - like you're explaining to someone who asked about your center. Specific numbers and real examples make the strongest documents."
+                  placeholder="Just talk naturally — like you're explaining to a parent what a day at your center looks like. Include real numbers and examples when you can."
                   rows={6}
-                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 pr-14 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm resize-none"
+                  className="w-full bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 text-warm-800 placeholder:text-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm resize-none leading-relaxed"
                 />
                 {isTranscribing && (
                   <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm">
@@ -594,40 +635,36 @@ export default function TrsDocPage() {
                 )}
               </div>
 
-              {/* Voice recorder */}
-              <div className="mt-3 flex items-center justify-between gap-3">
-                <VoiceMemoRecorder
-                  disabled={isGenerating || isTranscribing}
-                  onRecordingComplete={handleRecordingComplete}
-                />
-                <p className="text-xs text-warm-400 text-right">
-                  or record a voice memo
-                </p>
-              </div>
-
-              {/* Document photo upload */}
+              {/* Input methods */}
               <div className="mt-3 border-t border-warm-100 pt-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  multiple
-                  onChange={handleImageSelect}
-                  className="hidden"
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isGenerating}
-                  className="flex items-center gap-2 text-sm text-brand-600 hover:text-brand-700 font-medium transition disabled:opacity-50"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-                  </svg>
-                  Upload or take a document photo
-                </button>
+                <p className="text-[11px] font-medium text-warm-400 mb-2">Or add input another way:</p>
+                <div className="flex items-center gap-3">
+                  <VoiceMemoRecorder
+                    disabled={isGenerating || isTranscribing}
+                    onRecordingComplete={handleRecordingComplete}
+                  />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    multiple
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isGenerating}
+                    className="flex items-center gap-1.5 rounded-lg bg-warm-50 border border-warm-200 px-3 py-2 text-xs font-medium text-warm-600 hover:bg-warm-100 hover:text-warm-700 transition disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                    </svg>
+                    Photo
+                  </button>
+                </div>
                 {uploadedImages.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {uploadedImages.map((img, i) => (
@@ -635,19 +672,19 @@ export default function TrsDocPage() {
                         <img
                           src={img.preview}
                           alt={`Uploaded document ${i + 1}`}
-                          className="h-20 w-20 object-cover rounded-lg border border-warm-200"
+                          className="h-16 w-16 object-cover rounded-lg border border-warm-200"
                         />
                         <button
                           type="button"
                           onClick={() => removeImage(i)}
-                          className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-sm"
                         >
                           &times;
                         </button>
                       </div>
                     ))}
-                    <p className="w-full text-xs text-warm-400 mt-1">
-                      {uploadedImages.length} photo{uploadedImages.length !== 1 ? "s" : ""} attached — AI will extract content from {uploadedImages.length !== 1 ? "these" : "this"}
+                    <p className="w-full text-[11px] text-warm-400">
+                      {uploadedImages.length} photo{uploadedImages.length !== 1 ? "s" : ""} attached
                     </p>
                   </div>
                 )}
@@ -660,35 +697,64 @@ export default function TrsDocPage() {
               </div>
             )}
 
-            <button
-              onClick={generateDraft}
-              disabled={isGenerating || (!textInput.trim() && uploadedImages.length === 0)}
-              className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white py-3.5 rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isGenerating ? "Generating..." : "Generate professional draft"}
-            </button>
+            <div className="space-y-2">
+              <button
+                onClick={generateDraft}
+                disabled={isGenerating || (!textInput.trim() && uploadedImages.length === 0)}
+                className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 active:scale-[0.98] text-white py-3.5 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    Writing your draft...
+                  </>
+                ) : (
+                  <>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                    Generate professional draft
+                  </>
+                )}
+              </button>
+              {textInput.trim() && !isGenerating && (
+                <p className="text-center text-[11px] text-warm-400">
+                  {textInput.split(/\s+/).filter(Boolean).length} words · {uploadedImages.length > 0 ? `${uploadedImages.length} photo${uploadedImages.length !== 1 ? "s" : ""} · ` : ""}AI will expand this into a full document
+                </p>
+              )}
+            </div>
             {isGenerating && (
-              <div className="mt-4 rounded-xl border border-brand-200 bg-brand-50 p-5">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" />
+              <div className="mt-4 rounded-xl border border-brand-100 bg-gradient-to-b from-brand-50 to-white p-5">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="relative h-10 w-10 shrink-0">
+                    <div className="absolute inset-0 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" />
+                    <svg className="absolute inset-0 m-auto h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                  </div>
                   <div>
-                    <p className="text-sm font-semibold text-warm-900">Writing your professional draft</p>
-                    <p className="text-xs text-warm-500">This usually takes 10-15 seconds</p>
+                    <p className="text-sm font-bold text-warm-900">AI is writing your document</p>
+                    <p className="text-xs text-warm-400">Usually 10-15 seconds</p>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-brand-700">
-                    <svg className="h-4 w-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                    Checking your input has enough detail
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-brand-700">
-                    <div className="h-4 w-4 animate-pulse rounded-full bg-brand-400" />
-                    Drafting professional narrative from your words
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-warm-400">
-                    <div className="h-4 w-4 rounded-full bg-warm-200" />
-                    Extracting facts for verification
-                  </div>
+                <div className="space-y-3 pl-1">
+                  {[
+                    { label: "Reading your input", done: true },
+                    { label: "Checking for enough detail", done: true },
+                    { label: "Writing professional narrative", active: true },
+                    { label: "Extracting facts to verify", pending: true },
+                  ].map((step, i) => (
+                    <div key={i} className={`flex items-center gap-2.5 text-xs ${step.done ? "text-brand-700" : step.active ? "text-brand-600 font-medium" : "text-warm-300"}`}>
+                      {step.done ? (
+                        <svg className="h-4 w-4 text-brand-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      ) : step.active ? (
+                        <div className="h-4 w-4 shrink-0 animate-pulse rounded-full bg-brand-400" />
+                      ) : (
+                        <div className="h-4 w-4 shrink-0 rounded-full bg-warm-200" />
+                      )}
+                      {step.label}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -713,7 +779,17 @@ export default function TrsDocPage() {
         {/* DRAFT PHASE */}
         {aiDraft && (status === "draft_generated" || status === "verified") && (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-warm-200 bg-white shadow-lg overflow-hidden">
+            {/* Verified success card */}
+            {status === "verified" && (
+              <div className="rounded-xl bg-brand-800 p-5 text-center animate-fade-up">
+                <svg className="mx-auto h-8 w-8 text-brand-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                </svg>
+                <p className="text-base font-bold text-white">{template.title} approved</p>
+                <p className="text-xs text-brand-200 mt-1">This document is ready for your TRS application</p>
+              </div>
+            )}
+            <div className="rounded-2xl border border-warm-200 bg-white shadow-lg shadow-warm-200/40 overflow-hidden">
               {/* Document header bar */}
               <div className="bg-gradient-to-r from-brand-600 to-brand-700 px-5 py-3">
                 <div className="flex items-center justify-between">
@@ -743,12 +819,22 @@ export default function TrsDocPage() {
               </div>
 
               {/* Document body */}
-              <div className="px-5 py-5 sm:px-6">
-                {aiDraft.split("\n\n").map((para, i) => (
-                  <p key={i} className="mb-4 text-sm leading-relaxed text-warm-700 last:mb-0 first:first-letter:text-lg first:first-letter:font-semibold first:first-letter:text-warm-900">
-                    {para}
-                  </p>
-                ))}
+              <div className="px-5 py-5 sm:px-8">
+                {aiDraft.split("\n\n").map((para, i) => {
+                  const trimmed = para.trim();
+                  // Detect markdown-style headings
+                  if (trimmed.startsWith("## ")) {
+                    return <h4 key={i} className="mt-5 mb-2 text-sm font-bold text-warm-900">{trimmed.slice(3)}</h4>;
+                  }
+                  if (trimmed.startsWith("# ")) {
+                    return <h3 key={i} className="mt-5 mb-2 text-base font-bold text-warm-900">{trimmed.slice(2)}</h3>;
+                  }
+                  return (
+                    <p key={i} className="mb-3 text-[13px] leading-[1.8] text-warm-700 last:mb-0">
+                      {para}
+                    </p>
+                  );
+                })}
               </div>
 
               {/* Document footer */}
@@ -762,11 +848,21 @@ export default function TrsDocPage() {
             {/* Claim verification */}
             {claims.length > 0 && status !== "verified" && (
               <div className="bg-white border border-warm-200/80 rounded-2xl p-4">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-1">
                   <h3 className="text-sm font-bold text-warm-900">
-                    Verify facts ({claims.filter(c => c.verified).length}/{claims.length})
+                    Verify facts
                   </h3>
-                  <span className="text-xs text-warm-400">Tap to confirm each</span>
+                  <span className="text-xs font-semibold text-brand-600">
+                    {claims.filter(c => c.verified).length}/{claims.length} confirmed
+                  </span>
+                </div>
+                <p className="text-xs text-warm-400 mb-3">Are these details correct? Tap to confirm or fix.</p>
+                {/* Progress bar for claims */}
+                <div className="h-1 rounded-full bg-warm-100 mb-3 overflow-hidden">
+                  <div
+                    className="h-1 rounded-full bg-brand-500 transition-all duration-300"
+                    style={{ width: `${claims.length ? (claims.filter(c => c.verified).length / claims.length) * 100 : 0}%` }}
+                  />
                 </div>
                 <div className="space-y-1.5">
                   {claims.map((claim, i) => (
@@ -823,29 +919,57 @@ export default function TrsDocPage() {
             )}
 
             {/* Actions */}
-            <div className="flex gap-3">
-              {template.requiresDirectorInput && (
-                <button
-                  onClick={() => {
-                    setStatus("input_given");
-                    setAiDraft("");
-                    setClaims([]);
-                    setFollowUp(null);
-                  }}
-                  className="flex-1 bg-warm-100 text-warm-700 py-3 rounded-xl font-semibold text-sm transition hover:bg-warm-200"
-                >
-                  Re-do my input
-                </button>
-              )}
+            <div className="space-y-2">
               {status !== "verified" && (
                 <button
                   onClick={verifySection}
                   disabled={!allClaimsVerified}
-                  className="flex-1 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white py-3 rounded-xl font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 active:scale-[0.98] text-white py-3.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {allClaimsVerified ? "Looks good - approve" : "Verify all claims first"}
+                  {allClaimsVerified ? (
+                    <>
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Approve this document
+                    </>
+                  ) : (
+                    `Verify all ${claims.length} facts first`
+                  )}
                 </button>
               )}
+              {status === "verified" && sectionId && (
+                <a
+                  href={`/api/export-pdf?docType=${docType}&applicationId=${sectionId}`}
+                  className="w-full bg-brand-600 hover:bg-brand-700 text-white py-3.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  Download PDF
+                </a>
+              )}
+              <div className="flex gap-2">
+                {template.requiresDirectorInput && status !== "verified" && (
+                  <button
+                    onClick={() => {
+                      setStatus("input_given");
+                      setAiDraft("");
+                      setClaims([]);
+                      setFollowUp(null);
+                    }}
+                    className="flex-1 bg-warm-50 border border-warm-200 text-warm-600 py-2.5 rounded-xl text-xs font-medium transition hover:bg-warm-100"
+                  >
+                    Start over
+                  </button>
+                )}
+                <Link
+                  href="/dashboard"
+                  className="flex-1 text-center bg-warm-50 border border-warm-200 text-warm-600 py-2.5 rounded-xl text-xs font-medium transition hover:bg-warm-100"
+                >
+                  Back to dashboard
+                </Link>
+              </div>
             </div>
           </div>
         )}
