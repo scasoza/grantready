@@ -10,18 +10,16 @@ type CheckoutResponse = {
 
 const freeFeatures = [
   "Funding snapshot with dollar estimate",
-  "Full TRS certification roadmap (visible and actionable)",
-  "Staff credential tracker (data entry and gap detection)",
-  "Deadline and expiration alerts",
+  "Full TRS certification dashboard",
+  "Staff credential tracker",
   "3 AI document generations per month",
+  "Expiration alerts on dashboard",
 ];
 
 const proFeatures = [
   "Everything in Free, plus:",
   "Unlimited AI document generation",
-  "TRS self-assessment auto-fill",
-  "Room self-check tool (ECERS-3 / ITERS-3)",
-  "Staff auto-email for expiring certifications",
+  "Readiness report with cross-document validation",
   "Concierge application submission",
   "Printable staff credentials binder",
 ];
