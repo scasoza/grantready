@@ -357,37 +357,22 @@ export default function DashboardPage() {
           </Link>
         )}
 
-        {/* Progress */}
-        <section className="animate-fade-up animate-delay-200 rounded-xl bg-white p-5 border border-warm-200">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-warm-400">Progress</p>
-              <p className="mt-0.5 text-sm text-warm-700">
-                <span className="text-2xl font-bold text-warm-900">{totalDone}</span>
-                <span className="text-warm-400"> / {totalTasks} tasks</span>
-              </p>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50">
-              <span className="text-sm font-bold text-brand-700">{progressPct}%</span>
-            </div>
+        {/* Compact progress */}
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 flex-1 rounded-full bg-warm-100">
+            <div className="h-1.5 rounded-full bg-brand-500 transition-all" style={{ width: `${progressPct}%` }} />
           </div>
-          <div className="mt-4 h-3 w-full rounded-full bg-warm-100">
-            <div
-              className="h-3 rounded-full bg-brand-500 transition-all"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-          {allComplete && !submission && (
-            <div className="mt-4">
-              <Link
-                href="/trs/readiness"
-                className="inline-flex rounded-xl bg-brand-600 hover:bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow"
-              >
-                Ready to submit
-              </Link>
-            </div>
-          )}
-        </section>
+          <span className="text-xs font-medium text-warm-400">{totalDone}/{totalTasks}</span>
+        </div>
+
+        {allComplete && !submission && (
+          <Link
+            href="/trs/readiness"
+            className="block w-full rounded-xl bg-brand-600 hover:bg-brand-700 px-5 py-3 text-sm font-semibold text-white text-center shadow"
+          >
+            All done — review and submit
+          </Link>
+        )}
 
         {/* Zone 1: Needs your attention */}
         {attentionItems.length > 0 && (
