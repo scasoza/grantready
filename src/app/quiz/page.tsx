@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type YesNo = "yes" | "no" | "";
 
@@ -39,6 +39,7 @@ export default function QuizPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>(initialAnswers);
+  const initRef = useRef(false);
 
   const activeQuestionIndices = useMemo(
     () =>
@@ -52,9 +53,11 @@ export default function QuizPage() {
   const progressPercent = useMemo(() => ((step + 1) / totalSteps) * 100, [step, totalSteps]);
 
   useEffect(() => {
+    if (initRef.current) return;
+    initRef.current = true;
+
     const storedStart = localStorage.getItem("grantready_quiz_start");
     if (!storedStart) {
-      // No start data means user navigated directly — send them to landing page
       router.replace("/");
       return;
     }
@@ -65,14 +68,12 @@ export default function QuizPage() {
       const parsed = JSON.parse(storedStart) as { centerType?: string };
       if (typeof parsed.centerType === "string" && parsed.centerType.length > 0) {
         setAnswers((prev) => ({ ...prev, centerType: parsed.centerType ?? "" }));
-        // Skip the center-type question since it was already answered on the landing page
         setStep(1);
       }
     } catch {
       // Ignore invalid start payloads.
     }
-
-  }, []);
+  }, [router]);
 
   const canGoNext = useMemo(() => {
     switch (currentQuestionIndex) {
