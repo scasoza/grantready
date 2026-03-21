@@ -296,16 +296,26 @@ export default function DashboardPage() {
       </nav>
 
 
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 pb-24 sm:pb-8 space-y-6">
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 pb-24 sm:pb-8 space-y-5">
         {/* Submission Banner */}
         {submission?.status === "pending" && (
-          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
-            Your application has been submitted &mdash; we&apos;re handling it.
+          <div className="flex items-center gap-3 rounded-xl bg-brand-50 border border-brand-200 p-4">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500 shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-brand-800">Your application is being submitted</p>
+              <p className="text-xs text-brand-600">We&apos;ll update you when it&apos;s done.</p>
+            </div>
           </div>
         )}
         {submission?.status === "completed" && (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-            Your TRS application was submitted to your Workforce Board.
+          <div className="flex items-center gap-3 rounded-xl bg-brand-800 p-4 text-white">
+            <svg className="h-6 w-6 shrink-0 text-brand-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold">Application submitted</p>
+              <p className="text-xs text-brand-200">Your TRS certification request has been sent to your Workforce Board.</p>
+            </div>
           </div>
         )}
 
@@ -363,6 +373,16 @@ export default function DashboardPage() {
           }
           return null;
         })()}
+
+        {/* Phase complete celebration */}
+        {pendingPaperwork.length === 0 && completedPaperwork.length > 0 && pendingPrep.length > 0 && !submission && (
+          <div className="flex items-center gap-2 rounded-lg bg-brand-50 border border-brand-200 px-4 py-2.5">
+            <svg className="h-4 w-4 text-brand-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-xs font-medium text-brand-700">Documents complete — now finish your center prep below</p>
+          </div>
+        )}
 
         {/* Compact progress */}
         <div className="flex items-center gap-3">
