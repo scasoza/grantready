@@ -63,6 +63,8 @@ export default function QuizPage() {
       const parsed = JSON.parse(storedStart) as { centerType?: string };
       if (typeof parsed.centerType === "string" && parsed.centerType.length > 0) {
         setAnswers((prev) => ({ ...prev, centerType: parsed.centerType ?? "" }));
+        // Skip the center-type question since it was already answered on the landing page
+        setStep(1);
       }
     } catch {
       // Ignore invalid start payloads.
