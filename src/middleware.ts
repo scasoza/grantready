@@ -43,9 +43,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Admin routes: restrict to operator email
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
+  if (isAdminRoute) {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (!adminEmail || user.email !== adminEmail) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  }
+
   return response;
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/app/:path*", "/staff/:path*", "/apply/:path*", "/documents/:path*", "/onboarding/:path*"],
+  matcher: ["/dashboard/:path*", "/app/:path*", "/staff/:path*", "/apply/:path*", "/documents/:path*", "/onboarding/:path*", "/trs/:path*", "/admin/:path*"],
 };
