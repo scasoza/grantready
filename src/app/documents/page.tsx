@@ -180,24 +180,28 @@ export default function DocumentsPage() {
     );
   }
 
-  if (errorMessage) {
-    return (
-      <div className="min-h-screen bg-warm-50 px-4 py-8 text-warm-900 sm:px-6">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
-          {errorMessage}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-warm-50 px-4 py-8 text-warm-900 sm:px-6">
-      <main className="mx-auto max-w-4xl">
-        <Link href="/dashboard" className="text-sm font-medium text-warm-700 hover:text-warm-900">
-          ← Dashboard
-        </Link>
-        <h1 className="mt-3 text-3xl font-bold">Documents</h1>
-        <p className="mt-1 text-warm-700">All your generated grant documents.</p>
+    <div className="min-h-screen bg-warm-50 text-warm-900">
+      <nav className="sticky top-0 z-40 border-b border-warm-200/40 bg-white/90 backdrop-blur-sm shadow-sm">
+        <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3 sm:px-6">
+          <Link href="/dashboard" className="text-warm-400 hover:text-warm-600 transition p-2 -m-2" aria-label="Back to dashboard">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </Link>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-sm font-bold text-warm-900">Documents</h1>
+            <p className="text-xs text-warm-400">{documents.length} generated</p>
+          </div>
+        </div>
+      </nav>
+
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+        {errorMessage && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
 
         {documents.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6">
@@ -251,17 +255,23 @@ export default function DocumentsPage() {
                     <button
                       type="button"
                       onClick={() => toggleExpanded(document.id)}
-                      className="rounded-xl border border-warm-200 px-3 py-2 text-sm font-medium text-warm-800 hover:bg-warm-100"
+                      className="rounded-xl border border-warm-200 px-4 py-2 text-sm font-medium text-warm-800 hover:bg-warm-100"
                     >
-                      {isExpanded ? "Hide full document" : "View full document"}
+                      {isExpanded ? "Collapse" : "View full"}
                     </button>
                     <button
                       type="button"
                       onClick={() => void handleCopy(document.aiDraft)}
-                      className="rounded-xl bg-brand-500 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-600"
+                      className="rounded-xl border border-warm-200 px-4 py-2 text-sm font-medium text-warm-800 hover:bg-warm-100"
                     >
-                      Copy to clipboard
+                      Copy
                     </button>
+                    <Link
+                      href={`/trs/${document.sectionType}`}
+                      className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600"
+                    >
+                      Edit
+                    </Link>
                   </div>
                 </article>
               );
