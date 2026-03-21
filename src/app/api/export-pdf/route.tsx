@@ -362,13 +362,37 @@ export async function GET(request: Request) {
     }
 
     // Standard docs: load from application_sections
-    const { data: sectionRow } = await supabase
+    // applicationId param may be either the application ID or section ID — try both
+    let sectionRow = null;
+    const { data: byApp } = await supabase
       .from("application_sections")
       .select("ai_draft")
       .eq("application_id", applicationId)
       .eq("section_type", docType)
       .limit(1)
-      .single();
+      .maybeSingle();
+
+    if (byApp) {
+      sectionRow = byApp;
+    } else {
+      // Fall back: look up by center's TRS application
+      const { data: trsApp } = await supabase
+        .from("applications")
+        .select("id")
+        .eq("center_id", centerId)
+        .eq("grant_id", "trs")
+        .maybeSingle();
+      if (trsApp) {
+        const { data: byCenterApp } = await supabase
+          .from("application_sections")
+          .select("ai_draft")
+          .eq("application_id", trsApp.id)
+          .eq("section_type", docType)
+          .limit(1)
+          .maybeSingle();
+        sectionRow = byCenterApp;
+      }
+    }
 
     const aiDraft = (sectionRow?.ai_draft as string) || "";
 
