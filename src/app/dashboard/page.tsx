@@ -292,15 +292,34 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* First-visit welcome */}
+        {totalDone === 0 && !submission && (
+          <section className="rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 p-5 text-white shadow-lg">
+            <h2 className="text-lg font-bold">Welcome to your TRS roadmap</h2>
+            <p className="mt-2 text-sm text-brand-100 leading-relaxed">
+              We&apos;ll generate your documents, track your staff credentials, and submit your application when you&apos;re ready. Start with the first item below.
+            </p>
+          </section>
+        )}
+
         {/* Next step suggestion */}
         {pendingPaperwork.length > 0 && !submission && (
           <Link
             href={`/trs/${pendingPaperwork[0].action?.docType ?? pendingPaperwork[0].id}`}
-            className="block rounded-2xl border border-brand-200 bg-brand-50 p-4 hover:bg-brand-100 transition"
+            className="flex items-center gap-3 rounded-2xl border border-brand-200 bg-brand-50 p-4 hover:bg-brand-100 hover:shadow-sm transition"
           >
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Next step</p>
-            <p className="mt-1 font-semibold text-warm-900">{pendingPaperwork[0].title}</p>
-            <p className="mt-0.5 text-sm text-warm-500">{pendingPaperwork[0].context}</p>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Next step</p>
+              <p className="mt-0.5 text-sm font-semibold text-warm-900 line-clamp-1">{pendingPaperwork[0].title}</p>
+            </div>
+            <svg className="h-5 w-5 shrink-0 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         )}
 
