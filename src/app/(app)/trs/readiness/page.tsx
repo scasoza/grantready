@@ -147,14 +147,14 @@ export default function ReadinessPage() {
   return (
     <div className="min-h-screen bg-warm-50 text-warm-900">
       {/* Nav */}
-      <nav className="sticky top-0 z-40 border-b border-warm-200/40 bg-white/90 backdrop-blur-sm shadow-sm">
+      <nav className="sticky top-0 z-40 bg-brand-700 shadow-md">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3 sm:px-6">
-          <Link href="/dashboard" className="text-warm-400 hover:text-warm-600 transition p-2 -m-2" aria-label="Back to dashboard">
+          <Link href="/dashboard" className="text-brand-200 hover:text-white transition p-2 -m-2" aria-label="Back to dashboard">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <h1 className="text-sm font-bold text-warm-900">Readiness Report</h1>
+          <h1 className="text-sm font-semibold text-white">Readiness Report</h1>
         </div>
       </nav>
 

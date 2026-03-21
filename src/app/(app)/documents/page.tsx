@@ -177,16 +177,16 @@ export default function DocumentsPage() {
 
   return (
     <div className="min-h-screen bg-warm-50 text-warm-900">
-      <nav className="sticky top-0 z-40 border-b border-warm-200/40 bg-white/90 backdrop-blur-sm shadow-sm">
+      <nav className="sticky top-0 z-40 bg-brand-700 shadow-md">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3 sm:px-6">
-          <Link href="/dashboard" className="text-warm-400 hover:text-warm-600 transition p-2 -m-2" aria-label="Back to dashboard">
+          <Link href="/dashboard" className="text-brand-200 hover:text-white transition p-2 -m-2" aria-label="Back to dashboard">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
           <div className="flex-1 min-w-0">
-            <h1 className="text-sm font-bold text-warm-900">Documents</h1>
-            <p className="text-xs text-warm-400">{documents.length} generated</p>
+            <h1 className="text-sm font-semibold text-white">Documents</h1>
+            <p className="text-xs text-brand-200">{documents.length} generated</p>
           </div>
         </div>
       </nav>
