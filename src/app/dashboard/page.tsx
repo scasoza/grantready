@@ -294,7 +294,7 @@ export default function DashboardPage() {
 
         {/* First-visit welcome */}
         {totalDone === 0 && !submission && (
-          <section className="rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 p-5 text-white shadow-lg">
+          <section className="animate-fade-up rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 p-5 text-white shadow-lg">
             <h2 className="text-lg font-bold">Welcome to your TRS roadmap</h2>
             <p className="mt-2 text-sm text-brand-100 leading-relaxed">
               We&apos;ll generate your documents, track your staff credentials, and submit your application when you&apos;re ready. Start with the first item below.
@@ -306,7 +306,7 @@ export default function DashboardPage() {
         {pendingPaperwork.length > 0 && !submission && (
           <Link
             href={`/trs/${pendingPaperwork[0].action?.docType ?? pendingPaperwork[0].id}`}
-            className="flex items-center gap-3 rounded-2xl border border-brand-200 bg-brand-50 p-4 hover:bg-brand-100 hover:shadow-sm transition"
+            className="animate-fade-up animate-delay-100 flex items-center gap-3 rounded-2xl border border-brand-200 bg-brand-50 p-4 hover:bg-brand-100 hover:shadow-sm transition"
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white">
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -324,7 +324,7 @@ export default function DashboardPage() {
         )}
 
         {/* Progress */}
-        <section className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6">
+        <section className="animate-fade-up animate-delay-200 rounded-2xl border border-warm-200 bg-white p-5 sm:p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <h1 className="text-xl font-semibold text-warm-900">TRS Certification</h1>

@@ -63,14 +63,14 @@ export default function Home() {
 
       <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-10">
         <div className="w-full max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-warm-900">
+          <h1 className="animate-fade-up text-3xl sm:text-5xl font-extrabold tracking-tight text-warm-900">
             Stop leaving money on the table.
           </h1>
-          <p className="mt-4 mx-auto text-base sm:text-lg text-warm-500 max-w-lg leading-relaxed">
+          <p className="animate-fade-up animate-delay-100 mt-4 mx-auto text-base sm:text-lg text-warm-500 max-w-lg leading-relaxed">
             Texas childcare providers miss an average of <span className="font-semibold text-brand-700">$14,000/yr</span> in funding they already qualify for. See what you&apos;re missing — free, 5 minutes, no account needed.
           </p>
 
-          <div className="mt-8 flex justify-center">
+          <div className="animate-fade-up animate-delay-200 mt-8 flex justify-center">
             <div className="w-full max-w-sm">
               <div className="space-y-3" role="radiogroup" aria-label="Provider type">
                 {options.map((option) => {
