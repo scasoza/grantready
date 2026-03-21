@@ -20,7 +20,7 @@ interface StaffMember {
 }
 
 interface CenterRow {
-  id: number;
+  id: string;
 }
 
 interface CenterDataRow {

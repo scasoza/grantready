@@ -8,7 +8,7 @@ ALTER TABLE centers ADD COLUMN IF NOT EXISTS generation_month integer DEFAULT 0;
 -- Submissions table for concierge workflow
 CREATE TABLE IF NOT EXISTS submissions (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  center_id integer REFERENCES centers(id) NOT NULL,
+  center_id uuid REFERENCES centers(id) NOT NULL,
   status text DEFAULT 'pending' NOT NULL,
   requested_at timestamptz DEFAULT now() NOT NULL,
   completed_at timestamptz,
