@@ -160,22 +160,23 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-warm-50 px-4 py-10 sm:px-6">
-      <div className="mx-auto max-w-2xl">
-        <div className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">Center onboarding</p>
-          <h1 className="mt-2 text-2xl sm:text-3xl font-extrabold text-warm-900 tracking-tight">Tell us about your center</h1>
-          <p className="mt-2 text-sm text-warm-500">This helps us personalize your TRS certification roadmap.</p>
-        </div>
-
-        <div className="mb-6 rounded-2xl border border-warm-200 bg-white p-4 sm:p-5">
-          <div className="flex items-center gap-3 text-sm">
-            <span className={`h-8 w-8 rounded-full flex items-center justify-center font-bold ${step === 1 ? "bg-brand-600 text-white" : "bg-brand-100 text-brand-700"}`}>1</span>
-            <span className="font-semibold text-warm-800">Enter center details</span>
-            <span className="h-px flex-1 bg-warm-200" />
-            <span className={`h-8 w-8 rounded-full flex items-center justify-center font-bold ${step === 2 ? "bg-brand-600 text-white" : "bg-warm-100 text-warm-500"}`}>2</span>
-            <span className="font-semibold text-warm-800">Confirm</span>
+    <div className="min-h-screen bg-warm-50">
+      <nav className="sticky top-0 z-40 border-b border-warm-200/40 bg-white/90 backdrop-blur-sm shadow-sm">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-b from-brand-500 to-brand-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-extrabold text-sm">G</span>
+            </div>
+            <span className="text-sm font-bold text-warm-900">GrantReady</span>
           </div>
+          <span className="text-xs text-warm-400">Step {step} of 2</span>
+        </div>
+      </nav>
+
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
+        <div className="mb-5">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-warm-900 tracking-tight">Tell us about your center</h1>
+          <p className="mt-1 text-sm text-warm-500">This helps us personalize your TRS certification roadmap.</p>
         </div>
 
         <div className="rounded-2xl border border-warm-200 bg-white p-6 sm:p-8 shadow-sm">
@@ -268,7 +269,7 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">CCS count</label>
+                <label className="block text-xs text-warm-500 mb-1.5 font-semibold">Subsidized (CCS) children</label>
                 <input
                   type="number"
                   inputMode="numeric"
@@ -327,7 +328,7 @@ export default function OnboardingPage() {
                   <dd className="text-warm-800">{staffCount || "Not provided"}</dd>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
-                  <dt className="text-warm-500 font-semibold">CCS count</dt>
+                  <dt className="text-warm-500 font-semibold">Subsidized (CCS) children</dt>
                   <dd className="text-warm-800">{ccsCount || "Not provided"}</dd>
                 </div>
               </dl>
