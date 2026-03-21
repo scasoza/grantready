@@ -83,10 +83,12 @@ export default function PricingPage() {
             <h1 className="text-2xl font-bold tracking-tight">Free</h1>
             <p className="mt-3 text-4xl font-extrabold tracking-tight">$0</p>
 
-            <ul className="mt-6 space-y-3 text-sm text-warm-700">
+            <ul className="mt-6 space-y-3 text-sm text-warm-600">
               {freeFeatures.map((feature) => (
                 <li key={feature} className="flex items-start gap-2.5">
-                  <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-brand-600" />
+                  <svg className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
                   <span>{feature}</span>
                 </li>
               ))}
@@ -100,15 +102,18 @@ export default function PricingPage() {
             </Link>
           </article>
 
-          <article className="rounded-2xl border-2 border-green-500 bg-white p-6 shadow-sm sm:p-8">
+          <article className="relative rounded-xl bg-brand-800 p-6 shadow-lg sm:p-8 text-white overflow-hidden">
+            <div className="absolute top-0 right-0 bg-brand-400 text-brand-900 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-lg">Popular</div>
             <h2 className="text-2xl font-bold tracking-tight">Pro</h2>
-            <p className="mt-3 text-4xl font-extrabold tracking-tight">$49/month</p>
-            <p className="mt-2 text-sm text-warm-600">No contracts. Cancel anytime.</p>
+            <p className="mt-3 text-4xl font-extrabold tracking-tight">$49<span className="text-lg font-normal text-brand-300">/mo</span></p>
+            <p className="mt-2 text-sm text-brand-300">No contracts. Cancel anytime.</p>
 
-            <ul className="mt-6 space-y-3 text-sm text-warm-700">
+            <ul className="mt-6 space-y-3 text-sm text-brand-100">
               {proFeatures.map((feature) => (
                 <li key={feature} className="flex items-start gap-2.5">
-                  <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-brand-600" />
+                  <svg className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
                   <span>{feature}</span>
                 </li>
               ))}
@@ -124,7 +129,7 @@ export default function PricingPage() {
               type="button"
               onClick={handleStartTrial}
               disabled={isLoading}
-              className="mt-8 inline-flex w-full items-center justify-center rounded-xl bg-brand-600 hover:bg-brand-700 px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-8 inline-flex w-full items-center justify-center rounded-xl bg-white text-brand-800 hover:bg-brand-50 px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isLoading ? "Redirecting..." : "Start 14-Day Free Trial"}
             </button>
