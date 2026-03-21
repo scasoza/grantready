@@ -279,7 +279,25 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
+      {/* Bottom nav */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-warm-200 bg-white/95 backdrop-blur-sm sm:hidden">
+        <div className="flex justify-around py-2">
+          <span className="flex flex-col items-center gap-0.5 text-brand-600 text-xs font-semibold py-1 px-3">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+            Dashboard
+          </span>
+          <Link href="/staff" className="flex flex-col items-center gap-0.5 text-warm-400 text-xs py-1 px-3">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            Staff
+          </Link>
+          <Link href="/documents" className="flex flex-col items-center gap-0.5 text-warm-400 text-xs py-1 px-3">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            Documents
+          </Link>
+        </div>
+      </nav>
+
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 pb-24 sm:pb-8 space-y-6">
         {/* Submission Banner */}
         {submission?.status === "pending" && (
           <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
@@ -290,6 +308,18 @@ export default function DashboardPage() {
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
             Your TRS application was submitted to your Workforce Board.
           </div>
+        )}
+
+        {/* Next step suggestion */}
+        {pendingPaperwork.length > 0 && !submission && (
+          <Link
+            href={`/trs/${pendingPaperwork[0].action?.docType ?? pendingPaperwork[0].id}`}
+            className="block rounded-2xl border border-brand-200 bg-brand-50 p-4 hover:bg-brand-100 transition"
+          >
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Next step</p>
+            <p className="mt-1 font-semibold text-warm-900">{pendingPaperwork[0].title}</p>
+            <p className="mt-0.5 text-sm text-warm-500">{pendingPaperwork[0].context}</p>
+          </Link>
         )}
 
         {/* Progress */}
@@ -458,10 +488,13 @@ export default function DashboardPage() {
                     <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-sm text-warm-500 line-through">{task.title}</span>
-                    <span className="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
-                      Verified
-                    </span>
+                    <span className="text-sm text-warm-500 line-through flex-1">{task.title}</span>
+                    <Link
+                      href={`/trs/${task.action?.docType ?? task.id}`}
+                      className="text-xs font-medium text-brand-600 hover:text-brand-700 py-1 px-2 shrink-0"
+                    >
+                      View
+                    </Link>
                   </div>
                 ))}
                 {completedPrep.map((task) => (

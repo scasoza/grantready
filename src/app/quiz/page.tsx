@@ -183,7 +183,9 @@ export default function QuizPage() {
 
           <div className="mt-8 flex items-center justify-between gap-3">
             {step === 0 ? (
-              <div />
+              <Link href="/" className="rounded-xl border border-warm-200 px-5 py-3 text-base font-semibold text-warm-700 hover:bg-warm-50 transition">
+                Back
+              </Link>
             ) : (
               <button
                 type="button"

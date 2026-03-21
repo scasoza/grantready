@@ -20,13 +20,22 @@ export default function Home() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [selected, setSelected] = useState<(typeof options)[number] | "">("");
+  const [checking, setChecking] = useState(true);
 
   // If already logged in, go straight to dashboard
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) router.replace("/dashboard");
+      if (user) {
+        router.replace("/dashboard");
+      } else {
+        setChecking(false);
+      }
     });
   }, [supabase, router]);
+
+  if (checking) {
+    return <div className="min-h-screen bg-warm-50" />;
+  }
 
   const handleGetStarted = () => {
     if (!selected) return;
