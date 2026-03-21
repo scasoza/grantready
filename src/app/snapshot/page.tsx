@@ -145,7 +145,7 @@ export default function FundingSnapshotPage() {
                 {quizData.ccsCount > 0 ? currency.format(revenue.annualIncrease) : "Depends on future CCS enrollment"}
               </p>
               <p className="text-sm text-warm-900">
-                <span className="font-semibold">What&apos;s required:</span> 22 tasks to complete, estimated 8 weeks
+                <span className="font-semibold">How it works:</span> 22 simple steps — GrantReady walks you through each one. Most directors finish in 4-8 weeks, about 20 min/week.
               </p>
               {!isThinkingAboutOpening && (
                 <p className="text-xs text-warm-500">
@@ -154,7 +154,7 @@ export default function FundingSnapshotPage() {
               )}
               <Link
                 href="/dashboard"
-                className="inline-flex rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-600/20 hover:from-brand-600 hover:to-brand-700"
+                className="mt-1 flex w-full items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-brand-600/20 hover:from-brand-600 hover:to-brand-700 sm:w-auto sm:inline-flex"
               >
                 See your roadmap &rarr;
               </Link>
@@ -165,18 +165,19 @@ export default function FundingSnapshotPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-warm-900">Could Qualify With Changes</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <article className="rounded-2xl border border-warm-200 bg-warm-100 p-4 text-warm-700">
-              <p className="font-semibold text-warm-800">Pre-K Partnership</p>
-              <p className="mt-1 text-sm">Public school partnership slots for full-day pre-K services.</p>
-            </article>
-            <article className="rounded-2xl border border-warm-200 bg-warm-100 p-4 text-warm-700">
-              <p className="font-semibold text-warm-800">Head Start</p>
-              <p className="mt-1 text-sm">Federal early learning funding for centers meeting program standards.</p>
-            </article>
-            <article className="rounded-2xl border border-warm-200 bg-warm-100 p-4 text-warm-700">
-              <p className="font-semibold text-warm-800">Early Head Start</p>
-              <p className="mt-1 text-sm">Infant and toddler services funding through local Head Start grantees.</p>
-            </article>
+            {[
+              { name: "Pre-K Partnership", desc: "Public school partnership slots for full-day pre-K services." },
+              { name: "Head Start", desc: "Federal early learning funding for centers meeting program standards." },
+              { name: "Early Head Start", desc: "Infant and toddler services funding through local Head Start grantees." },
+            ].map((g) => (
+              <article key={g.name} className="rounded-2xl border border-warm-200 bg-warm-50 p-4 text-warm-600 opacity-75">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-semibold text-warm-700">{g.name}</p>
+                  <span className="rounded-full bg-warm-200 px-2 py-0.5 text-[10px] font-semibold text-warm-500 whitespace-nowrap">Coming soon</span>
+                </div>
+                <p className="mt-1 text-sm">{g.desc}</p>
+              </article>
+            ))}
           </div>
         </section>
 
