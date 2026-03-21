@@ -147,19 +147,14 @@ export default function ReadinessPage() {
   return (
     <div className="min-h-screen bg-warm-50 text-warm-900">
       {/* Nav */}
-      <nav className="border-b border-warm-200 bg-white/90">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 text-sm text-warm-600 hover:text-warm-900"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+      <nav className="sticky top-0 z-40 border-b border-warm-200/40 bg-white/90 backdrop-blur-sm shadow-sm">
+        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3 sm:px-6">
+          <Link href="/dashboard" className="text-warm-400 hover:text-warm-600 transition p-2 -m-2" aria-label="Back to dashboard">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to dashboard
           </Link>
-          <span className="text-lg font-bold text-warm-900">Readiness Report</span>
-          <div className="w-20" />
+          <h1 className="text-sm font-bold text-warm-900">Readiness Report</h1>
         </div>
       </nav>
 
@@ -181,8 +176,8 @@ export default function ReadinessPage() {
                   </svg>
                 </div>
               )}
-              <div>
-                <h1 className="text-xl font-semibold text-warm-900">
+              <div className="flex-1">
+                <h1 className="text-lg font-semibold text-warm-900">
                   {result.summary.passed} of {result.summary.total} checks passed
                 </h1>
                 {result.summary.failed > 0 && (
@@ -198,16 +193,24 @@ export default function ReadinessPage() {
               </div>
             </div>
 
+            {/* Visual progress bar */}
+            <div className="mt-4 h-2 w-full rounded-full bg-warm-100">
+              <div
+                className={`h-2 rounded-full transition-all ${allPassed ? "bg-emerald-500" : "bg-amber-500"}`}
+                style={{ width: `${Math.round((result.summary.passed / result.summary.total) * 100)}%` }}
+              />
+            </div>
+
             {allPassed && (
               <div className="mt-5">
                 <button
                   onClick={() => void handleSubmit()}
                   disabled={submitting}
-                  className="inline-flex rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow hover:from-brand-600 hover:to-brand-700 disabled:opacity-50"
+                  className="w-full rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-6 py-3 text-sm font-semibold text-white shadow hover:from-brand-600 hover:to-brand-700 disabled:opacity-50"
                 >
                   {submitting ? "Submitting..." : "Submit my application"}
                 </button>
-                <p className="mt-2 text-xs text-warm-500">
+                <p className="mt-2 text-xs text-warm-500 text-center">
                   We&apos;ll submit your TRS certification request to your local Workforce Board on your behalf. You&apos;ll see the status update on your dashboard.
                 </p>
               </div>
