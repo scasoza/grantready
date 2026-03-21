@@ -316,7 +316,7 @@ export default function DashboardPage() {
         {pendingPaperwork.length > 0 && !submission && (
           <Link
             href={`/trs/${pendingPaperwork[0].action?.docType ?? pendingPaperwork[0].id}`}
-            className="animate-fade-up animate-delay-100 flex items-center gap-3 rounded-2xl border border-brand-200 bg-brand-50 p-4 hover:bg-brand-100 hover:shadow-sm transition"
+            className="animate-fade-up animate-delay-100 flex items-center gap-3 rounded-xl border border-brand-200 bg-brand-50 p-4 hover:bg-brand-100 hover:shadow-sm transition"
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white">
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

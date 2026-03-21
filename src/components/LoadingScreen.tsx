@@ -21,7 +21,7 @@ export default function LoadingScreen({ label }: { label?: string }) {
       {/* Skeleton content */}
       <div className="mx-auto max-w-5xl px-4 py-6 space-y-5">
         {/* Progress card skeleton */}
-        <div className="rounded-2xl border border-warm-200 bg-white p-5">
+        <div className="rounded-xl border border-warm-200 bg-white p-5">
           <div className="flex justify-between items-center">
             <div className="space-y-2">
               <Bone className="h-5 w-36" />

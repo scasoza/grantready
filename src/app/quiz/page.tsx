@@ -176,7 +176,7 @@ export default function QuizPage() {
           </div>
         </div>
 
-        <form onSubmit={onSubmit} className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-8 shadow-sm">
+        <form onSubmit={onSubmit} className="rounded-xl border border-warm-200 bg-white p-5 sm:p-8 shadow-sm">
           <div>{renderQuestion(currentQuestionIndex, answers, updateAnswer)}</div>
 
           <div className="mt-6 flex items-center justify-between gap-3">
@@ -230,7 +230,7 @@ function renderQuestion(
             ].map((option) => (
               <label
                 key={option}
-                className="flex cursor-pointer items-center gap-3 rounded-2xl border border-warm-200 bg-warm-50 px-4 py-4 text-lg font-medium text-warm-900 hover:border-brand-500/40"
+                className="flex cursor-pointer items-center gap-3 rounded-xl border border-warm-200 bg-warm-50 px-4 py-4 text-lg font-medium text-warm-900 hover:border-brand-500/40"
               >
                 <input
                   type="radio"
@@ -255,7 +255,7 @@ function renderQuestion(
             value={answers.county}
             onChange={(event) => updateAnswer("county", event.target.value)}
             placeholder="e.g., Travis"
-            className="w-full rounded-2xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+            className="w-full rounded-xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
           />
         </div>
       );
@@ -270,7 +270,7 @@ function renderQuestion(
             inputMode="numeric"
             value={answers.licensedCapacity}
             onChange={(event) => updateAnswer("licensedCapacity", event.target.value)}
-            className="w-full rounded-2xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+            className="w-full rounded-xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
           />
         </div>
       );
@@ -285,7 +285,7 @@ function renderQuestion(
             inputMode="numeric"
             value={answers.currentEnrollment}
             onChange={(event) => updateAnswer("currentEnrollment", event.target.value)}
-            className="w-full rounded-2xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+            className="w-full rounded-xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
           />
         </div>
       );
@@ -333,7 +333,7 @@ function renderQuestion(
                 inputMode="numeric"
                 value={answers.ccsCount}
                 onChange={(event) => updateAnswer("ccsCount", event.target.value)}
-                className="w-full rounded-2xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                className="w-full rounded-xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
               />
             </div>
           )}
@@ -350,7 +350,7 @@ function renderQuestion(
             inputMode="numeric"
             value={answers.staffCount}
             onChange={(event) => updateAnswer("staffCount", event.target.value)}
-            className="w-full rounded-2xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+            className="w-full rounded-xl border border-warm-200 bg-warm-50 px-5 py-4 text-lg text-warm-900 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
           />
         </div>
       );

@@ -161,7 +161,7 @@ export default function ReadinessPage() {
       <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
         {/* Summary */}
         {result && (
-          <section className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6">
+          <section className="rounded-xl border border-warm-200 bg-white p-5 sm:p-6">
             <div className="flex items-center gap-3">
               {allPassed ? (
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
@@ -232,7 +232,7 @@ export default function ReadinessPage() {
           const catPassed = checks.filter((c) => c.passed).length;
 
           return (
-            <section key={cat} className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6">
+            <section key={cat} className="rounded-xl border border-warm-200 bg-white p-5 sm:p-6">
               <div className="flex items-center gap-3 mb-4">
                 <svg className="h-5 w-5 text-warm-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d={config.icon} />

@@ -220,7 +220,7 @@ export default function AdminSubmissionPage() {
       <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
 
         {/* Header */}
-        <section className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6">
+        <section className="rounded-xl border border-warm-200 bg-white p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-xl font-bold text-warm-900">
@@ -275,7 +275,7 @@ export default function AdminSubmissionPage() {
 
         {/* Center Info */}
         {center && (
-          <section className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6">
+          <section className="rounded-xl border border-warm-200 bg-white p-5 sm:p-6">
             <h2 className="text-lg font-semibold text-warm-900 mb-4">Center Info</h2>
             <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {center.address && (
@@ -326,7 +326,7 @@ export default function AdminSubmissionPage() {
               {sectionsWithDraft.map((sec) => (
                 <div
                   key={sec.id}
-                  className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6"
+                  className="rounded-xl border border-warm-200 bg-white p-5 sm:p-6"
                 >
                   <div className="flex items-center justify-between gap-3 mb-4">
                     <h3 className="font-semibold text-warm-900">
@@ -352,14 +352,14 @@ export default function AdminSubmissionPage() {
         )}
 
         {sectionsWithDraft.length === 0 && (
-          <section className="rounded-2xl border border-warm-200 bg-white p-5 text-sm text-warm-500">
+          <section className="rounded-xl border border-warm-200 bg-white p-5 text-sm text-warm-500">
             No generated documents found for this submission.
           </section>
         )}
 
         {/* Staff Summary */}
         {staff.length > 0 && (
-          <section className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6">
+          <section className="rounded-xl border border-warm-200 bg-white p-5 sm:p-6">
             <h2 className="text-lg font-semibold text-warm-900 mb-4">Staff Summary</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -393,7 +393,7 @@ export default function AdminSubmissionPage() {
         )}
 
         {staff.length === 0 && (
-          <section className="rounded-2xl border border-warm-200 bg-white p-5 text-sm text-warm-500">
+          <section className="rounded-xl border border-warm-200 bg-white p-5 text-sm text-warm-500">
             No staff data on file for this center.
           </section>
         )}

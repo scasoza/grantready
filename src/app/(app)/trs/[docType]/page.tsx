@@ -554,7 +554,7 @@ export default function TrsDocPage() {
               {isGenerating ? "Generating..." : "Generate professional draft"}
             </button>
             {isGenerating && (
-              <div className="mt-4 rounded-2xl border border-brand-200 bg-brand-50 p-5">
+              <div className="mt-4 rounded-xl border border-brand-200 bg-brand-50 p-5">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" />
                   <div>

@@ -111,7 +111,7 @@ export default function Home() {
                 type="button"
                 onClick={handleGetStarted}
                 disabled={!selected}
-                className="mt-4 w-full rounded-2xl bg-brand-600 hover:bg-brand-700 px-6 py-3.5 font-semibold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-4 w-full rounded-xl bg-brand-600 hover:bg-brand-700 px-6 py-3.5 font-semibold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Get Started →
               </button>

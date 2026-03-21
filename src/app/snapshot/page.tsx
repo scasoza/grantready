@@ -98,7 +98,7 @@ export default function FundingSnapshotPage() {
             <div className="h-4 w-1/2 rounded bg-emerald-200/70" />
           </div>
           <div className="h-5 w-40 rounded bg-warm-200/70" />
-          <div className="rounded-2xl border border-warm-200 bg-white p-5 space-y-3">
+          <div className="rounded-xl border border-warm-200 bg-white p-5 space-y-3">
             <div className="h-4 w-48 rounded bg-warm-200/70" />
             <div className="h-3 w-full rounded bg-warm-200/70" />
             <div className="h-3 w-2/3 rounded bg-warm-200/70" />
@@ -147,7 +147,7 @@ export default function FundingSnapshotPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-warm-900">Eligible Now - Action Needed</h2>
-          <article className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6 shadow-sm">
+          <article className="rounded-xl border border-warm-200 bg-white p-5 sm:p-6 shadow-sm">
             <div className="space-y-3">
               <p className="text-sm font-semibold text-brand-700">Texas Rising Star (TRS) Certification</p>
               <p className="text-sm text-warm-700">
@@ -183,7 +183,7 @@ export default function FundingSnapshotPage() {
               { name: "Head Start", desc: "Federal early learning funding for centers meeting program standards." },
               { name: "Early Head Start", desc: "Infant and toddler services funding through local Head Start grantees." },
             ].map((g) => (
-              <article key={g.name} className="rounded-2xl border border-warm-200 bg-warm-50 p-4 text-warm-600 opacity-75">
+              <article key={g.name} className="rounded-xl border border-warm-200 bg-warm-50 p-4 text-warm-600 opacity-75">
                 <div className="flex items-start justify-between gap-2">
                   <p className="font-semibold text-warm-700">{g.name}</p>
                   <span className="rounded-full bg-warm-200 px-2 py-0.5 text-[10px] font-semibold text-warm-500 whitespace-nowrap">Coming soon</span>
@@ -197,7 +197,7 @@ export default function FundingSnapshotPage() {
         {quizData.ccsCount > 0 && !isThinkingAboutOpening && (
           <section className="space-y-4">
             <h2 className="text-xl font-bold text-warm-900">Already Using</h2>
-            <article className="rounded-2xl border border-warm-200 bg-white p-5 text-warm-800">
+            <article className="rounded-xl border border-warm-200 bg-white p-5 text-warm-800">
               Child Care Services (CCS) - You&apos;re already enrolled. Nice.
             </article>
           </section>
@@ -208,7 +208,7 @@ export default function FundingSnapshotPage() {
           <p className="mt-2 text-sm text-brand-100">No credit card. Takes 30 seconds.</p>
           <Link
             href="/login?mode=signup"
-            className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-white px-6 py-3.5 text-base font-semibold text-brand-700 shadow-md hover:bg-brand-50 sm:w-auto transition"
+            className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-brand-700 shadow-md hover:bg-brand-50 sm:w-auto transition"
           >
             Create Free Account
           </Link>

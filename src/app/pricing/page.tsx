@@ -79,7 +79,7 @@ export default function PricingPage() {
         </div>
 
         <section className="grid gap-6 md:grid-cols-2">
-          <article className="rounded-2xl border border-warm-200 bg-white p-6 shadow-sm sm:p-8">
+          <article className="rounded-xl border border-warm-200 bg-white p-6 shadow-sm sm:p-8">
             <h1 className="text-2xl font-bold tracking-tight">Free</h1>
             <p className="mt-3 text-4xl font-extrabold tracking-tight">$0</p>
 
@@ -94,7 +94,7 @@ export default function PricingPage() {
 
             <Link
               href="/login?mode=signup"
-              className="mt-8 inline-flex w-full items-center justify-center rounded-2xl border border-warm-200 px-4 py-3 text-sm font-semibold text-warm-900 transition hover:bg-warm-100"
+              className="mt-8 inline-flex w-full items-center justify-center rounded-xl border border-warm-200 px-4 py-3 text-sm font-semibold text-warm-900 transition hover:bg-warm-100"
             >
               Get Started Free
             </Link>
@@ -124,7 +124,7 @@ export default function PricingPage() {
               type="button"
               onClick={handleStartTrial}
               disabled={isLoading}
-              className="mt-8 inline-flex w-full items-center justify-center rounded-2xl bg-brand-600 hover:bg-brand-700 px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-8 inline-flex w-full items-center justify-center rounded-xl bg-brand-600 hover:bg-brand-700 px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isLoading ? "Redirecting..." : "Start 14-Day Free Trial"}
             </button>

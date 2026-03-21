@@ -207,7 +207,7 @@ export default function ReviewApplicationPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-warm-50 px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-warm-200 bg-white p-6 text-warm-700">
+        <div className="mx-auto max-w-4xl rounded-xl border border-warm-200 bg-white p-6 text-warm-700">
           Loading review...
         </div>
       </div>
@@ -228,7 +228,7 @@ export default function ReviewApplicationPage() {
     return (
       <div className="min-h-screen bg-warm-50 px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-3xl">
-          <div className="relative overflow-hidden rounded-2xl border border-warm-200 bg-white p-6 sm:p-8">
+          <div className="relative overflow-hidden rounded-xl border border-warm-200 bg-white p-6 sm:p-8">
             <div className="pointer-events-none absolute inset-0">
               <span className="absolute left-8 top-8 h-3 w-3 rounded-full bg-brand-400/70" />
               <span className="absolute right-12 top-12 h-2 w-2 rounded-full bg-emerald-400/70" />
@@ -283,7 +283,7 @@ export default function ReviewApplicationPage() {
 
         <section className="mt-6 space-y-4">
           {displaySections.length === 0 ? (
-            <div className="rounded-2xl border border-warm-200 bg-white p-5 text-warm-700">
+            <div className="rounded-xl border border-warm-200 bg-white p-5 text-warm-700">
               No generated drafts yet. Complete at least one section to review.
             </div>
           ) : (
@@ -294,7 +294,7 @@ export default function ReviewApplicationPage() {
               const claimCount = claimsBySection.get(row.id)?.length ?? 0;
 
               return (
-                <article key={template.type} className="rounded-2xl border border-warm-200 bg-white p-5 sm:p-6">
+                <article key={template.type} className="rounded-xl border border-warm-200 bg-white p-5 sm:p-6">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <h2 className="text-lg font-bold text-warm-900">{template.title}</h2>
                     <span
@@ -331,7 +331,7 @@ export default function ReviewApplicationPage() {
           )}
         </section>
 
-        <footer className="mt-8 rounded-2xl border border-warm-200 bg-white p-5">
+        <footer className="mt-8 rounded-xl border border-warm-200 bg-white p-5">
           <button
             type="button"
             onClick={handleSubmit}

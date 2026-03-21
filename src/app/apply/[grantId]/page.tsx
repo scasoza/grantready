@@ -170,7 +170,7 @@ export default function ApplicationBuilderPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-warm-50 px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-warm-200 bg-white p-6 text-warm-700">
+        <div className="mx-auto max-w-4xl rounded-xl border border-warm-200 bg-white p-6 text-warm-700">
           Loading application builder...
         </div>
       </div>
@@ -223,7 +223,7 @@ export default function ApplicationBuilderPage() {
               <Link
                 key={section.type}
                 href={`/apply/${parsedGrantId}/${section.type}`}
-                className="block rounded-2xl border border-warm-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+                className="block rounded-xl border border-warm-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
@@ -247,7 +247,7 @@ export default function ApplicationBuilderPage() {
           })}
         </section>
 
-        <footer className="mt-6 rounded-2xl border border-warm-200 bg-white p-4">
+        <footer className="mt-6 rounded-xl border border-warm-200 bg-white p-4">
           <p className="text-sm font-semibold text-warm-900">
             {completedCount} of {sections.length} sections complete
           </p>

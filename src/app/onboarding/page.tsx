@@ -179,7 +179,7 @@ export default function OnboardingPage() {
           <p className="mt-1 text-sm text-warm-500">This helps us personalize your TRS certification roadmap.</p>
         </div>
 
-        <div className="rounded-2xl border border-warm-200 bg-white p-6 sm:p-8 shadow-sm">
+        <div className="rounded-xl border border-warm-200 bg-white p-6 sm:p-8 shadow-sm">
           {step === 1 ? (
             <form onSubmit={moveToReview} className="space-y-4">
               <div>
@@ -298,7 +298,7 @@ export default function OnboardingPage() {
                 <p className="text-sm text-warm-500 mt-1">Verify this information before saving to your account.</p>
               </div>
 
-              <dl className="rounded-2xl border border-warm-200 bg-warm-50/70 p-4 sm:p-5 space-y-3">
+              <dl className="rounded-xl border border-warm-200 bg-warm-50/70 p-4 sm:p-5 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-3 text-sm">
                   <dt className="text-warm-500 font-semibold">License number</dt>
                   <dd className="text-warm-800">{licenseNumber || "Not provided"}</dd>

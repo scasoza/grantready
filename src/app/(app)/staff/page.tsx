@@ -452,7 +452,7 @@ export default function StaffTrackerPage() {
           </div>
         )}
 
-        <section className="rounded-2xl border border-warm-200 bg-white p-4 sm:p-5">
+        <section className="rounded-xl border border-warm-200 bg-white p-4 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-warm-900">Staff Members</h2>
             <button
