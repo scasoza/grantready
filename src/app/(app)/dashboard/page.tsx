@@ -390,7 +390,12 @@ export default function DashboardPage() {
               className="flex items-center gap-2 mb-3 w-full text-left py-1"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">{attentionItems.length}</span>
-              <h2 className="text-sm font-bold text-warm-900 flex-1">Needs your attention</h2>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-sm font-bold text-warm-900">Needs your attention</h2>
+                {activeZone !== "attention" && (
+                  <p className="text-xs text-warm-400 truncate">{attentionItems[0]?.message}</p>
+                )}
+              </div>
               <svg className={`h-4 w-4 text-warm-400 transition-transform ${activeZone === "attention" ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
@@ -429,7 +434,12 @@ export default function DashboardPage() {
               className="flex items-center gap-2 mb-3 w-full text-left py-1"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-100 text-brand-700 text-xs font-bold">{pendingPaperwork.length}</span>
-              <h2 className="text-sm font-bold text-warm-900 flex-1">Your paperwork</h2>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-sm font-bold text-warm-900">Your paperwork</h2>
+                {activeZone !== "paperwork" && (
+                  <p className="text-xs text-warm-400">{pendingPaperwork.length} document{pendingPaperwork.length !== 1 ? "s" : ""} to generate</p>
+                )}
+              </div>
               <svg className={`h-4 w-4 text-warm-400 transition-transform ${activeZone === "paperwork" ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
@@ -477,7 +487,12 @@ export default function DashboardPage() {
               className="flex items-center gap-2 mb-3 w-full text-left py-1"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-warm-200 text-warm-500 text-xs font-bold">{pendingPrep.length}</span>
-              <h2 className="text-sm font-bold text-warm-700 flex-1">Center prep</h2>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-sm font-bold text-warm-700">Center prep</h2>
+                {activeZone !== "prep" && (
+                  <p className="text-xs text-warm-400">{pendingPrep.length} task{pendingPrep.length !== 1 ? "s" : ""} to check off</p>
+                )}
+              </div>
               <svg className={`h-4 w-4 text-warm-400 transition-transform ${activeZone === "prep" ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
