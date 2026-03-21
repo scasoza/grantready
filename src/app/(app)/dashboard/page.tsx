@@ -412,15 +412,13 @@ export default function DashboardPage() {
               <span className="text-xs text-warm-400">{pendingPaperwork.length} remaining</span>
             </div>
             <div className="space-y-2">
-              {pendingPaperwork.map((task) => {
+              {pendingPaperwork.map((task, idx) => {
                 const href = actionHref(task);
                 const card = (
                   <div className="flex items-center gap-3 rounded-lg border border-warm-100 bg-white px-4 py-3 transition hover:border-warm-300 hover:bg-warm-50/50">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-500">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </div>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
+                      {idx + 1}
+                    </span>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-semibold text-warm-900">{task.title}</h3>
                       <p className="text-xs text-warm-500 line-clamp-1">{task.context}</p>
