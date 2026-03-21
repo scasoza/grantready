@@ -304,11 +304,20 @@ export default function DashboardPage() {
 
         {/* First-visit welcome */}
         {totalDone === 0 && !submission && (
-          <section className="animate-fade-up rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 p-5 text-white shadow-lg">
-            <h2 className="text-lg font-bold">Welcome to your TRS roadmap</h2>
-            <p className="mt-2 text-sm text-brand-100 leading-relaxed">
-              We&apos;ll generate your documents, track your staff credentials, and submit your application when you&apos;re ready. Start with the first item below.
-            </p>
+          <section className="animate-fade-up rounded-xl bg-brand-800 p-5 text-white shadow-lg">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-600">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-base font-bold">Your TRS certification starts here</h2>
+                <p className="mt-1 text-sm text-brand-200 leading-relaxed">
+                  We generate your documents, track credentials, and submit when ready. Tap below to begin.
+                </p>
+              </div>
+            </div>
           </section>
         )}
 
@@ -334,15 +343,18 @@ export default function DashboardPage() {
         )}
 
         {/* Progress */}
-        <section className="animate-fade-up animate-delay-200 rounded-xl border border-warm-200 bg-white p-5 shadow-sm">
+        <section className="animate-fade-up animate-delay-200 rounded-xl bg-white p-5 border border-warm-200">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl font-semibold text-warm-900">TRS Certification</h1>
-              <p className="mt-1 text-sm text-warm-500">
-                {totalDone} of {totalTasks} tasks complete
+              <p className="text-xs font-semibold uppercase tracking-wide text-warm-400">Progress</p>
+              <p className="mt-0.5 text-sm text-warm-700">
+                <span className="text-2xl font-bold text-warm-900">{totalDone}</span>
+                <span className="text-warm-400"> / {totalTasks} tasks</span>
               </p>
             </div>
-            <span className="text-2xl font-bold text-brand-600">{progressPct}%</span>
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50">
+              <span className="text-sm font-bold text-brand-700">{progressPct}%</span>
+            </div>
           </div>
           <div className="mt-4 h-3 w-full rounded-full bg-warm-100">
             <div
