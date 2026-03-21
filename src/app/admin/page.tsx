@@ -173,8 +173,9 @@ export default function AdminPage() {
         </div>
 
         {submissions.length === 0 ? (
-          <div className="rounded-2xl border border-warm-200 bg-white p-8 text-center text-warm-500">
-            No submissions yet.
+          <div className="rounded-2xl border border-dashed border-warm-300 bg-warm-50/50 p-8 text-center">
+            <p className="text-sm font-medium text-warm-600">No submissions yet</p>
+            <p className="mt-1 text-xs text-warm-400">When a director submits their TRS application, it will appear here for you to process.</p>
           </div>
         ) : (
           <div className="space-y-3">

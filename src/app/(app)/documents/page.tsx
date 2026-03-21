@@ -199,13 +199,17 @@ export default function DocumentsPage() {
         )}
 
         {documents.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6">
-            <p className="text-warm-800">
-              No documents yet. Start working on your TRS roadmap to generate documents.
-            </p>
+          <div className="mt-6 rounded-2xl border border-dashed border-warm-300 bg-warm-50/50 p-8 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-warm-100">
+              <svg className="h-6 w-6 text-warm-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <p className="text-sm font-medium text-warm-700">Your documents will show up here</p>
+            <p className="mt-1 text-xs text-warm-500">Head to your dashboard and generate your first TRS document — it takes about 2 minutes.</p>
             <Link
               href="/dashboard"
-              className="mt-4 inline-flex rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600"
+              className="mt-4 inline-flex rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
             >
               Go to Dashboard
             </Link>
