@@ -229,22 +229,24 @@ export default function DashboardPage() {
     const status = sectionStatusMap.get(docType);
     if (status === "verified") {
       return (
-        <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
-          Verified
+        <span className="flex items-center gap-1 text-xs font-medium text-brand-700">
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          Done
         </span>
       );
     }
     if (status && status !== "pending") {
       return (
-        <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-          Generated
+        <span className="flex items-center gap-1 text-xs font-medium text-amber-600">
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+          Draft
         </span>
       );
     }
     return (
-      <span className="rounded-full bg-warm-100 px-2.5 py-0.5 text-xs font-medium text-warm-600">
-        Not started
-      </span>
+      <span className="text-xs text-warm-400">Start →</span>
     );
   }
 
