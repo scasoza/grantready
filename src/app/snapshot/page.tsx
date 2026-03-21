@@ -193,16 +193,29 @@ export default function FundingSnapshotPage() {
           </section>
         )}
 
-        <section className="rounded-2xl border border-warm-200 bg-white p-6 text-center sm:p-8">
-          <h2 className="text-2xl font-extrabold tracking-tight text-warm-900">Create a free account to start your roadmap</h2>
+        <section className="rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-center sm:p-8 shadow-lg">
+          <h2 className="text-xl font-extrabold tracking-tight text-white">Start your roadmap — it&apos;s free</h2>
+          <p className="mt-2 text-sm text-brand-100">No credit card. Takes 30 seconds.</p>
           <Link
             href="/login?mode=signup"
-            className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-b from-brand-500 to-brand-600 px-6 py-4 text-base font-semibold text-white shadow-md shadow-brand-600/20 hover:from-brand-600 hover:to-brand-700 sm:w-auto"
+            className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-white px-6 py-3.5 text-base font-semibold text-brand-700 shadow-md hover:bg-brand-50 sm:w-auto transition"
           >
             Create Free Account
           </Link>
-          <p className="mt-3 text-sm text-warm-500">Free. No credit card. Takes 30 seconds.</p>
         </section>
+
+        {/* Extra bottom space for sticky bar */}
+        <div className="h-16 sm:hidden" />
+      </div>
+
+      {/* Sticky CTA bar on mobile */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-brand-400/30 bg-white/95 backdrop-blur-sm p-3 sm:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+        <Link
+          href="/login?mode=signup"
+          className="flex w-full items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-md"
+        >
+          Create Free Account — It&apos;s Free
+        </Link>
       </div>
     </div>
   );
