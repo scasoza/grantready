@@ -77,77 +77,31 @@ export default function AdminSubmissionPage() {
 
   useEffect(() => {
     const load = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/login");
-        return;
-      }
-
-      // 1. Get submission
-      const { data: subData, error: subErr } = await supabase
-        .from("submissions")
-        .select("id, center_id, status, requested_at, completed_at")
-        .eq("id", submissionId)
-        .maybeSingle();
-
-      if (subErr || !subData) {
-        setError(subErr?.message ?? "Submission not found");
+      // Fetch via admin API (uses service role key to bypass RLS)
+      const res = await fetch(`/api/admin/submissions/${submissionId}`);
+      if (!res.ok) {
+        if (res.status === 401) {
+          router.replace("/login");
+          return;
+        }
+        const data = await res.json();
+        setError(data.error ?? "Failed to load submission");
         setLoading(false);
         return;
       }
-      const sub = subData as SubmissionRow;
+
+      const data = await res.json();
+      const sub = data.submission as SubmissionRow;
       setSubmission(sub);
       if (sub.status === "completed") setMarked(true);
-
-      // 2. Get center
-      const { data: centerData } = await supabase
-        .from("centers")
-        .select("id, center_name, address, county, licensed_capacity, enrollment_count, staff_count, ccs_count, user_id")
-        .eq("id", sub.center_id)
-        .maybeSingle();
-
-      const c = centerData as CenterRow | null;
-      setCenter(c);
-
-      if (c) {
-        // 3. Get TRS application
-        const { data: appData } = await supabase
-          .from("applications")
-          .select("id")
-          .eq("center_id", c.id)
-          .eq("grant_id", "trs")
-          .maybeSingle();
-
-        // 4. Get application sections
-        if (appData) {
-          const { data: secData } = await supabase
-            .from("application_sections")
-            .select("id, section_type, status, ai_draft")
-            .eq("application_id", (appData as { id: string }).id);
-          setSections((secData as ApplicationSection[] | null) ?? []);
-        }
-
-        // 5. Get staff data
-        const { data: staffData } = await supabase
-          .from("center_data")
-          .select("data_value")
-          .eq("center_id", c.id)
-          .eq("data_key", "staff_members")
-          .maybeSingle();
-
-        const parsed = parseStaffMembers(
-          (staffData as { data_value: string } | null)?.data_value ?? null
-        );
-        setStaff(parsed);
-      }
-
+      setCenter(data.center as CenterRow | null);
+      setSections((data.sections ?? []) as ApplicationSection[]);
+      setStaff(data.staff ?? []);
       setLoading(false);
     };
 
     void load();
-  }, [router, supabase, submissionId]);
+  }, [router, submissionId]);
 
   const handleMarkCompleted = async () => {
     if (!submission || marking) return;

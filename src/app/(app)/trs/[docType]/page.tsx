@@ -134,13 +134,17 @@ export default function TrsDocPage() {
         if (newSection) {
           setSectionId(newSection.id);
         }
+
+        // Staff binder auto-generation for newly created section
+        if (!template.requiresDirectorInput && newSection) {
+          autoGenerateStaffBinder(center, newSection.id);
+        }
       }
 
-      // Staff binder auto-generation: skip input, generate immediately
-      if (!template.requiresDirectorInput) {
-        const existingStatus = existingSection?.status;
-        if (!existingStatus || existingStatus === "pending") {
-          autoGenerateStaffBinder(center, existingSection?.id || sectionId);
+      // Staff binder auto-generation for existing section still in pending
+      if (existingSection && !template.requiresDirectorInput) {
+        if (!existingSection.status || existingSection.status === "pending") {
+          autoGenerateStaffBinder(center, existingSection.id);
         }
       }
 

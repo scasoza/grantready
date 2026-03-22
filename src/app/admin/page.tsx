@@ -46,82 +46,20 @@ export default function AdminPage() {
 
   useEffect(() => {
     const load = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/login");
-        return;
-      }
-
-      // Fetch all submissions ordered by most recent first
-      const { data: subRows, error: subErr } = await supabase
-        .from("submissions")
-        .select("id, center_id, status, requested_at, completed_at")
-        .order("requested_at", { ascending: false });
-
-      if (subErr) {
-        setError(subErr.message);
-        setLoading(false);
-        return;
-      }
-
-      const rows = (subRows ?? []) as SubmissionRow[];
-
-      if (rows.length === 0) {
-        setSubmissions([]);
-        setLoading(false);
-        return;
-      }
-
-      // Fetch centers for all submissions
-      const centerIds = [...new Set(rows.map((r) => r.center_id))];
-      const { data: centerRows } = await supabase
-        .from("centers")
-        .select("id, center_name, user_id")
-        .in("id", centerIds);
-
-      const centersById = new Map<string, CenterRow>();
-      for (const c of (centerRows ?? []) as CenterRow[]) {
-        centersById.set(c.id, c);
-      }
-
-      // Fetch user emails for each unique user_id via auth — fall back to placeholder
-      // Since we only have anon key, we'll fetch profiles/emails by querying auth.users
-      // We'll use the user_id from centers and try to get email from a stored source.
-      // For MVP: show user_id if email unavailable (anon client can't read auth.users)
-      const userIds = [...new Set(
-        [...centersById.values()].map((c) => c.user_id).filter(Boolean)
-      )];
-
-      // Try to get emails from a profiles table or similar — gracefully degrade
-      let emailMap = new Map<string, string>();
-      if (userIds.length > 0) {
-        // Attempt to get emails stored in a profiles or similar table
-        // If it doesn't exist, this silently returns empty
-        const { data: profileRows } = await supabase
-          .from("profiles")
-          .select("id, email")
-          .in("id", userIds);
-        if (profileRows) {
-          for (const p of profileRows as { id: string; email: string }[]) {
-            emailMap.set(p.id, p.email);
-          }
+      // Fetch submissions via admin API (uses service role key to bypass RLS)
+      const res = await fetch("/api/admin/submissions");
+      if (!res.ok) {
+        if (res.status === 401) {
+          router.replace("/login");
+          return;
         }
+        setError("Failed to load submissions");
+        setLoading(false);
+        return;
       }
 
-      const enriched: EnrichedSubmission[] = rows.map((row) => {
-        const center = centersById.get(row.center_id);
-        const userId = center?.user_id ?? "";
-        const email = emailMap.get(userId) ?? userId ?? "—";
-        return {
-          ...row,
-          center_name: center?.center_name ?? "Unknown center",
-          director_email: email,
-        };
-      });
-
-      setSubmissions(enriched);
+      const data = await res.json();
+      setSubmissions(data.submissions ?? []);
       setLoading(false);
     };
 
