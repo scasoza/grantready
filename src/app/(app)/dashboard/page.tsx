@@ -667,6 +667,11 @@ export default function DashboardPage() {
                           <div className="flex-1 min-w-0">
                             <span className="text-sm text-warm-800 block">{task.title}</span>
                             <span className="text-xs text-warm-400 block mt-0.5">{task.context}</span>
+                            {task.howTo && (
+                              <span className="text-xs text-warm-500 block mt-1.5 bg-warm-50 rounded-lg p-2.5 leading-relaxed border border-warm-100">
+                                {task.howTo}
+                              </span>
+                            )}
                             <span className="text-[11px] text-warm-300 block mt-0.5">{task.effort}</span>
                           </div>
                           {href && (
