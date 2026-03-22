@@ -622,7 +622,10 @@ export default function SelfAssessmentPage() {
             </div>
           </div>
           <button
-            onClick={() => router.replace("/dashboard")}
+            onClick={async () => {
+              await persistAnswers(answers);
+              router.replace("/dashboard");
+            }}
             className={`px-6 py-3 rounded-xl font-semibold text-sm transition ${
               allDone
                 ? "bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white"
