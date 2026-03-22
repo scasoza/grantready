@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { grants } from "@/lib/grants";
 import { createClient } from "@/lib/supabase/client";
+import { trsDocTemplates } from "@/lib/trs-documents";
 import LoadingScreen from "@/components/LoadingScreen";
 
 type SectionStatus = "pending" | "input_given" | "draft_generated" | "verified";
@@ -26,14 +26,19 @@ interface ApplicationSectionRow {
 interface DocumentItem {
   id: string;
   sectionType: string;
+  title: string;
   grantName: string;
   createdAt: string | null;
   status: SectionStatus | null;
   aiDraft: string;
+  isJson: boolean;
 }
 
-function formatSectionType(value: string) {
-  return value
+// Get proper title from trsDocTemplates, fall back to formatted section_type
+function getDocTitle(sectionType: string): string {
+  const template = trsDocTemplates.find((t) => t.docType === sectionType);
+  if (template) return template.title;
+  return sectionType
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
@@ -43,12 +48,36 @@ function formatDate(value: string | null) {
   if (!value) return "Unknown date";
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return "Unknown date";
-
   return parsed.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
+}
+
+// Check if content is JSON (self-assessment answers)
+function isJsonContent(text: string): boolean {
+  if (!text.startsWith("{")) return false;
+  try {
+    JSON.parse(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Format self-assessment JSON into readable summary
+function formatSelfAssessment(json: string): string {
+  try {
+    const answers = JSON.parse(json) as Record<string, string>;
+    const total = Object.keys(answers).length;
+    const yes = Object.values(answers).filter((v) => v === "yes").length;
+    const no = Object.values(answers).filter((v) => v === "no").length;
+    const na = Object.values(answers).filter((v) => v === "na").length;
+    return `Self-assessment completed: ${total} items answered (${yes} yes, ${no} no, ${na} N/A)`;
+  } catch {
+    return "Self-assessment in progress";
+  }
 }
 
 export default function DocumentsPage() {
@@ -110,8 +139,11 @@ export default function DocumentsPage() {
       const applicationIds = applications.map((app) => app.id);
       const grantNameByApplicationId = new Map<number, string>();
       applications.forEach((app) => {
-        const grant = grants.find((item) => String(item.id) === String(app.grant_id));
-        grantNameByApplicationId.set(app.id, grant?.name ?? "Unknown Grant");
+        if (String(app.grant_id) === "trs") {
+          grantNameByApplicationId.set(app.id, "TRS Certification");
+        } else {
+          grantNameByApplicationId.set(app.id, String(app.grant_id ?? "Document"));
+        }
       });
 
       const { data: sectionRows, error: sectionError } = await supabase
@@ -128,14 +160,20 @@ export default function DocumentsPage() {
       }
 
       const mapped = ((sectionRows ?? []) as ApplicationSectionRow[])
-        .map((row) => ({
-          id: row.id,
-          sectionType: row.section_type,
-          grantName: grantNameByApplicationId.get(row.application_id) ?? "Unknown Grant",
-          createdAt: row.created_at ?? null,
-          status: row.status,
-          aiDraft: row.ai_draft ?? "",
-        }))
+        .map((row) => {
+          const draft = row.ai_draft ?? "";
+          const json = isJsonContent(draft);
+          return {
+            id: row.id,
+            sectionType: row.section_type,
+            title: getDocTitle(row.section_type),
+            grantName: grantNameByApplicationId.get(row.application_id) ?? "Document",
+            createdAt: row.created_at ?? null,
+            status: row.status,
+            aiDraft: draft,
+            isJson: json,
+          };
+        })
         .sort((a, b) => {
           const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
           const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -163,7 +201,6 @@ export default function DocumentsPage() {
 
   const handleCopy = async (text: string) => {
     if (!text) return;
-
     try {
       await navigator.clipboard.writeText(text);
     } catch {
@@ -215,62 +252,76 @@ export default function DocumentsPage() {
             </Link>
           </div>
         ) : (
-          <div className="mt-6 space-y-4">
-            {documents.map((document) => {
-              const isExpanded = expandedIds.has(document.id);
-              const statusLabel = document.status === "verified" ? "Approved" : "Draft";
-              const previewText = document.aiDraft.slice(0, 150);
+          <div className="mt-4 space-y-3">
+            {documents.map((doc) => {
+              const isExpanded = expandedIds.has(doc.id);
+              const statusLabel = doc.status === "verified" ? "Approved" : "Draft";
+              const displayText = doc.isJson
+                ? formatSelfAssessment(doc.aiDraft)
+                : doc.aiDraft;
+              const previewText = displayText.slice(0, 200);
 
               return (
-                <article key={document.id} className="rounded-xl border border-warm-200 bg-white p-4 shadow-sm">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <h2 className="text-lg font-semibold text-warm-900">
-                        {formatSectionType(document.sectionType)}
-                      </h2>
-                      <p className="mt-1 text-sm text-warm-700">{document.grantName}</p>
-                      <p className="mt-1 text-xs text-warm-500">
-                        Created {formatDate(document.createdAt)}
-                      </p>
+                <article key={doc.id} className="rounded-xl border border-warm-200 bg-white overflow-hidden">
+                  <div className="p-4 sm:p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h2 className="text-base font-bold text-warm-900">{doc.title}</h2>
+                        <p className="mt-0.5 text-xs text-warm-400">
+                          {doc.grantName} · Created {formatDate(doc.createdAt)}
+                        </p>
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                          statusLabel === "Approved"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-amber-50 text-amber-700 border border-amber-200"
+                        }`}
+                      >
+                        {statusLabel}
+                      </span>
                     </div>
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        statusLabel === "Approved"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-amber-50 text-amber-700"
-                      }`}
-                    >
-                      {statusLabel}
-                    </span>
-                  </div>
 
-                  <p className="mt-4 whitespace-pre-wrap text-sm text-warm-800">
-                    {isExpanded
-                      ? document.aiDraft
-                      : `${previewText}${document.aiDraft.length > 150 ? "..." : ""}`}
-                  </p>
+                    <p className="mt-3 text-sm text-warm-700 leading-relaxed whitespace-pre-wrap">
+                      {isExpanded && !doc.isJson
+                        ? displayText
+                        : `${previewText}${displayText.length > 200 ? "..." : ""}`}
+                    </p>
 
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => toggleExpanded(document.id)}
-                      className="rounded-xl border border-warm-200 px-4 py-2 text-sm font-medium text-warm-800 hover:bg-warm-100"
-                    >
-                      {isExpanded ? "Collapse" : "View full"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void handleCopy(document.aiDraft)}
-                      className="rounded-xl border border-warm-200 px-4 py-2 text-sm font-medium text-warm-800 hover:bg-warm-100"
-                    >
-                      Copy
-                    </button>
-                    <Link
-                      href={`/trs/${document.sectionType}`}
-                      className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600"
-                    >
-                      Edit
-                    </Link>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {!doc.isJson && (
+                        <button
+                          type="button"
+                          onClick={() => toggleExpanded(doc.id)}
+                          className="rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-600 hover:bg-warm-50 transition"
+                        >
+                          {isExpanded ? "Collapse" : "View full"}
+                        </button>
+                      )}
+                      {!doc.isJson && (
+                        <button
+                          type="button"
+                          onClick={() => void handleCopy(doc.aiDraft)}
+                          className="rounded-lg border border-warm-200 px-3 py-1.5 text-xs font-medium text-warm-600 hover:bg-warm-50 transition"
+                        >
+                          Copy
+                        </button>
+                      )}
+                      <Link
+                        href={doc.sectionType === "self_assessment" ? "/trs/self-assessment" : `/trs/${doc.sectionType}`}
+                        className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-700 transition"
+                      >
+                        {doc.isJson ? "Open" : "Edit"}
+                      </Link>
+                      {!doc.isJson && doc.status === "verified" && (
+                        <a
+                          href={`/api/export-pdf?docType=${doc.sectionType}&applicationId=${doc.id}`}
+                          className="rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 hover:bg-brand-100 transition"
+                        >
+                          PDF
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </article>
               );
