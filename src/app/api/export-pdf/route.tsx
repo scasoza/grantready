@@ -241,9 +241,25 @@ const StaffBinderPdf = ({ centerName, staff, date }: StaffBinderPdfProps) => (
 
 /* Standard Document PDF */
 
+// Document category descriptions for PDF subtitles
+const docSubtitles: Record<string, string> = {
+  curriculum_framework: "Texas Rising Star — Category 3: Program Administration",
+  parent_engagement: "Texas Rising Star — Category 3: Program Administration",
+  cqip: "Texas Rising Star — Continuous Quality Improvement",
+  weekly_objectives: "Texas Rising Star — Category 2: Teacher-Child Interactions",
+  director_qualifications: "Texas Rising Star — Category 1: Director & Staff Qualifications",
+  training_plan: "Texas Rising Star — Category 1: Director & Staff Qualifications",
+  health_safety_policy: "Texas Rising Star — Required Policy Document",
+  discipline_guidance: "Texas Rising Star — Required Policy Document",
+  nutrition_policy: "Texas Rising Star — Required Policy Document",
+  emergency_preparedness: "Texas Rising Star — Required Policy Document",
+  safe_sleep_policy: "Texas Rising Star — Required Policy Document",
+};
+
 interface StandardDocPdfProps {
   centerName: string;
   docTitle: string;
+  docType: string;
   aiDraft: string;
   date: string;
 }
@@ -251,29 +267,53 @@ interface StandardDocPdfProps {
 const StandardDocPdf = ({
   centerName,
   docTitle,
+  docType,
   aiDraft,
   date,
 }: StandardDocPdfProps) => {
-  const paragraphs = aiDraft
+  const blocks = aiDraft
     .split(/\n{2,}/)
     .map((p) => p.trim())
     .filter(Boolean);
+
+  const subtitle = docSubtitles[docType] ?? "Texas Rising Star Certification Document";
 
   return (
     <Document title={`${docTitle} — ${centerName}`} author="CareLadder">
       <Page size="LETTER" style={styles.page}>
         <Header centerName={centerName} title={docTitle} date={date} />
 
-        {paragraphs.length === 0 ? (
+        <Text style={{ fontSize: 8, color: "#666", marginBottom: 16, fontStyle: "italic" }}>
+          {subtitle}
+        </Text>
+
+        {blocks.length === 0 ? (
           <Text style={styles.emptyNotice}>
             No content has been drafted for this document yet.
           </Text>
         ) : (
-          paragraphs.map((p, i) => (
-            <Text key={i} style={styles.paragraph}>
-              {p}
-            </Text>
-          ))
+          blocks.map((block, i) => {
+            // Detect markdown headings
+            if (block.startsWith("## ")) {
+              return (
+                <Text key={i} style={{ fontSize: 13, fontWeight: 700, color: "#1a1a2e", marginTop: 16, marginBottom: 6 }}>
+                  {block.slice(3)}
+                </Text>
+              );
+            }
+            if (block.startsWith("# ")) {
+              return (
+                <Text key={i} style={{ fontSize: 15, fontWeight: 700, color: "#1a1a2e", marginTop: 18, marginBottom: 8 }}>
+                  {block.slice(2)}
+                </Text>
+              );
+            }
+            return (
+              <Text key={i} style={styles.paragraph}>
+                {block}
+              </Text>
+            );
+          })
         )}
 
         <Footer centerName={centerName} />
@@ -400,6 +440,7 @@ export async function GET(request: Request) {
       <StandardDocPdf
         centerName={centerName}
         docTitle={template.title}
+        docType={docType}
         aiDraft={aiDraft}
         date={date}
       />
