@@ -163,7 +163,7 @@ export default function FundingSnapshotPage() {
                 {quizData.ccsCount > 0 ? currency.format(revenue.annualIncrease) : "Depends on future CCS enrollment"}
               </p>
               <p className="text-sm text-warm-900">
-                <span className="font-semibold">How it works:</span> 22 simple steps — CareLadder walks you through each one. Most directors finish in 4-8 weeks, about 20 min/week.
+                <span className="font-semibold">How it works:</span> simple steps — CareLadder walks you through each one. Most directors finish in 4-8 weeks, about 20 min/week.
               </p>
               {!isThinkingAboutOpening && (
                 <p className="text-xs text-warm-500">
