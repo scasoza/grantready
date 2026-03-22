@@ -245,7 +245,8 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/quiz"
+              href="#start"
+              onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-white text-brand-800 px-6 py-3 font-semibold text-sm hover:bg-warm-50 transition"
             >
               Start free quiz →
