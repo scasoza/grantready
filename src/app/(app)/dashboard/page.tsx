@@ -406,24 +406,122 @@ export default function DashboardPage() {
           </button>
         )}
 
-        {/* Submission Banner */}
+        {/* Submission Status */}
         {submission?.status === "pending" && (
-          <div className="flex items-center gap-3 rounded-xl bg-brand-50 border border-brand-200 p-4">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500 shrink-0" />
-            <div>
-              <p className="text-sm font-semibold text-brand-800">Your application is being submitted</p>
-              <p className="text-xs text-brand-600">We&apos;ll update you when it&apos;s done.</p>
+          <div className="rounded-xl bg-white border border-brand-200 overflow-hidden">
+            <div className="bg-brand-800 p-5">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-300/30 border-t-brand-300 shrink-0" />
+                <div>
+                  <p className="text-base font-bold text-white">We&apos;re preparing your submission</p>
+                  <p className="text-xs text-brand-200 mt-0.5">
+                    Submitted {submission.requested_at ? new Date(submission.requested_at).toLocaleDateString("en-US", { month: "long", day: "numeric" }) : "today"}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <svg className="h-5 w-5 text-brand-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-warm-800">Documents reviewed and packaged</p>
+                    <p className="text-xs text-warm-400">All 6 TRS documents are ready</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-5 w-5 shrink-0 mt-0.5 flex items-center justify-center">
+                    <div className="h-3 w-3 animate-pulse rounded-full bg-brand-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-warm-800">Submitting to your Workforce Board</p>
+                    <p className="text-xs text-warm-400">We submit the certification request on your behalf</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-5 w-5 shrink-0 mt-0.5 rounded-full bg-warm-200" />
+                  <div>
+                    <p className="text-sm text-warm-400">Assessment visit scheduled</p>
+                    <p className="text-xs text-warm-300">Your Workforce Board will contact you to schedule</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-brand-50 rounded-lg p-3 border border-brand-100">
+                <p className="text-xs text-brand-700">
+                  <span className="font-semibold">What happens next:</span> Our team will submit your TRS certification request to your local Workforce Solutions office within 1-2 business days. You&apos;ll receive an email confirmation when it&apos;s done. After that, your Workforce Board will assign a mentor and schedule your assessment visit.
+                </p>
+              </div>
+              <p className="text-[11px] text-warm-400 text-center">
+                Questions? Email us at support@careladder.app
+              </p>
             </div>
           </div>
         )}
         {submission?.status === "completed" && (
-          <div className="flex items-center gap-3 rounded-xl bg-brand-800 p-4 text-white">
-            <svg className="h-6 w-6 shrink-0 text-brand-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <p className="text-sm font-semibold">Application submitted</p>
-              <p className="text-xs text-brand-200">Your TRS certification request has been sent to your Workforce Board.</p>
+          <div className="rounded-xl bg-white border border-brand-200 overflow-hidden">
+            <div className="bg-brand-800 p-5">
+              <div className="flex items-center gap-3">
+                <svg className="h-8 w-8 shrink-0 text-brand-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p className="text-base font-bold text-white">Application submitted to Workforce Board</p>
+                  <p className="text-xs text-brand-200 mt-0.5">
+                    Completed {submission.requested_at ? new Date(submission.requested_at).toLocaleDateString("en-US", { month: "long", day: "numeric" }) : ""}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <svg className="h-5 w-5 text-brand-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-warm-800">Documents reviewed and packaged</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <svg className="h-5 w-5 text-brand-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-warm-800">Certification request submitted</p>
+                    <p className="text-xs text-warm-400">Sent to your local Workforce Solutions office</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-5 w-5 shrink-0 mt-0.5 flex items-center justify-center">
+                    <div className="h-3 w-3 animate-pulse rounded-full bg-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-warm-800">Waiting for assessment visit</p>
+                    <p className="text-xs text-warm-400">Your Workforce Board will contact you to schedule a date — typically within 4-6 weeks</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-brand-50 rounded-lg p-3 border border-brand-100">
+                <p className="text-xs text-brand-700">
+                  <span className="font-semibold">Prepare for your visit:</span> Keep all printed documents in a binder near the entrance. Make sure your daily schedules and weekly objectives are posted in each classroom. The assessor will observe classrooms for 1-1.5 hours each and review your documentation.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Link
+                  href="/documents"
+                  className="flex-1 text-center bg-warm-50 border border-warm-200 text-warm-600 py-2.5 rounded-xl text-xs font-medium transition hover:bg-warm-100"
+                >
+                  View my documents
+                </Link>
+                <Link
+                  href="/staff"
+                  className="flex-1 text-center bg-warm-50 border border-warm-200 text-warm-600 py-2.5 rounded-xl text-xs font-medium transition hover:bg-warm-100"
+                >
+                  Staff tracker
+                </Link>
+              </div>
             </div>
           </div>
         )}
