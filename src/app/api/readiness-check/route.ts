@@ -14,7 +14,7 @@ interface StaffMember {
 }
 
 interface Check {
-  category: "documents" | "staff" | "consistency";
+  category: "documents" | "staff" | "consistency" | "prep" | "assessment";
   label: string;
   passed: boolean;
   detail: string;
@@ -286,6 +286,93 @@ export async function POST(request: Request) {
           ? "All staff have documented credentials"
           : `${staffMembers.filter((m) => m.credentialType === "none").length} staff missing credentials`,
         fixHref: !allCredentialed ? staffFixHref : undefined,
+      });
+    }
+
+    // ---- Center prep checks ----
+
+    const { data: completedData } = await supabase
+      .from("center_data")
+      .select("data_value")
+      .eq("center_id", centerId)
+      .eq("data_key", "completed_tasks")
+      .maybeSingle();
+
+    let completedTasks: string[] = [];
+    if (completedData?.data_value) {
+      try {
+        const raw = completedData.data_value;
+        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+        if (Array.isArray(parsed)) completedTasks = parsed.filter((id): id is string => typeof id === "string");
+      } catch { /* ignore */ }
+    }
+
+    // Import prep task IDs from trs-tasks (hardcoded here to avoid client import)
+    const prepTaskIds = [
+      "ccs-enrolled", "license-12mo", "compliance-check",
+      "director-registry", "staff-registry", "cpr-current", "staff-quals",
+      "daily-schedule", "room-materials", "outdoor-area", "books-displayed",
+      "science-nature", "annual-training", "trs-orientation",
+    ];
+    const completedPrepCount = prepTaskIds.filter(id => completedTasks.includes(id)).length;
+    const allPrepDone = completedPrepCount === prepTaskIds.length;
+
+    checks.push({
+      category: "prep",
+      label: "Center prep tasks completed",
+      passed: allPrepDone,
+      detail: allPrepDone
+        ? `All ${prepTaskIds.length} center prep tasks checked off`
+        : `${completedPrepCount} of ${prepTaskIds.length} center prep tasks done`,
+      fixHref: !allPrepDone ? "/dashboard" : undefined,
+    });
+
+    // ---- Self-assessment check ----
+
+    const selfAssessmentSection = sectionMap.get("self_assessment");
+    let selfAssessmentComplete = false;
+    if (selfAssessmentSection?.ai_draft) {
+      try {
+        const answers = JSON.parse(selfAssessmentSection.ai_draft);
+        if (typeof answers === "object" && answers !== null) {
+          const totalItems = 33; // matches the self-assessment page
+          const answeredCount = Object.keys(answers).length;
+          selfAssessmentComplete = answeredCount >= totalItems;
+
+          checks.push({
+            category: "assessment",
+            label: "Self-assessment completed",
+            passed: selfAssessmentComplete,
+            detail: selfAssessmentComplete
+              ? `All ${totalItems} items answered`
+              : `${answeredCount} of ${totalItems} items answered`,
+            fixHref: !selfAssessmentComplete ? "/trs/self-assessment" : undefined,
+          });
+        } else {
+          checks.push({
+            category: "assessment",
+            label: "Self-assessment completed",
+            passed: false,
+            detail: "Self-assessment not started",
+            fixHref: "/trs/self-assessment",
+          });
+        }
+      } catch {
+        checks.push({
+          category: "assessment",
+          label: "Self-assessment completed",
+          passed: false,
+          detail: "Self-assessment not started",
+          fixHref: "/trs/self-assessment",
+        });
+      }
+    } else {
+      checks.push({
+        category: "assessment",
+        label: "Self-assessment completed",
+        passed: false,
+        detail: "Self-assessment not started",
+        fixHref: "/trs/self-assessment",
       });
     }
 
