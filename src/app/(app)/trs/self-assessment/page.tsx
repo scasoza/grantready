@@ -17,6 +17,7 @@ type Answer = "yes" | "no" | "na" | null;
 interface ChecklistItem {
   id: string;
   label: string;
+  hint?: string; // explains what "yes" means for this item
   autoFillKey?: string; // key used to resolve auto-fill from center data
 }
 
@@ -37,12 +38,12 @@ const categories: ChecklistCategory[] = [
     title: "Director & Staff Qualifications",
     description: "Auto-filled from your staff tracker when possible",
     items: [
-      { id: "director_registry", label: "Director has active Workforce Registry account", autoFillKey: "director_registry" },
-      { id: "director_education", label: "Director meets education requirements for current star level", autoFillKey: "director_education" },
-      { id: "all_staff_registry", label: "All staff have Workforce Registry accounts", autoFillKey: "all_staff_registry" },
-      { id: "cpr_current", label: "All staff CPR/First Aid certifications are current", autoFillKey: "cpr_current" },
-      { id: "training_hours", label: "All staff meet annual training hour requirements (24+ hrs)", autoFillKey: "training_hours" },
-      { id: "staff_ratios", label: "Staff-child ratios meet TRS requirements", autoFillKey: "staff_ratios" },
+      { id: "director_registry", label: "Director has active Workforce Registry account", hint: "You have a current account at public.tecpds.org with your education and employment history entered", autoFillKey: "director_registry" },
+      { id: "director_education", label: "Director meets education requirements for current star level", hint: "2-Star: CDA or 60 college hours. 3-Star: Associate's. 4-Star: Bachelor's in ECE or related field", autoFillKey: "director_education" },
+      { id: "all_staff_registry", label: "All staff have Workforce Registry accounts", hint: "Every staff member who works directly with children has their own TECPDS account linked to your center", autoFillKey: "all_staff_registry" },
+      { id: "cpr_current", label: "All staff CPR/First Aid certifications are current", hint: "Every staff member has a valid, non-expired CPR and First Aid certification card on file", autoFillKey: "cpr_current" },
+      { id: "training_hours", label: "All staff meet annual training hour requirements (24+ hrs)", hint: "Each staff member has completed at least 24 hours of documented training this year (TRS requirement is higher than the 15-20 CCR minimum)", autoFillKey: "training_hours" },
+      { id: "staff_ratios", label: "Staff-child ratios meet TRS requirements", hint: "Your staffing meets or exceeds the minimum ratios: 1:4 for infants, 1:11 for toddlers, 1:15 for preschool, 1:22 for school-age", autoFillKey: "staff_ratios" },
     ],
   },
   {
@@ -50,12 +51,12 @@ const categories: ChecklistCategory[] = [
     title: "Written Plans & Documentation",
     description: "Auto-filled from your generated documents",
     items: [
-      { id: "curriculum_complete", label: "Curriculum framework document is complete", autoFillKey: "curriculum_complete" },
-      { id: "parent_engagement_complete", label: "Parent/family engagement policy is complete", autoFillKey: "parent_engagement_complete" },
-      { id: "cqip_complete", label: "Continuous Quality Improvement Plan (CQIP) is complete", autoFillKey: "cqip_complete" },
-      { id: "weekly_objectives_posted", label: "Weekly learning objectives posted in classrooms" },
-      { id: "daily_schedule_posted", label: "Daily schedule posted in each classroom" },
-      { id: "staff_binder_complete", label: "Staff credentials binder is complete and current", autoFillKey: "staff_binder_complete" },
+      { id: "curriculum_complete", label: "Curriculum framework document is complete", hint: "A written document describing your daily schedule, learning activities, and how they map to developmental domains", autoFillKey: "curriculum_complete" },
+      { id: "parent_engagement_complete", label: "Parent/family engagement policy is complete", hint: "A written policy covering communication methods, family events, complaint procedures, and volunteer opportunities", autoFillKey: "parent_engagement_complete" },
+      { id: "cqip_complete", label: "Continuous Quality Improvement Plan (CQIP) is complete", hint: "Written goals for this year with specific timelines — staff development, classroom improvements, family engagement", autoFillKey: "cqip_complete" },
+      { id: "weekly_objectives_posted", label: "Weekly learning objectives posted in classrooms", hint: "A printed card or poster in each classroom showing this week's learning goals and planned activities" },
+      { id: "daily_schedule_posted", label: "Daily schedule posted in each classroom", hint: "A printed schedule showing time blocks for meals, learning, outdoor play, nap, etc. — visible to parents at the door" },
+      { id: "staff_binder_complete", label: "Staff credentials binder is complete and current", hint: "A physical binder with one page per staff member showing credentials, CPR dates, training hours, and hire date", autoFillKey: "staff_binder_complete" },
     ],
   },
   {
@@ -63,16 +64,16 @@ const categories: ChecklistCategory[] = [
     title: "Learning Environment -- Indoor",
     description: "Self-reported by the director",
     items: [
-      { id: "age_appropriate_materials", label: "Age-appropriate materials in each learning center" },
-      { id: "books_displayed", label: "Books displayed face-out and accessible to children" },
-      { id: "science_area", label: "Science/nature area available for self-directed exploration" },
-      { id: "art_supplies", label: "Art supplies accessible for creative expression" },
-      { id: "dramatic_play", label: "Dramatic play area set up with diverse props" },
-      { id: "block_area", label: "Block/construction area with variety of materials" },
-      { id: "writing_materials", label: "Writing materials accessible in multiple areas" },
-      { id: "math_materials", label: "Manipulatives and math materials available" },
-      { id: "music_materials", label: "Music and movement materials accessible" },
-      { id: "cozy_area", label: "Cozy/quiet area available for children" },
+      { id: "age_appropriate_materials", label: "Age-appropriate materials in each learning center", hint: "Materials on low shelves that children can reach independently, organized by learning area, and rotated regularly" },
+      { id: "books_displayed", label: "Books displayed face-out and accessible to children", hint: "At least 1 book per child, covers facing out, mix of fiction/non-fiction/diverse cultures, in a cozy reading area" },
+      { id: "science_area", label: "Science/nature area available for self-directed exploration", hint: "Table or shelf with magnifying glasses, natural items (rocks, shells, leaves), magnets, or a small garden/plant" },
+      { id: "art_supplies", label: "Art supplies accessible for creative expression", hint: "Crayons, markers, paint, paper, scissors, glue accessible on shelves — not locked in a closet" },
+      { id: "dramatic_play", label: "Dramatic play area set up with diverse props", hint: "Dress-up clothes, play kitchen, dolls, puppets — reflecting diverse cultures, abilities, and family structures" },
+      { id: "block_area", label: "Block/construction area with variety of materials", hint: "Unit blocks, large hollow blocks, LEGO/Duplo, vehicles, and accessories like road signs or animals" },
+      { id: "writing_materials", label: "Writing materials accessible in multiple areas", hint: "Paper, pencils, crayons available not just in art area but also in dramatic play, science, etc." },
+      { id: "math_materials", label: "Manipulatives and math materials available", hint: "Counting bears, pattern blocks, sorting trays, number puzzles, measuring cups — for hands-on math" },
+      { id: "music_materials", label: "Music and movement materials accessible", hint: "Instruments (shakers, drums, bells), scarves for dancing, CD/speaker for music — children can access freely" },
+      { id: "cozy_area", label: "Cozy/quiet area available for children", hint: "A soft space with pillows, stuffed animals, and books where a child can go to decompress" },
     ],
   },
   {
@@ -80,10 +81,10 @@ const categories: ChecklistCategory[] = [
     title: "Learning Environment -- Outdoor",
     description: "Self-reported by the director",
     items: [
-      { id: "outdoor_safety", label: "Outdoor play area meets safety requirements" },
-      { id: "outdoor_equipment", label: "Variety of outdoor equipment (climbing, riding, sand/water)" },
-      { id: "shade_available", label: "Shade available in outdoor area" },
-      { id: "nature_elements", label: "Nature elements present (garden, plants, natural materials)" },
+      { id: "outdoor_safety", label: "Outdoor play area meets safety requirements", hint: "Safe surfacing under equipment, secure fencing, no hazards, equipment in good repair" },
+      { id: "outdoor_equipment", label: "Variety of outdoor equipment (climbing, riding, sand/water)", hint: "Multiple types of play: climbing structures, tricycles/bikes, sandbox or water table, balls" },
+      { id: "shade_available", label: "Shade available in outdoor area", hint: "Trees, shade sails, canopies, or covered areas where children can play out of direct sun" },
+      { id: "nature_elements", label: "Nature elements present (garden, plants, natural materials)", hint: "Small garden, potted plants, bird feeder, natural loose parts (sticks, pine cones) for exploration" },
     ],
   },
   {
@@ -91,13 +92,13 @@ const categories: ChecklistCategory[] = [
     title: "Program Administration",
     description: "Self-reported by the director",
     items: [
-      { id: "ccs_agreement", label: "Active CCS provider agreement on file" },
-      { id: "clean_licensing", label: "12+ months of clean licensing history" },
-      { id: "ccr_compliance", label: "Compliance with CCR minimum standards" },
-      { id: "parent_communication", label: "Parent communication system in place (app, newsletter, etc.)" },
-      { id: "conference_schedule", label: "Family conference schedule maintained" },
-      { id: "enrollment_records", label: "Enrollment and attendance records current" },
-      { id: "emergency_procedures", label: "Emergency procedures posted and practiced" },
+      { id: "ccs_agreement", label: "Active CCS provider agreement on file", hint: "You have a current agreement with your local Workforce Solutions to accept subsidized (CCS) children" },
+      { id: "clean_licensing", label: "12+ months of clean licensing history", hint: "Your CCR license has been active for at least 12 months with no unresolved deficiencies" },
+      { id: "ccr_compliance", label: "Compliance with CCR minimum standards", hint: "Your last 2-3 CCR inspections show no major or repeated violations" },
+      { id: "parent_communication", label: "Parent communication system in place (app, newsletter, etc.)", hint: "You have a regular way to communicate with families — Brightwheel, HiMama, newsletter, daily reports, etc." },
+      { id: "conference_schedule", label: "Family conference schedule maintained", hint: "You offer formal parent-teacher conferences at least twice per year and maintain a schedule" },
+      { id: "enrollment_records", label: "Enrollment and attendance records current", hint: "You maintain daily attendance sign-in/out sheets and current enrollment records for all children" },
+      { id: "emergency_procedures", label: "Emergency procedures posted and practiced", hint: "Fire drill schedule posted, drills conducted monthly, evacuation plan posted at exits, lockdown procedure documented" },
     ],
   },
 ];
@@ -507,6 +508,9 @@ export default function SelfAssessmentPage() {
                       <div key={item.id} className="px-5 py-3.5 flex items-start gap-3">
                         <div className="flex-1 min-w-0 pt-1">
                           <p className="text-sm text-warm-800 leading-snug">{item.label}</p>
+                          {item.hint && (
+                            <p className="text-[11px] text-warm-400 mt-0.5 leading-relaxed">{item.hint}</p>
+                          )}
                           {isAuto && (
                             <p className="text-[11px] text-brand-500 mt-0.5 font-medium">
                               Auto-filled from your data
