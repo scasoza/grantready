@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -241,17 +241,25 @@ export default function DashboardPage() {
     );
   }, [center, supabase]);
 
-  const toggleTask = async (taskId: string) => {
-    const next = new Set(completedTasks);
-    if (next.has(taskId)) {
-      next.delete(taskId);
-    } else {
-      next.add(taskId);
-      setJustCompleted(taskId);
-      setTimeout(() => setJustCompleted(null), 600);
-    }
-    setCompletedTasks(next);
-    await saveCompletedTasks(next);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const toggleTask = (taskId: string) => {
+    setCompletedTasks((prev) => {
+      const next = new Set(prev);
+      if (next.has(taskId)) {
+        next.delete(taskId);
+      } else {
+        next.add(taskId);
+        setJustCompleted(taskId);
+        setTimeout(() => setJustCompleted(null), 600);
+      }
+      // Debounce the save to handle rapid clicks
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = setTimeout(() => {
+        void saveCompletedTasks(next);
+      }, 500);
+      return next;
+    });
   };
 
   const handleSignOut = async () => {
