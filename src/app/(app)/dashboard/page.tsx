@@ -305,13 +305,7 @@ export default function DashboardPage() {
     return "Good evening";
   }, []);
 
-  const firstName = useMemo(() => {
-    if (!userEmail) return "";
-    const local = userEmail.split("@")[0] ?? "";
-    // Try to extract a name from the email (e.g. "sandra.thompson" -> "Sandra")
-    const name = local.split(/[._-]/)[0] ?? "";
-    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-  }, [userEmail]);
+  // Don't try to extract name from email — it looks bad for addresses like "inglescomsaulo"
 
   // ---- Render ----
 
@@ -342,7 +336,7 @@ export default function DashboardPage() {
         {!submission && (
           <div className="rounded-xl bg-brand-800 p-4 sm:p-5">
             <p className="text-sm font-semibold text-white">
-              {greeting}{firstName ? `, ${firstName}` : ""}
+              {greeting}
             </p>
             {center?.center_name && (
               <p className="text-xs text-brand-300 mt-0.5">{center.center_name}</p>

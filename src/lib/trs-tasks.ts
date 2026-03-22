@@ -223,7 +223,7 @@ export const trsTasks: TrsTask[] = [
     effort: "45 min (mostly auto-filled)",
     category: "admin",
     dependsOn: ["curriculum-framework", "parent-engagement", "staff-quals", "cqip"],
-    action: { type: "self-assessment", label: "Start self-assessment" },
+    action: { type: "self-assessment", label: "Start self-assessment", docType: "self_assessment" },
   },
   {
     id: "submit-application",
