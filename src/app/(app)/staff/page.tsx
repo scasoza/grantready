@@ -161,6 +161,9 @@ const emptyAddForm = {
   role: "",
   hireDate: "",
   email: "",
+  cprExpiry: "",
+  trainingHours: "",
+  credentialType: "none" as CredentialType,
 };
 
 export default function StaffTrackerPage() {
@@ -178,6 +181,7 @@ export default function StaffTrackerPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<EditableStaffDraft | null>(null);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -328,15 +332,16 @@ export default function StaffTrackerPage() {
       return;
     }
 
+    const parsedHours = Number(addForm.trainingHours);
     const nextStaff: StaffMember[] = [
       {
         id: crypto.randomUUID(),
         name,
         role,
         hireDate: addForm.hireDate,
-        cprExpiry: "",
-        credentialType: "none",
-        trainingHours: 0,
+        cprExpiry: addForm.cprExpiry,
+        credentialType: addForm.credentialType,
+        trainingHours: Number.isFinite(parsedHours) ? Math.max(0, parsedHours) : 0,
         email,
       },
       ...staffMembers,
@@ -395,12 +400,10 @@ export default function StaffTrackerPage() {
     setTimeout(() => setSavedMessage(null), 2000);
   };
 
-  const handleDelete = async (member: StaffMember) => {
-    const confirmed = window.confirm(`Delete ${member.name} from staff records?`);
-    if (!confirmed) return;
-
-    const nextStaff = staffMembers.filter((item) => item.id !== member.id);
+  const handleDelete = async (memberId: string) => {
+    const nextStaff = staffMembers.filter((item) => item.id !== memberId);
     await persistStaff(nextStaff);
+    setConfirmDeleteId(null);
   };
 
   if (loading) {
@@ -503,26 +506,37 @@ export default function StaffTrackerPage() {
           </div>
 
           {showAddForm && (
-            <form onSubmit={handleAddStaff} className="mt-4 rounded-lg border border-warm-100 bg-warm-50/80 p-4">
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <form onSubmit={handleAddStaff} className="mt-4 rounded-xl border border-warm-100 bg-warm-50/80 p-4 sm:p-5">
+              <p className="text-xs font-semibold text-warm-500 uppercase tracking-wide mb-3">New Staff Member</p>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                  <label className="block text-xs text-warm-500 mb-1 font-semibold">Name</label>
+                  <label className="block text-xs text-warm-500 mb-1 font-semibold">Name *</label>
                   <input
                     type="text"
-                    placeholder="Name"
+                    placeholder="Full name"
                     value={addForm.name}
                     onChange={(event) => setAddForm((prev) => ({ ...prev, name: event.target.value }))}
-                    className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    className="w-full rounded-lg border border-warm-200 bg-white px-3 py-2.5 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
                 <div>
                   <label className="block text-xs text-warm-500 mb-1 font-semibold">Role</label>
                   <input
                     type="text"
-                    placeholder="Lead Teacher"
+                    placeholder="e.g. Lead Teacher, Director, Assistant"
                     value={addForm.role}
                     onChange={(event) => setAddForm((prev) => ({ ...prev, role: event.target.value }))}
-                    className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    className="w-full rounded-lg border border-warm-200 bg-white px-3 py-2.5 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-warm-500 mb-1 font-semibold">Email</label>
+                  <input
+                    type="email"
+                    placeholder="staff@yourcenter.com"
+                    value={addForm.email}
+                    onChange={(event) => setAddForm((prev) => ({ ...prev, email: event.target.value }))}
+                    className="w-full rounded-lg border border-warm-200 bg-white px-3 py-2.5 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
                 <div>
@@ -531,28 +545,55 @@ export default function StaffTrackerPage() {
                     type="date"
                     value={addForm.hireDate}
                     onChange={(event) => setAddForm((prev) => ({ ...prev, hireDate: event.target.value }))}
-                    className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    className="w-full rounded-lg border border-warm-200 bg-white px-3 py-2.5 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-warm-500 mb-1 font-semibold">Email</label>
+                  <label className="block text-xs text-warm-500 mb-1 font-semibold">CPR expiry date</label>
                   <input
-                    type="email"
-                    placeholder="Email"
-                    value={addForm.email}
-                    onChange={(event) => setAddForm((prev) => ({ ...prev, email: event.target.value }))}
-                    className="w-full rounded-xl border border-warm-200 bg-white px-3 py-2 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    type="date"
+                    value={addForm.cprExpiry}
+                    onChange={(event) => setAddForm((prev) => ({ ...prev, cprExpiry: event.target.value }))}
+                    className="w-full rounded-lg border border-warm-200 bg-white px-3 py-2.5 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-warm-500 mb-1 font-semibold">Training hours this year</label>
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="0"
+                    value={addForm.trainingHours}
+                    onChange={(event) => setAddForm((prev) => ({ ...prev, trainingHours: event.target.value }))}
+                    className="w-full rounded-lg border border-warm-200 bg-white px-3 py-2.5 text-sm text-warm-800 placeholder:text-warm-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
               </div>
+              <div className="mt-3">
+                <label className="block text-xs text-warm-500 mb-1 font-semibold">Highest credential</label>
+                <select
+                  value={addForm.credentialType}
+                  onChange={(event) => {
+                    const val = event.target.value;
+                    if (isCredentialType(val)) setAddForm((prev) => ({ ...prev, credentialType: val }));
+                  }}
+                  className="rounded-lg border border-warm-200 bg-white px-3 py-2.5 text-sm text-warm-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:w-56"
+                >
+                  <option value="none">No credential</option>
+                  <option value="cda">CDA</option>
+                  <option value="associates">Associate&apos;s Degree</option>
+                  <option value="bachelors">Bachelor&apos;s Degree</option>
+                  <option value="masters">Master&apos;s Degree</option>
+                </select>
+              </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60"
+                  className="rounded-lg bg-brand-600 hover:bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60 transition"
                 >
-                  {saving ? "Saving..." : "Save"}
+                  {saving ? "Saving..." : "Add staff member"}
                 </button>
                 <button
                   type="button"
@@ -560,7 +601,7 @@ export default function StaffTrackerPage() {
                     setShowAddForm(false);
                     setAddForm(emptyAddForm);
                   }}
-                  className="rounded-xl border border-warm-200 bg-white px-4 py-2 text-sm font-semibold text-warm-700 hover:bg-warm-50"
+                  className="rounded-lg border border-warm-200 bg-white px-5 py-2.5 text-sm font-medium text-warm-600 hover:bg-warm-50 transition"
                 >
                   Cancel
                 </button>
@@ -598,8 +639,10 @@ export default function StaffTrackerPage() {
                 const cprStatus = getCprStatus(cprDays);
                 const trainingLow = member.trainingHours < 24;
 
+                const isDirector = member.role.toLowerCase().includes("director");
+
                 return (
-                  <article key={member.id} className="rounded-lg border border-warm-100 bg-warm-50/80 p-4">
+                  <article key={member.id} className={`rounded-xl border p-4 ${isDirector ? "border-brand-200 bg-brand-50/30 ring-1 ring-brand-100" : "border-warm-100 bg-white"}`}>
                     {isEditing && editDraft ? (
                       <div className="space-y-3">
                         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -720,39 +763,78 @@ export default function StaffTrackerPage() {
                       <div>
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <h3 className="text-base font-bold text-warm-900">{member.name || "Unnamed staff"}</h3>
-                            <p className="text-sm text-warm-600">{member.role || "Role not set"}</p>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-base font-bold text-warm-900">{member.name || "Unnamed staff"}</h3>
+                              {isDirector && (
+                                <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-semibold text-white">Director</span>
+                              )}
+                            </div>
+                            <p className="text-sm text-warm-500">{member.role || "Role not set"}</p>
                           </div>
                           <span className={`shrink-0 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${credentialBadgeStyles[member.credentialType]}`}>
                             {credentialLabels[member.credentialType]}
                           </span>
                         </div>
 
-                        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-warm-500">
-                          <span>Hired {formatDate(member.hireDate)}</span>
-                          <span className={cprStatus.tone}>
-                            CPR: {cprStatus.label}
-                          </span>
-                          <span className={trainingLow ? "text-amber-700" : "text-emerald-700"}>
-                            Training: {member.trainingHours}/24 hrs
-                          </span>
+                        {/* Status indicators */}
+                        <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          <div className="rounded-lg bg-white border border-warm-100 px-3 py-2">
+                            <p className="text-[10px] text-warm-400 font-medium uppercase tracking-wide">CPR/First Aid</p>
+                            <p className={`text-sm font-semibold ${cprStatus.tone}`}>
+                              {cprDays === null ? "Not set" : cprDays < 0 ? `Expired ${Math.abs(cprDays)}d ago` : cprDays < 90 ? `${cprDays} days left` : "Current"}
+                            </p>
+                            {member.cprExpiry && <p className="text-[10px] text-warm-400">Exp: {formatDate(member.cprExpiry)}</p>}
+                          </div>
+                          <div className="rounded-lg bg-white border border-warm-100 px-3 py-2">
+                            <p className="text-[10px] text-warm-400 font-medium uppercase tracking-wide">Training Hours</p>
+                            <p className={`text-sm font-semibold ${trainingLow ? "text-amber-700" : "text-emerald-700"}`}>
+                              {member.trainingHours}/24 hrs
+                            </p>
+                            <div className="mt-1 h-1 rounded-full bg-warm-100 overflow-hidden">
+                              <div className={`h-1 rounded-full transition-all ${trainingLow ? "bg-amber-400" : "bg-emerald-400"}`} style={{ width: `${Math.min(100, (member.trainingHours / 24) * 100)}%` }} />
+                            </div>
+                          </div>
+                          <div className="rounded-lg bg-white border border-warm-100 px-3 py-2">
+                            <p className="text-[10px] text-warm-400 font-medium uppercase tracking-wide">Hired</p>
+                            <p className="text-sm font-medium text-warm-700">{formatDate(member.hireDate)}</p>
+                          </div>
                         </div>
 
                         <div className="mt-3 flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => startEdit(member)}
-                            className="rounded-lg border border-warm-200 bg-white px-3 py-1.5 text-xs font-semibold text-warm-700 hover:bg-warm-100"
+                            className="rounded-lg border border-warm-200 bg-white px-3 py-1.5 text-xs font-semibold text-warm-700 hover:bg-warm-100 transition"
                           >
                             Edit
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => void handleDelete(member)}
-                            className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
-                          >
-                            Delete
-                          </button>
+                          {confirmDeleteId === member.id ? (
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs text-red-600">Remove?</span>
+                              <button
+                                type="button"
+                                onClick={() => void handleDelete(member.id)}
+                                className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700 transition"
+                              >
+                                Yes
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setConfirmDeleteId(null)}
+                                className="rounded-lg border border-warm-200 bg-white px-3 py-1.5 text-xs font-medium text-warm-600 hover:bg-warm-50 transition"
+                              >
+                                No
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setConfirmDeleteId(member.id)}
+                              className="rounded-lg border border-warm-200 bg-white px-3 py-1.5 text-xs font-medium text-warm-500 hover:text-red-600 hover:border-red-200 transition"
+                            >
+                              Remove
+                            </button>
+                          )}
                         </div>
                       </div>
                     )}
