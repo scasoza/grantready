@@ -850,7 +850,7 @@ export default function TrsDocPage() {
             </div>
 
             {/* Claim verification */}
-            {claims.length > 0 && status !== "verified" && (
+            {claims.length > 0 && !allClaimsVerified && (
               <div className="bg-white border border-warm-200/80 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="text-sm font-bold text-warm-900">
