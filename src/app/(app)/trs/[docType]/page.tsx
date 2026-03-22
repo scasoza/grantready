@@ -967,6 +967,19 @@ export default function TrsDocPage() {
                     Start over
                   </button>
                 )}
+                {template.requiresDirectorInput && status === "verified" && (
+                  <button
+                    onClick={() => {
+                      setStatus("input_given");
+                      setAiDraft("");
+                      setClaims([]);
+                      setFollowUp(null);
+                    }}
+                    className="flex-1 bg-warm-50 border border-warm-200 text-warm-600 py-2.5 rounded-xl text-xs font-medium transition hover:bg-warm-100"
+                  >
+                    Regenerate
+                  </button>
+                )}
                 <Link
                   href="/dashboard"
                   className="flex-1 text-center bg-warm-50 border border-warm-200 text-warm-600 py-2.5 rounded-xl text-xs font-medium transition hover:bg-warm-100"
