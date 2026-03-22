@@ -146,6 +146,80 @@ export const trsTasks: TrsTask[] = [
     },
   },
 
+  // === ADDITIONAL REQUIRED DOCUMENTS ===
+  {
+    id: "training-plan",
+    title: "Write staff training & professional development plan",
+    context: "TRS requires a written training plan showing how each staff member will meet the 24+ hour annual requirement",
+    effort: "15-20 min with AI help",
+    category: "docs",
+    action: {
+      type: "generate-doc",
+      label: "Generate with AI",
+      docType: "training_plan",
+    },
+  },
+  {
+    id: "health-safety",
+    title: "Write health & safety policies",
+    context: "Required document covering illness, medication, hygiene, injury reporting, and immunizations",
+    effort: "15-20 min with AI help",
+    category: "docs",
+    action: {
+      type: "generate-doc",
+      label: "Generate with AI",
+      docType: "health_safety_policy",
+    },
+  },
+  {
+    id: "discipline-guidance",
+    title: "Write discipline & guidance policy",
+    context: "Documents your positive guidance approach — assessors verify you have this on file",
+    effort: "10-15 min with AI help",
+    category: "docs",
+    action: {
+      type: "generate-doc",
+      label: "Generate with AI",
+      docType: "discipline_guidance",
+    },
+  },
+  {
+    id: "nutrition-policy",
+    title: "Write nutrition & meal policy",
+    context: "Covers meal schedules, allergy management, and how mealtimes support learning",
+    effort: "10-15 min with AI help",
+    category: "docs",
+    action: {
+      type: "generate-doc",
+      label: "Generate with AI",
+      docType: "nutrition_policy",
+    },
+  },
+  {
+    id: "emergency-plan",
+    title: "Write emergency preparedness plan",
+    context: "Covers fire drills, severe weather, lockdown, evacuation, and parent communication procedures",
+    effort: "15 min with AI help",
+    category: "docs",
+    action: {
+      type: "generate-doc",
+      label: "Generate with AI",
+      docType: "emergency_preparedness",
+    },
+  },
+  {
+    id: "safe-sleep",
+    title: "Write safe sleep policy",
+    context: "Required if you serve infants — covers SIDS prevention, crib safety, and sleep checks",
+    effort: "10 min with AI help",
+    category: "docs",
+    action: {
+      type: "generate-doc",
+      label: "Generate with AI",
+      docType: "safe_sleep_policy",
+    },
+  },
+
   // === ROOM PREPARATION ===
   {
     id: "room-materials",
