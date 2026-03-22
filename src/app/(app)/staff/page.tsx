@@ -427,6 +427,41 @@ export default function StaffTrackerPage() {
       </nav>
 
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 pb-24 sm:pb-6 space-y-5">
+        {/* Stats overview */}
+        {staffMembers.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="rounded-xl bg-white border border-warm-100 p-3 text-center">
+              <p className="text-2xl font-bold text-warm-900">{staffMembers.length}</p>
+              <p className="text-[11px] text-warm-400 font-medium">Staff</p>
+            </div>
+            <div className="rounded-xl bg-white border border-warm-100 p-3 text-center">
+              <p className="text-2xl font-bold text-emerald-600">{staffMembers.filter(m => m.credentialType !== "none").length}</p>
+              <p className="text-[11px] text-warm-400 font-medium">Credentialed</p>
+            </div>
+            <div className="rounded-xl bg-white border border-warm-100 p-3 text-center">
+              <p className={`text-2xl font-bold ${staffMembers.every(m => { const d = daysUntil(m.cprExpiry); return d !== null && d > 0; }) ? "text-emerald-600" : "text-amber-600"}`}>
+                {staffMembers.filter(m => { const d = daysUntil(m.cprExpiry); return d !== null && d > 0; }).length}/{staffMembers.length}
+              </p>
+              <p className="text-[11px] text-warm-400 font-medium">CPR Current</p>
+            </div>
+            <div className="rounded-xl bg-white border border-warm-100 p-3 text-center">
+              <p className={`text-2xl font-bold ${staffMembers.every(m => m.trainingHours >= 24) ? "text-emerald-600" : "text-amber-600"}`}>
+                {staffMembers.filter(m => m.trainingHours >= 24).length}/{staffMembers.length}
+              </p>
+              <p className="text-[11px] text-warm-400 font-medium">24+ Training Hrs</p>
+            </div>
+          </div>
+        )}
+
+        {/* TRS requirement note */}
+        {staffMembers.length > 0 && (
+          <div className="bg-brand-50 border border-brand-100 rounded-lg px-3 py-2">
+            <p className="text-[11px] text-brand-700">
+              <span className="font-semibold">TRS requires:</span> All staff must have current CPR/First Aid, 24+ annual training hours, and be registered in TECPDS. Director credential level directly affects your star rating.
+            </p>
+          </div>
+        )}
+
         {/* Alerts */}
         {alerts.length > 0 && (
           <section className="space-y-2">
