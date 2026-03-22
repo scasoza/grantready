@@ -10,6 +10,12 @@ function getStripe() {
 
 export async function POST() {
   try {
+    if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_PRICE_ID) {
+      return NextResponse.json(
+        { error: "Payments are being set up. Please try again soon or contact support@careladder.app." },
+        { status: 503 }
+      );
+    }
     const stripe = getStripe();
     const supabase = await createClient();
     const {
