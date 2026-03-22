@@ -179,14 +179,14 @@ export async function POST(request: Request) {
         checks.push({
           category: "documents",
           label: `${tmpl.title} - claims verified`,
-          passed: claims.length > 0 && unverified.length === 0,
+          passed: unverified.length === 0,
           detail:
             claims.length === 0
-              ? "No claims extracted yet"
+              ? "No claims to verify"
               : unverified.length === 0
                 ? `All ${claims.length} claims verified`
                 : `${unverified.length} of ${claims.length} claims not yet verified`,
-          fixHref: unverified.length > 0 || claims.length === 0 ? fixHref : undefined,
+          fixHref: unverified.length > 0 ? fixHref : undefined,
         });
       } else {
         checks.push({
